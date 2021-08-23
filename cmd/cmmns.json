@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "postgresql",
+    "host": "127.0.0.1",
+    "port": 25432,
+    "user": "postgres",
+    "password": "",
+    "database": "test_xsnos2"
+  }
+}
