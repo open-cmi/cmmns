@@ -53,6 +53,6 @@ func main() {
 		fmt.Printf("listening unix socket: %s\n", sockAddr)
 		http.Serve(listener, r)
 	} else {
-		r.Run(":30002")
+		r.Run(":30000")
 	}
 }

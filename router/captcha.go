@@ -8,7 +8,7 @@ import (
 
 // CaptchaGroup define captcha group
 func CaptchaGroup(e *gin.Engine) {
-	g := e.Group("/api/common/captcha")
+	g := e.Group("/api/common/v3/captcha")
 	{
 		g.GET("/", captchac.GetID)
 		g.GET("/:id", captchac.GetPic)
