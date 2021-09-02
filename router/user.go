@@ -12,6 +12,8 @@ func UserGroup(e *gin.Engine) {
 	g := e.Group("/api/common/v3/user")
 	{
 		g.GET("/", userc.List)
+		g.POST("/login", userc.Login)
+		g.POST("/register", userc.Register)
 		g.GET("/:id", userc.Get)
 		g.GET("/:id/self", userc.GetSelf)
 	}

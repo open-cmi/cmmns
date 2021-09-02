@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"fmt"
+
 	"github.com/open-cmi/cmmns/model/auth"
 
 	"github.com/gin-gonic/gin"
@@ -30,6 +32,8 @@ func AuthMiddleware(r *gin.Engine) error {
 			}
 		}
 		c.Next()
+		var postuser auth.User
+		fmt.Println(postuser)
 		// Save it before we write to the response/return from the handler.
 		sessions.Save(c.Request, c.Writer)
 	})
