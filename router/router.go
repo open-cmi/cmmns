@@ -11,11 +11,12 @@ func NauthInit(e *gin.Engine) {
 	fmt.Println("NauthInit")
 
 	CaptchaGroup(e)
+	UserNauthGroup(e)
 }
 
 // AuthInit auth router init
 func AuthInit(e *gin.Engine) {
 	fmt.Println("AuthInit")
-	UserGroup(e)
+	UserAuthGroup(e)
 	SystemInfoGroup(e)
 }

@@ -6,14 +6,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// UserGroup user group router
-func UserGroup(e *gin.Engine) {
+// UserNauthGroup user nauth group
+func UserNauthGroup(e *gin.Engine) {
+	g := e.Group("/api/common/v3/user")
+	{
+		g.POST("/login", userc.Login)
+		g.POST("/register", userc.Register)
+	}
+}
+
+// UserAuthGroup user auth group router
+func UserAuthGroup(e *gin.Engine) {
 
 	g := e.Group("/api/common/v3/user")
 	{
 		g.GET("/", userc.List)
-		g.POST("/login", userc.Login)
-		g.POST("/register", userc.Register)
 		g.GET("/:id", userc.Get)
 		g.GET("/:id/self", userc.GetSelf)
 	}

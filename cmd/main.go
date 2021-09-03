@@ -32,8 +32,15 @@ func main() {
 	// init router
 	r := gin.Default()
 
+	err = middleware.Init()
+	if err != nil {
+		fmt.Printf("middleware init failed")
+		return
+	}
+
+	middleware.AuthMiddleware(r)
 	cmmns.NauthInit(r)
-	middleware.Init(r)
+	middleware.UserPermMiddleware(r)
 	cmmns.AuthInit(r)
 
 	useSocket := false

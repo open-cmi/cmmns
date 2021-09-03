@@ -21,12 +21,28 @@ func List() ([]User, error) {
 	return []User{}, nil
 }
 
+// Get get id
+func Get(id string) (user *User, err error) {
+	// 先检查用户名是否存在
+	queryclause := fmt.Sprintf("select id,username from users where id='%s'", id)
+
+	var tmpuser User
+	sqldb := db.GetDB()
+	row := sqldb.QueryRow(queryclause)
+	err = row.Scan(&tmpuser.ID, &tmpuser.UserName)
+	if err != nil {
+		// 用户名不存在
+		return nil, errors.New("user not exist")
+	}
+
+	return &tmpuser, nil
+}
+
 // Login  user login
 func Login(m *climsg.LoginMsg) (authuser *User, err error) {
 	// 先检查用户名是否存在
 	queryclause := fmt.Sprintf("select id,username,password from users where username='%s'", m.UserName)
 
-	fmt.Println(m)
 	var user User
 	var password string
 	sqldb := db.GetDB()

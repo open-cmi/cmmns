@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/dchest/captcha"
 	climsg "github.com/open-cmi/cmmns/climsg/user"
@@ -32,13 +33,28 @@ func List(c *gin.Context) {
 // Get get user by id
 func Get(c *gin.Context) {
 
-	c.JSON(200, gin.H{
-		"ret": 0,
-		"msg": "",
-		"data": map[string]interface{}{
-			"username": "admin",
-		},
-	})
+	expire := time.Now().Add(10 * time.Minute)
+	cookie := http.Cookie{
+		Name:     "test",
+		Value:    "this is a test",
+		Expires:  expire,
+		Path:     "/",
+		HttpOnly: false,
+	}
+
+	id := c.Param("id")
+	user, err := model.Get(id)
+	if err != nil {
+		c.JSON(200, gin.H{
+			"ret": -1,
+			"msg": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{"ret": 0, "msg": "", "data": *user})
+	http.SetCookie(c.Writer, &cookie)
+	return
 }
 
 // Login login user
@@ -49,7 +65,6 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(apimsg)
 	// 验证验证码的有效性
 	if !apimsg.IgnoreCaptcha && !captcha.VerifyString(apimsg.CaptchaID, apimsg.Captcha) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "captcha is incorrect"})
@@ -58,7 +73,6 @@ func Login(c *gin.Context) {
 
 	user, err := model.Login(&apimsg)
 	if err != nil {
-		fmt.Println(err)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
@@ -77,7 +91,6 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(apimsg)
 	// 验证验证码的有效性
 	if !apimsg.IgnoreCaptcha && !captcha.VerifyString(apimsg.CaptchaID, apimsg.Captcha) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "captcha is incorrect"})
