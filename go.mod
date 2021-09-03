@@ -13,5 +13,5 @@ require (
 	github.com/open-cmi/goutils v0.0.0-20210822022246-d7157f2953e6
 	github.com/shirou/gopsutil v3.21.7+incompatible
 	github.com/tklauser/go-sysconf v0.3.8 // indirect
-	github.com/topmyself/redistore v0.0.1
+	github.com/topmyself/redistore v0.0.2
 )
