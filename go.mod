@@ -11,7 +11,6 @@ require (
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
 	github.com/lib/pq v1.10.2
 	github.com/open-cmi/goutils v0.0.0-20210822022246-d7157f2953e6
-	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shirou/gopsutil v3.21.7+incompatible
 	github.com/tklauser/go-sysconf v0.3.8 // indirect
 	github.com/topmyself/redistore v0.0.3
