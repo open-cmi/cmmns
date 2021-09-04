@@ -76,6 +76,16 @@ func Register(m *climsg.RegisterMsg) (err error) {
 		return errors.New("username has been used")
 	}
 
+	queryclause = fmt.Sprintf("select email from users where email=%s", m.Email)
+
+	var email string
+	row = sqldb.QueryRow(queryclause)
+	err = row.Scan(&email)
+	if err == nil {
+		// 邮箱已经被占用
+		return errors.New("email has been used")
+	}
+
 	id := uuid.New()
 	salt, _ := bcrypt.Salt(10)
 	hash, _ := bcrypt.Hash(m.Password, salt)

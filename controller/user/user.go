@@ -9,6 +9,7 @@ import (
 	climsg "github.com/open-cmi/cmmns/climsg/user"
 	"github.com/open-cmi/cmmns/model/auth"
 	model "github.com/open-cmi/cmmns/model/user"
+	"github.com/open-cmi/goutils/verify"
 
 	"github.com/gin-gonic/gin"
 )
@@ -94,6 +95,12 @@ func Register(c *gin.Context) {
 	// 验证验证码的有效性
 	if !apimsg.IgnoreCaptcha && !captcha.VerifyString(apimsg.CaptchaID, apimsg.Captcha) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "captcha is incorrect"})
+		return
+	}
+
+	// 验证邮箱有效性
+	if !verify.EmailIsValid(apimsg.Email) {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email is not valid"})
 		return
 	}
 
