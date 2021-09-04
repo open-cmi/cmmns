@@ -14,6 +14,7 @@ import (
 	model "github.com/open-cmi/cmmns/model/user"
 	"github.com/open-cmi/goutils/verify"
 
+	"github.com/open-cmi/cmmns/config"
 	"github.com/open-cmi/cmmns/db"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +26,7 @@ var EmailTemplate string = `
 <div>
 	<h1>Hi username, Welcome to Nay!</h1>
 	<h5>Here is a link to activate your account, please copy and paste it to your browser:</h5>
-	<h5>https://domain/api/common/v3/users/activate/token</h5>
+	<h5>https://domain/api/common/v3/user/activate/token</h5>
 </div>
 `
 
@@ -76,9 +77,10 @@ func Get(c *gin.Context) {
 // Activate activate user
 func Activate(c *gin.Context) {
 	code := c.Param("code")
+	fmt.Println("code:", code)
 	_, err := uuid.Parse(code)
 	if err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": "activate code is not valid"})
+		c.String(200, "activate code is not valid")
 		return
 	}
 
@@ -86,15 +88,15 @@ func Activate(c *gin.Context) {
 	activateCode := fmt.Sprintf("activate_code_%s", code)
 	username, err := cache.Get(context.TODO(), activateCode).Result()
 	if err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": "activate code is not valid"})
+		c.String(200, "activate code is not exist")
 		return
 	}
 
 	err = model.Activate(username)
 	if err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
+		c.String(200, "activate user failed")
 	} else {
-		c.JSON(200, gin.H{"ret": 0, "msg": ""})
+		c.String(200, "activate user success, you can login now")
 	}
 	return
 }
@@ -173,7 +175,7 @@ func Register(c *gin.Context) {
 	htmlcontent = strings.Replace(htmlcontent, "username", apimsg.UserName, 1)
 
 	e.HTML = []byte(htmlcontent)
-	err = e.Send(emailInfo.SMTPServer, smtp.PlainAuth("", emailInfo.UserName, emailInfo.Password, emailInfo.SMTPHost))
+	err = e.Send(emailInfo.SMTPServer, smtp.PlainAuth("", emailInfo.User, emailInfo.Password, emailInfo.SMTPHost))
 	if err != nil {
 		model.Delete(apimsg.UserName)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email can't be verified"})
