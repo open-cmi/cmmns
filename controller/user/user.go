@@ -1,18 +1,33 @@
 package user
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"net/smtp"
+	"strings"
 	"time"
 
 	"github.com/dchest/captcha"
+	"github.com/google/uuid"
 	climsg "github.com/open-cmi/cmmns/climsg/user"
-	"github.com/open-cmi/cmmns/model/auth"
 	model "github.com/open-cmi/cmmns/model/user"
 	"github.com/open-cmi/goutils/verify"
 
+	"github.com/open-cmi/cmmns/db"
+
 	"github.com/gin-gonic/gin"
+	"github.com/jordan-wright/email"
 )
+
+// EmailTemplate html content template
+var EmailTemplate string = `
+<div>
+	<h1>Hi username, Welcome to Nay!</h1>
+	<h5>Here is a link to activate your account, please copy and paste it to your browser:</h5>
+	<h5>https://domain/api/common/v3/users/activate/token</h5>
+</div>
+`
 
 // List list user
 func List(c *gin.Context) {
@@ -55,6 +70,32 @@ func Get(c *gin.Context) {
 
 	c.JSON(200, gin.H{"ret": 0, "msg": "", "data": *user})
 	http.SetCookie(c.Writer, &cookie)
+	return
+}
+
+// Activate activate user
+func Activate(c *gin.Context) {
+	code := c.Param("code")
+	_, err := uuid.Parse(code)
+	if err != nil {
+		c.JSON(200, gin.H{"ret": -1, "msg": "activate code is not valid"})
+		return
+	}
+
+	cache := db.GetCache()
+	activateCode := fmt.Sprintf("activate_code_%s", code)
+	username, err := cache.Get(context.TODO(), activateCode).Result()
+	if err != nil {
+		c.JSON(200, gin.H{"ret": -1, "msg": "activate code is not valid"})
+		return
+	}
+
+	err = model.Activate(username)
+	if err != nil {
+		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
+	} else {
+		c.JSON(200, gin.H{"ret": 0, "msg": ""})
+	}
 	return
 }
 
@@ -107,21 +148,50 @@ func Register(c *gin.Context) {
 	err := model.Register(&apimsg)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
-	} else {
-		c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 	}
+
+	code := uuid.New()
+	cache := db.GetCache()
+	activateCode := fmt.Sprintf("activate_code_%s", code.String())
+	err = cache.Set(context.TODO(), activateCode, apimsg.UserName, time.Hour*24).Err()
+	if err != nil {
+		model.Delete(apimsg.UserName)
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "code generate failed"})
+		return
+	}
+
+	e := email.NewEmail()
+	emailInfo := config.GetConfig().Email
+	domain := config.GetConfig().Domain
+	e.From = emailInfo.From
+	e.To = []string{apimsg.Email}
+	//e.Cc = []string{"danielzhao2012@163.com"}
+	e.Subject = "Welcome to Nay"
+	//e.Text = []byte("Text Body is, of course, supported!")
+	htmlcontent := strings.Replace(EmailTemplate, "token", code.String(), 1)
+	htmlcontent = strings.Replace(htmlcontent, "domain", domain, 1)
+	htmlcontent = strings.Replace(htmlcontent, "username", apimsg.UserName, 1)
+
+	e.HTML = []byte(htmlcontent)
+	err = e.Send(emailInfo.SMTPServer, smtp.PlainAuth("", emailInfo.UserName, emailInfo.Password, emailInfo.SMTPHost))
+	if err != nil {
+		model.Delete(apimsg.UserName)
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email can't be verified"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+	return
 }
 
 // GetSelf get by self
 func GetSelf(c *gin.Context) {
-	user, _ := c.Get("user")
-	user = user.(auth.User)
-	fmt.Println(user)
+	cache, _ := c.Get("user")
+	user, _ := cache.(model.User)
 	c.JSON(200, gin.H{
 		"ret": 0,
 		"msg": "",
 		"data": map[string]interface{}{
-			"username": "admin",
+			"username": user.UserName,
 		},
 	})
 }

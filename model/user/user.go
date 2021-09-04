@@ -62,6 +62,28 @@ func Login(m *climsg.LoginMsg) (authuser *User, err error) {
 	return &user, nil
 }
 
+// Activate activate user
+func Activate(username string) error {
+	updateClause := fmt.Sprintf("update users set status=1 where username='%s'", username)
+	sqldb := db.GetDB()
+	_, err := sqldb.Exec(updateClause)
+	if err != nil {
+		return errors.New("activate user failed")
+	}
+	return err
+}
+
+// Delete delete user
+func Delete(username string) error {
+	deleteClause := fmt.Sprintf("delete from users where username='%s'", username)
+	sqldb := db.GetDB()
+	_, err := sqldb.Exec(deleteClause)
+	if err != nil {
+		return errors.New("del user failed")
+	}
+	return err
+}
+
 // Register register user
 func Register(m *climsg.RegisterMsg) (err error) {
 	// 先检查用户名是否存在

@@ -11,6 +11,8 @@ import (
 
 	"github.com/open-cmi/goutils/database"
 	"github.com/open-cmi/goutils/database/dbsql"
+
+	"github.com/go-redis/redis/v8"
 )
 
 // Init service Init
@@ -36,6 +38,18 @@ func Init(configfile string) error {
 		return err
 	}
 	db.DB = dbi
+
+	rdb := config.GetConfig().Rdb
+	cachehost := rdb.Host
+	cacheport := rdb.Port
+	cachepassword := rdb.Password
+
+	cache := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%d", cachehost, cacheport),
+		Password: cachepassword,
+		DB:       1,
+	})
+	db.Cache = cache
 
 	startup.Init()
 	return nil

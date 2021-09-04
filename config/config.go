@@ -20,18 +20,36 @@ type DatabaseModel struct {
 	Password string `json:"password,omitempty"`
 }
 
+// RedisCache redis cache
+type RedisCache struct {
+	Host     string `json:"host,omitempty"`
+	Port     int    `json:"port,omitempty"`
+	Password string `json:"password,omitempty"`
+}
+
+// EmailInfo email info
+type EmailInfo struct {
+	From       string `json:"from"`
+	SMTPServer string `json:"smtp_server"`
+	User       string `json:"user"`
+	Password   string `json:"password"`
+	SMTPHost   string `json:"smtp_host"`
+}
+
 // Config config
 type Config struct {
 	Debug    bool          `json:"debug"`
 	UnixSock bool          `json:"unixsock"`
 	Model    DatabaseModel `json:"model"`
+	Rdb      RedisCache    `json:"rdb"`
+	Email    EmailInfo     `json:"email"`
+	Domain   string        `json:"domain"`
 }
 
 var config Config
 
 // Init config init
 func Init(configfile string) (err error) {
-
 	parser := confparser.New(configfile)
 	if parser == nil {
 		return errors.New("parse config failed")

@@ -12,6 +12,7 @@ func UserNauthGroup(e *gin.Engine) {
 	{
 		g.POST("/login", userc.Login)
 		g.POST("/register", userc.Register)
+		g.GET("/activate/:id", userc.Activate)
 	}
 }
 
