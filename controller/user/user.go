@@ -10,6 +10,7 @@ import (
 
 	"github.com/dchest/captcha"
 	"github.com/google/uuid"
+	"github.com/gorilla/sessions"
 	climsg "github.com/open-cmi/cmmns/climsg/user"
 	model "github.com/open-cmi/cmmns/model/user"
 	"github.com/open-cmi/goutils/verify"
@@ -121,7 +122,11 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.Set("user", user)
+	s, _ := c.Get("session")
+	session, ok := s.(*sessions.Session)
+	if ok {
+		session.Values["user"] = user
+	}
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": user})
 	return

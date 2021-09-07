@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,9 +15,7 @@ func AuthMiddleware(r *gin.Engine) {
 
 	r.Use(func(c *gin.Context) {
 
-		fmt.Println(c.Request.Header.Get("cookie"))
 		session, _ := store.Get(c.Request, "koa")
-		fmt.Println("session:", session)
 
 		// Save it before we write to the response/return from the handler.
 		c.Set("session", session)
@@ -27,7 +24,7 @@ func AuthMiddleware(r *gin.Engine) {
 
 		// if handler change session, save it
 		s, _ := c.Get("session")
-		session2, ok := s.(sessions.Session)
+		session2, ok := s.(*sessions.Session)
 		if ok {
 			session2.Save(c.Request, c.Writer)
 		}
@@ -37,7 +34,14 @@ func AuthMiddleware(r *gin.Engine) {
 // UserPermMiddleware func
 func UserPermMiddleware(r *gin.Engine) {
 	r.Use(func(c *gin.Context) {
-		_, ok := c.Get("user")
+		s, ok := c.Get("session")
+		session, ok := s.(*sessions.Session)
+		if !ok {
+			c.String(http.StatusUnauthorized, "authenticate is required")
+			c.Abort()
+			return
+		}
+		_, ok = session.Values["user"]
 		if !ok {
 			c.String(http.StatusUnauthorized, "authenticate is required")
 			c.Abort()

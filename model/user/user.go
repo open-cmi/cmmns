@@ -14,6 +14,7 @@ import (
 type User struct {
 	UserName string `json:"username"`
 	ID       string `json:"id"`
+	Email    string `json:"email"`
 }
 
 // List list func
@@ -41,14 +42,14 @@ func Get(id string) (user *User, err error) {
 // Login  user login
 func Login(m *climsg.LoginMsg) (authuser *User, err error) {
 	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select id,username,password,status from users where username='%s'", m.UserName)
+	queryclause := fmt.Sprintf("select id,username,email,password,status from users where username='%s'", m.UserName)
 
 	var user User
 	var password string
 	var status int
 	sqldb := db.GetDB()
 	row := sqldb.QueryRow(queryclause)
-	err = row.Scan(&user.ID, &user.UserName, &password, &status)
+	err = row.Scan(&user.ID, &user.UserName, &user.Email, &password, &status)
 	if err != nil {
 		// 用户名不存在
 		return nil, errors.New("username and password not match")
