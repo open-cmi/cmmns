@@ -5,7 +5,7 @@
     "port": 25432,
     "user": "postgres",
     "password": "",
-    "database": "test_xsnos2"
+    "database": "test_cmmns"
   },
   "rdb": {
     "host": "127.0.0.1",

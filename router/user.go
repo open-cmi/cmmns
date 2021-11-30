@@ -21,6 +21,7 @@ func UserAuthGroup(e *gin.Engine) {
 
 	g := e.Group("/api/common/v3/user")
 	{
+		g.GET("/userinfo", userc.GetUserInfo)
 		g.GET("/", userc.List)
 		g.GET("/:id", userc.Get)
 		g.GET("/:id/self", userc.GetSelf)

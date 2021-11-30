@@ -11,8 +11,9 @@ import (
 	"github.com/dchest/captcha"
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
-	climsg "github.com/open-cmi/cmmns/climsg/user"
 	model "github.com/open-cmi/cmmns/model/user"
+	msg "github.com/open-cmi/cmmns/msg/user"
+	"github.com/open-cmi/cmmns/prod"
 	"github.com/open-cmi/goutils/verify"
 
 	"github.com/open-cmi/cmmns/config"
@@ -31,21 +32,54 @@ var EmailTemplate string = `
 </div>
 `
 
+// GetUserInfo get userinfo
+func GetUserInfo(c *gin.Context) {
+	sess, _ := c.Get("session")
+	session := sess.(*sessions.Session)
+	userinfo, ok := session.Values["user"].(map[string]interface{})
+	if !ok {
+		c.String(http.StatusUnauthorized, "authentication is required")
+		return
+	}
+	userid, ok := userinfo["id"].(string)
+	if !ok {
+		c.String(http.StatusUnauthorized, "authentication is required")
+		return
+	}
+
+	fmt.Println(userinfo, userid)
+	fmt.Println(prod.GetProdInfo().Nav)
+	username, _ := userinfo["username"].(string)
+	c.JSON(200, gin.H{
+		"ret": 0,
+		"msg": "",
+		"data": map[string]interface{}{
+			"nav":      prod.GetProdInfo().Nav,
+			"username": username,
+		},
+	})
+	return
+}
+
 // List list user
 func List(c *gin.Context) {
-	users, err := model.List()
+	count, users, err := model.List()
 	if err != nil {
 		c.JSON(200, gin.H{
 			"ret": 1,
 			"msg": "list users failed",
 		})
-	} else {
-		c.JSON(200, gin.H{
-			"ret":  0,
-			"msg":  "",
-			"data": users,
-		})
+		return
 	}
+
+	c.JSON(200, gin.H{
+		"ret": 0,
+		"msg": "",
+		"data": map[string]interface{}{
+			"count":   count,
+			"results": users,
+		},
+	})
 }
 
 // Get get user by id
@@ -70,7 +104,7 @@ func Get(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"ret": 0, "msg": "", "data": *user})
+	c.JSON(200, gin.H{"ret": 0, "msg": "", "data": user})
 	http.SetCookie(c.Writer, &cookie)
 	return
 }
@@ -85,7 +119,7 @@ func Activate(c *gin.Context) {
 		return
 	}
 
-	cache := db.GetCache()
+	cache := db.GetCache(db.UserCache)
 	activateCode := fmt.Sprintf("activate_code_%s", code)
 	username, err := cache.Get(context.TODO(), activateCode).Result()
 	if err != nil {
@@ -104,7 +138,7 @@ func Activate(c *gin.Context) {
 
 // Login login user
 func Login(c *gin.Context) {
-	var apimsg climsg.LoginMsg
+	var apimsg msg.LoginMsg
 	if err := c.ShouldBindJSON(&apimsg); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -134,7 +168,7 @@ func Login(c *gin.Context) {
 
 // Register register user
 func Register(c *gin.Context) {
-	var apimsg climsg.RegisterMsg
+	var apimsg msg.RegisterMsg
 	if err := c.ShouldBindJSON(&apimsg); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -158,7 +192,7 @@ func Register(c *gin.Context) {
 	}
 
 	code := uuid.New()
-	cache := db.GetCache()
+	cache := db.GetCache(db.UserCache)
 	activateCode := fmt.Sprintf("activate_code_%s", code.String())
 	err = cache.Set(context.TODO(), activateCode, apimsg.UserName, time.Hour*24).Err()
 	if err != nil {
