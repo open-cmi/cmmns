@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/open-cmi/cmmns/db"
 	"github.com/open-cmi/cmmns/plugins/deploy"
+	"github.com/open-cmi/cmmns/storage/rdb"
 )
 
 // parseMsg
@@ -20,7 +20,7 @@ func dispatchMsg(msgchannel string, msg string) {
 
 // Init function
 func Init() {
-	cache := db.GetCache(db.TaskCache)
+	cache := rdb.GetCache(rdb.TaskCache)
 	pubsub := cache.Subscribe(context.TODO(),
 		"DeployAgent",
 	)

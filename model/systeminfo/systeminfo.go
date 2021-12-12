@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/open-cmi/cmmns/db"
 	"github.com/open-cmi/cmmns/pkg/device"
 	sysinfo "github.com/open-cmi/cmmns/pkg/systeminfo"
+	"github.com/open-cmi/cmmns/storage/db"
 
 	_ "github.com/lib/pq" //
 )

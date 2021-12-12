@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/open-cmi/cmmns/db"
+	"github.com/open-cmi/cmmns/storage/rdb"
 )
 
 // Executor job executor
@@ -17,8 +17,10 @@ type Executor struct {
 	Group    int    `json:"group"`
 }
 
-func formatExecutorKey(deviceid string) string {
-	key := fmt.Sprintf("agent_executor_%s", deviceid)
+var ExecutorPrefix string = "executor_"
+
+func getExecutorKey(deviceid string) string {
+	key := fmt.Sprintf("%s%s", ExecutorPrefix, deviceid)
 	return key
 }
 
@@ -37,8 +39,8 @@ func RegisterExecutor(name string, deviceid string, address string, group int) e
 		return err
 	}
 
-	cache := db.GetCache(db.AgentCache)
-	key := formatExecutorKey(deviceid)
+	cache := rdb.GetCache(rdb.AgentCache)
+	key := getExecutorKey(deviceid)
 	_, err = cache.Set(context.TODO(), key, exeStr, time.Second*5*60).Result()
 	if err != nil {
 		return err
@@ -49,8 +51,8 @@ func RegisterExecutor(name string, deviceid string, address string, group int) e
 // GetExecutor executor is exist
 func GetExecutor(deviceid string) (executor Executor, err error) {
 	// 先查缓存是否存在
-	key := formatExecutorKey(deviceid)
-	cache := db.GetCache(db.AgentCache)
+	key := getExecutorKey(deviceid)
+	cache := rdb.GetCache(rdb.AgentCache)
 	executorStr, err := cache.Get(context.TODO(), key).Result()
 	if err != nil {
 		return executor, err
@@ -69,16 +71,16 @@ func (e *Executor) Unregister(name string) {
 
 // Refresh executor refresh
 func (e *Executor) Refresh() error {
-	cache := db.GetCache(db.AgentCache)
-	key := formatExecutorKey(e.DeviceID)
+	cache := rdb.GetCache(rdb.AgentCache)
+	key := getExecutorKey(e.DeviceID)
 	_, err := cache.Expire(context.TODO(), key, time.Second*5*60).Result()
 	return err
 }
 
 // GetAllExecutors get all executors
 func GetAllExecutors() (executors []Executor, err error) {
-	pattern := "agent_executor_*"
-	cache := db.GetCache(db.AgentCache)
+	pattern := fmt.Sprintf("%s*", ExecutorPrefix)
+	cache := rdb.GetCache(rdb.AgentCache)
 	var cursor uint64 = 0
 	for {
 		keys, cursor, err := cache.Scan(context.TODO(), cursor, pattern, 10).Result()

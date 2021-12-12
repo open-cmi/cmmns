@@ -19,5 +19,15 @@
     "password": "123456",
     "smtp_host": "smtp.example.com"
   },
-  "domain": "test.com"
+  "distributed": {
+    "internal_address": "127.0.0.1",
+    "internal_port": 30000,
+    "internal_proto": "http",
+    "external_address": "test.com",
+    "external_port": 443,
+    "external_proto": "https",
+    "agent_location": "/Users/zhaodianle/flyover/nay/nays/data/nayagent-1.0.1.tar.gz"
+  },
+  "agent_package": "/Users/zhaodianle/flyover/nay/nays/data/nayagent-1.0.1.tar.gz",
+  "master_info_config": "/Users/zhaodianle/flyover/nay/nays/etc/masterinfo.json"
 }

@@ -19,6 +19,8 @@ func NauthInit(e *gin.Engine) {
 func AuthInit(e *gin.Engine) {
 	fmt.Println("AuthInit")
 	AgentAuthGroup(e)
+	AgentGroupGroup(e)
 	UserAuthGroup(e)
 	SystemInfoGroup(e)
+	ProgressAuthGroup(e)
 }

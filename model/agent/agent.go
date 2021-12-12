@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/open-cmi/cmmns/db"
-	"github.com/open-cmi/cmmns/msg"
 	agentmsg "github.com/open-cmi/cmmns/msg/agent"
+	msg "github.com/open-cmi/cmmns/msg/common"
+	"github.com/open-cmi/cmmns/storage/db"
 )
 
 // ItemSummary agent item summary
@@ -24,7 +24,7 @@ type Model struct {
 	Name        string `json:"name"`
 	Address     string `json:"address"`
 	Port        int    `json:"port"`
-	ConnType    int    `json:"conntype"`
+	ConnType    string `json:"conntype"`
 	User        string `json:"user"`
 	Password    string `json:"password"`
 	SecretKey   string `json:"secretkey"`
@@ -34,7 +34,7 @@ type Model struct {
 }
 
 // List list
-func List(p *msg.RequestParams) (int, []Model, error) {
+func List(p *msg.RequestQuery) (int, []Model, error) {
 	dbsql := db.GetDB()
 
 	var agents []Model = []Model{}
@@ -95,8 +95,8 @@ func GetAgentSummary() (agents []ItemSummary, err error) {
 	return agents, err
 }
 
-// ActivateAgent activate agent
-func ActivateAgent(clientIP string, deviceID string) error {
+// UpdateDeviceID activate agent
+func UpdateDeviceID(clientIP string, deviceID string) error {
 	dbquery := fmt.Sprintf("select deviceid from agent where address='%s'", clientIP)
 	dbsql := db.GetDB()
 	row := dbsql.QueryRow(dbquery)
@@ -118,13 +118,13 @@ func ActivateAgent(clientIP string, deviceID string) error {
 // GetAgent get agent
 func GetAgent(id string) (Model, error) {
 	queryClause := fmt.Sprintf(`select id,deviceid,name,address,
-	port,conntype,user,secretkey,location,state from agent where id='%s'`, id)
+	port,conntype,username,password, secretkey,location,state from agent where id='%s'`, id)
 	dbsql := db.GetDB()
 	row := dbsql.QueryRow(queryClause)
 
 	var mdl Model
 	err := row.Scan(&mdl.ID, &mdl.DeviceID, &mdl.Name, &mdl.Address,
-		&mdl.Port, &mdl.ConnType, &mdl.User, &mdl.SecretKey, &mdl.Location, &mdl.State)
+		&mdl.Port, &mdl.ConnType, &mdl.User, &mdl.Password, &mdl.SecretKey, &mdl.Location, &mdl.State)
 	if err != nil {
 		return mdl, errors.New("read model failed")
 	}
@@ -164,7 +164,7 @@ func CreateAgent(cm *agentmsg.CreateMsg) error {
 	id = uuid.New().String()
 	insertClause := fmt.Sprintf(`insert into 
 		agent(id, name, agentgroup, address, port, conntype, username, password, secretkey, description, location) 
-		values('%s', '%s', %d, '%s', %d, %d, '%s', '%s', '%s', '%s', '%s')`,
+		values('%s', '%s', %d, '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s')`,
 		id, cm.Name, cm.Group, cm.Address, cm.Port, cm.ConnType, cm.UserName,
 		cm.Password, cm.SecretKey, cm.Description, cm.Location)
 	_, err = dbsql.Exec(insertClause)

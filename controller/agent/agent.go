@@ -1,24 +1,21 @@
 package agent
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/db"
 	model "github.com/open-cmi/cmmns/model/agent"
-	msg "github.com/open-cmi/cmmns/msg"
 	agentmsg "github.com/open-cmi/cmmns/msg/agent"
+	msg "github.com/open-cmi/cmmns/msg/common"
 	"github.com/open-cmi/cmmns/utils"
 )
 
 // List list agents
 func List(c *gin.Context) {
 
-	var param msg.RequestParams
+	var param msg.RequestQuery
 	utils.ParseParams(c, &param)
 	count, list, err := model.List(&param)
 	if err != nil {
@@ -83,22 +80,33 @@ func DeployAgent(c *gin.Context) {
 		}
 		agents = append(agents, mdl)
 	}
-	type PubMsg struct {
-		TaskID string        `json:"taskid"`
-		Data   []model.Model `json:"data"`
-	}
 
-	var pubmsg PubMsg = PubMsg{
-		TaskID: taskid,
-		Data:   agents,
-	}
-	msg, err := json.Marshal(pubmsg)
+	/*
+		type PubMsg struct {
+			TaskID string        `json:"taskid"`
+			Data   []model.Model `json:"data"`
+		}
+
+		var pubmsg PubMsg = PubMsg{
+			TaskID: taskid,
+			Data:   agents,
+		}
+		msg, err := json.Marshal(pubmsg)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "convert to json failed"})
+			return
+		}*/
+
+	//rdb.GetCache(rdb.TaskCache).Publish(context.TODO(), "DeployAgent", msg)
+
+	err := Deploy(taskid, agents)
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "convert to json failed"})
+		c.JSON(http.StatusOK, gin.H{
+			"ret": 1,
+			"msg": err.Error(),
+		})
 		return
 	}
-
-	db.GetCache(db.TaskCache).Publish(context.TODO(), "DeployAgent", msg)
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,
 		"msg":  "",

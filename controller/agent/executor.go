@@ -30,7 +30,7 @@ func KeepAlive(c *gin.Context) {
 			return
 		}
 		// 新节点，需要查询数据进行更新
-		err = model.ActivateAgent(clientIP, deviceid)
+		err = model.UpdateDeviceID(clientIP, deviceid)
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": err.Error()})
 			return
@@ -48,13 +48,12 @@ func KeepAlive(c *gin.Context) {
 	// 查看是否有配置变更
 
 	// 查看是否有自己agent的任务
-	jobtype := scheduler.CheckAvailableJob(executor)
-	if jobtype != scheduler.SchedulerNone {
+	if scheduler.HasJob(&executor) {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 0,
 			"msg": "",
-			"data": map[string]int{
-				"tasktype": jobtype,
+			"data": map[string]string{
+				"msgtype": "GetJob",
 			}})
 		return
 	}
@@ -78,7 +77,7 @@ func GetSelfTask(c *gin.Context) {
 		return
 	}
 
-	task, err := scheduler.GetTask(executor)
+	task, err := scheduler.GetJob(&executor)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,

@@ -6,19 +6,24 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jameskeane/bcrypt"
-	"github.com/open-cmi/cmmns/db"
+	commsg "github.com/open-cmi/cmmns/msg/common"
 	msg "github.com/open-cmi/cmmns/msg/user"
+	"github.com/open-cmi/cmmns/storage/db"
+	"github.com/open-cmi/cmmns/utils"
 )
 
-// User user
-type User struct {
+type Model struct {
+}
+
+// BasicInfo user basic info
+type BasicInfo struct {
 	UserName string `json:"username"`
 	ID       string `json:"id"`
 	Email    string `json:"email"`
 }
 
-// Model user model
-type Model struct {
+// DetailInfo user detail info
+type DetailInfo struct {
 	UserName    string `json:"username"`
 	ID          string `json:"id"`
 	Email       string `json:"email"`
@@ -27,12 +32,16 @@ type Model struct {
 }
 
 // List list func
-func List() (int, []Model, error) {
+func List(query *commsg.RequestQuery) (int, []DetailInfo, error) {
 	dbsql := db.GetDB()
 
-	var users []Model = []Model{}
-
+	var users []DetailInfo = []DetailInfo{}
 	countClause := fmt.Sprintf("select count(*) from users")
+
+	var whereClause string = utils.BuildSQLClause(query)
+
+	countClause += whereClause
+	fmt.Println(countClause)
 	row := dbsql.QueryRow(countClause)
 
 	var count int
@@ -43,6 +52,8 @@ func List() (int, []Model, error) {
 
 	queryClause := fmt.Sprintf(`select id,username,email,role,description from users`)
 
+	queryClause += whereClause
+	fmt.Println(queryClause)
 	rows, err := dbsql.Query(queryClause)
 	if err != nil {
 		// 没有的话，也不需要报错
@@ -50,7 +61,7 @@ func List() (int, []Model, error) {
 	}
 
 	for rows.Next() {
-		var item Model
+		var item DetailInfo
 		err := rows.Scan(&item.ID, &item.UserName, &item.Email, &item.Role, &item.Description)
 		if err != nil {
 			break
@@ -62,11 +73,11 @@ func List() (int, []Model, error) {
 }
 
 // Get get id
-func Get(id string) (user *User, err error) {
+func Get(id string) (user *BasicInfo, err error) {
 	// 先检查用户名是否存在
 	queryclause := fmt.Sprintf("select id,username,email from users where id='%s'", id)
 
-	var tmpuser User
+	var tmpuser BasicInfo
 	sqldb := db.GetDB()
 	row := sqldb.QueryRow(queryclause)
 	err = row.Scan(&tmpuser.ID, &tmpuser.UserName, &tmpuser.Email)
@@ -79,7 +90,7 @@ func Get(id string) (user *User, err error) {
 }
 
 // GetByName get by name
-func GetByName(name string) (user User, err error) {
+func GetByName(name string) (user BasicInfo, err error) {
 	// 先检查用户名是否存在
 	queryclause := fmt.Sprintf("select id,username,email from users where username='%s'", name)
 
@@ -95,11 +106,11 @@ func GetByName(name string) (user User, err error) {
 }
 
 // Login  user login
-func Login(m *msg.LoginMsg) (authuser *User, err error) {
+func Login(m *msg.LoginMsg) (authuser *BasicInfo, err error) {
 	// 先检查用户名是否存在
 	queryclause := fmt.Sprintf("select id,username,email,password,status from users where username='%s'", m.UserName)
 
-	var user User
+	var user BasicInfo
 	var password string
 	var status int
 	sqldb := db.GetDB()
@@ -133,8 +144,18 @@ func Activate(username string) error {
 }
 
 // Delete delete user
-func Delete(username string) error {
+func DeleteByName(username string) error {
 	deleteClause := fmt.Sprintf("delete from users where username='%s'", username)
+	sqldb := db.GetDB()
+	_, err := sqldb.Exec(deleteClause)
+	if err != nil {
+		return errors.New("del user failed")
+	}
+	return err
+}
+
+func DeleteByID(id string) error {
+	deleteClause := fmt.Sprintf("delete from users where id='%s'", id)
 	sqldb := db.GetDB()
 	_, err := sqldb.Exec(deleteClause)
 	if err != nil {
@@ -172,6 +193,32 @@ func Register(m *msg.RegisterMsg) (err error) {
 	hash, _ := bcrypt.Hash(m.Password, salt)
 	insertClause := fmt.Sprintf("insert into users(id, username, password, email, description) values('%s', '%s', '%s', '%s', '%s')",
 		id.String(), m.UserName, hash, m.Email, m.Description)
+
+	_, err = sqldb.Exec(insertClause)
+	if err != nil {
+		return errors.New("create user failed")
+	}
+	return nil
+}
+
+func Create(m *msg.CreateMsg) (err error) {
+	// 先检查用户名是否存在
+	queryclause := fmt.Sprintf("select username from users where username='%s' or email='%s'", m.UserName, m.Email)
+
+	var un string
+	sqldb := db.GetDB()
+	row := sqldb.QueryRow(queryclause)
+	err = row.Scan(&un)
+	if err == nil {
+		// 用户名已经被占用
+		return errors.New("username or email has been used")
+	}
+
+	id := uuid.New()
+	salt, _ := bcrypt.Salt(10)
+	hash, _ := bcrypt.Hash(m.Password, salt)
+	insertClause := fmt.Sprintf("insert into users(id, username, password, email, status, description) values('%s', '%s', '%s', '%s', '%d', '%s')",
+		id.String(), m.UserName, hash, m.Email, 1, m.Description)
 
 	_, err = sqldb.Exec(insertClause)
 	if err != nil {

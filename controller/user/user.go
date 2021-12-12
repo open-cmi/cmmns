@@ -12,12 +12,14 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	model "github.com/open-cmi/cmmns/model/user"
+	commsg "github.com/open-cmi/cmmns/msg/common"
 	msg "github.com/open-cmi/cmmns/msg/user"
 	"github.com/open-cmi/cmmns/prod"
+	"github.com/open-cmi/cmmns/utils"
 	"github.com/open-cmi/goutils/verify"
 
 	"github.com/open-cmi/cmmns/config"
-	"github.com/open-cmi/cmmns/db"
+	"github.com/open-cmi/cmmns/storage/rdb"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jordan-wright/email"
@@ -63,7 +65,11 @@ func GetUserInfo(c *gin.Context) {
 
 // List list user
 func List(c *gin.Context) {
-	count, users, err := model.List()
+
+	var query commsg.RequestQuery
+	utils.ParseParams(c, &query)
+
+	count, users, err := model.List(&query)
 	if err != nil {
 		c.JSON(200, gin.H{
 			"ret": 1,
@@ -119,7 +125,7 @@ func Activate(c *gin.Context) {
 		return
 	}
 
-	cache := db.GetCache(db.UserCache)
+	cache := rdb.GetCache(rdb.UserCache)
 	activateCode := fmt.Sprintf("activate_code_%s", code)
 	username, err := cache.Get(context.TODO(), activateCode).Result()
 	if err != nil {
@@ -162,6 +168,7 @@ func Login(c *gin.Context) {
 		session.Values["user"] = user
 	}
 
+	fmt.Println(c.Request.Host)
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": user})
 	return
 }
@@ -192,18 +199,18 @@ func Register(c *gin.Context) {
 	}
 
 	code := uuid.New()
-	cache := db.GetCache(db.UserCache)
+	cache := rdb.GetCache(rdb.UserCache)
 	activateCode := fmt.Sprintf("activate_code_%s", code.String())
 	err = cache.Set(context.TODO(), activateCode, apimsg.UserName, time.Hour*24).Err()
 	if err != nil {
-		model.Delete(apimsg.UserName)
+		model.DeleteByName(apimsg.UserName)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "code generate failed"})
 		return
 	}
 
 	e := email.NewEmail()
 	emailInfo := config.GetConfig().Email
-	domain := config.GetConfig().Domain
+	domain := config.GetConfig().Distributed.ExternalAddress
 	e.From = emailInfo.From
 	e.To = []string{apimsg.Email}
 	//e.Cc = []string{"danielzhao2012@163.com"}
@@ -216,7 +223,7 @@ func Register(c *gin.Context) {
 	e.HTML = []byte(htmlcontent)
 	err = e.Send(emailInfo.SMTPServer, smtp.PlainAuth("", emailInfo.User, emailInfo.Password, emailInfo.SMTPHost))
 	if err != nil {
-		model.Delete(apimsg.UserName)
+		model.DeleteByName(apimsg.UserName)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email can't be verified"})
 		return
 	}
@@ -227,7 +234,7 @@ func Register(c *gin.Context) {
 // GetSelf get by self
 func GetSelf(c *gin.Context) {
 	cache, _ := c.Get("user")
-	user, _ := cache.(model.User)
+	user, _ := cache.(model.BasicInfo)
 	c.JSON(200, gin.H{
 		"ret": 0,
 		"msg": "",
@@ -235,4 +242,43 @@ func GetSelf(c *gin.Context) {
 			"username": user.UserName,
 		},
 	})
+}
+
+// CreateUser create user
+func CreateUser(c *gin.Context) {
+	var apimsg msg.CreateMsg
+	if err := c.ShouldBindJSON(&apimsg); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	// 验证邮箱有效性
+	if !verify.EmailIsValid(apimsg.Email) {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email is not valid"})
+		return
+	}
+
+	err := model.Create(&apimsg)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+	return
+}
+
+// DeleteUser delete user
+func DeleteUser(c *gin.Context) {
+	id := c.Param("id")
+	err := model.DeleteByID(id)
+	if err != nil {
+		c.JSON(200, gin.H{
+			"ret": -1,
+			"msg": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{"ret": 0, "msg": ""})
+	return
 }

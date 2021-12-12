@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/config"
-	"github.com/open-cmi/cmmns/db"
 	"github.com/open-cmi/cmmns/router"
 	"github.com/open-cmi/cmmns/startup"
+	"github.com/open-cmi/cmmns/storage"
 )
 
 // Init service Init
@@ -19,7 +19,7 @@ func Init(configfile string) error {
 		return err
 	}
 
-	db.Init()
+	storage.Init()
 
 	startup.Init()
 	return nil

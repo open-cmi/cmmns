@@ -12,6 +12,14 @@ type RegisterMsg struct {
 	IgnoreCaptcha bool   `json:"ignorecaptcha"`
 }
 
+type CreateMsg struct {
+	UserName    string `json:"username"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	Confirmpass string `json:"confirmpass"`
+	Description string `json:"description,omitempty"`
+}
+
 // LoginMsg struct
 type LoginMsg struct {
 	UserName      string `json:"username"`

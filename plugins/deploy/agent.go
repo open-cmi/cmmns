@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/open-cmi/cmmns/db"
 	model "github.com/open-cmi/cmmns/model/agent"
+	"github.com/open-cmi/cmmns/storage/rdb"
 )
 
 /*
@@ -135,7 +135,7 @@ func UpdatePackage() {
 
 // Exec func
 func Exec(msg string) {
-	cache := db.GetCache(db.TaskCache)
+	cache := rdb.GetCache(rdb.TaskCache)
 	fmt.Println(cache)
 	//UpdatePackage()
 

@@ -6,7 +6,7 @@ type CreateMsg struct {
 	Group       int    `json:"servergroup"`
 	Address     string `json:"address"`
 	Port        int    `json:"port"`
-	ConnType    int    `json:"conntype"`
+	ConnType    string `json:"conntype"`
 	UserName    string `json:"username"`
 	Password    string `json:"password"`
 	SecretKey   string `json:"secretkey"`

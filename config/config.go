@@ -36,14 +36,25 @@ type EmailInfo struct {
 	SMTPHost   string `json:"smtp_host"`
 }
 
+type DistributedConfig struct {
+	InternalAddress string `json:"internal_address"`
+	InternalPort    int    `json:"internal_port"`
+	InternalProto   string `json:"internal_proto"`
+	ExternalAddress string `json:"external_address"`
+	ExternalPort    int    `json:"external_port"`
+	ExternalProto   string `json:"external_proto"`
+	AgentLocation   string `json:"agent_location"`
+}
+
 // Config config
 type Config struct {
-	Debug    bool          `json:"debug"`
-	UnixSock bool          `json:"unixsock"`
-	Model    DatabaseModel `json:"model"`
-	Rdb      RedisCache    `json:"rdb"`
-	Email    EmailInfo     `json:"email"`
-	Domain   string        `json:"domain"`
+	Debug            bool              `json:"debug"`
+	UnixSock         bool              `json:"unixsock"`
+	Model            DatabaseModel     `json:"model"`
+	Rdb              RedisCache        `json:"rdb"`
+	Email            EmailInfo         `json:"email"`
+	Distributed      DistributedConfig `json:"distributed"`
+	MasterInfoConfig string            `json:"master_info_config"`
 }
 
 var config Config
