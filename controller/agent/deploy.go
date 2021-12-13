@@ -3,8 +3,8 @@ package agent
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -49,7 +49,7 @@ func GetMasterInfoFile() string {
 	return masterInfoFile
 }
 
-func DeployOne(agent *model.Model, agentPackage string, masterInfoConfig string) error {
+func DeployRemote(agent *model.Model, agentPackage string, masterInfoConfig string) error {
 	// 拷贝安装包
 	ss := goutils.NewSSHServer(agent.Address, agent.Port,
 		agent.ConnType, agent.User, agent.Password, agent.SecretKey)
@@ -89,24 +89,37 @@ func DeployOne(agent *model.Model, agentPackage string, masterInfoConfig string)
 	return err
 }
 
+func DeployLocal() error {
+	nayargs := []string{"start", "nayagent"}
+	cmd := exec.Command("systemctl", nayargs...)
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	v2rayargs := []string{"start", "v2ray"}
+	cmd = exec.Command("systemctl", v2rayargs...)
+	err = cmd.Run()
+	return err
+}
+
 func Deploy(taskid string, agents []model.Model) error {
 	cache := rdb.GetCache(rdb.TaskCache)
 
 	agentPackage := GetAgentPackage()
 
-	if !goutils.FileExist(agentPackage) {
-		return errors.New("agent package not exist")
-	}
-
-	mic := GetMasterInfoFile()
-	if !goutils.FileExist(mic) {
-		return errors.New("master info file not exist")
-	}
-
 	cache.HSet(context.TODO(), taskid, "total", len(agents))
 	for index, agent := range agents {
 		fmt.Println(agent)
-		err := DeployOne(&agent, agentPackage, mic)
+
+		var err error
+		if agent.Address == "127.0.0.1" || agent.Address == "localhost" {
+			err = DeployLocal()
+		} else {
+			if goutils.FileExist(agentPackage) {
+				mic := GetMasterInfoFile()
+				err = DeployRemote(&agent, agentPackage, mic)
+			}
+		}
 		if err != nil {
 			// 部署失败，写任务日志信息
 			keyMsg := fmt.Sprintf("task_log_%d", index)
