@@ -168,7 +168,19 @@ func Login(c *gin.Context) {
 		session.Values["user"] = user
 	}
 
-	fmt.Println(c.Request.Host)
+	if config.GetConfig().MasterInfo.ExternalAddress == "" {
+		var address string = ""
+		host := c.Request.Host
+		// 目前只支持ipv4地址，不支持ipv6地址
+		if strings.Contains(host, ":") {
+			arr := strings.Split(host, ":")
+			address = arr[0]
+		} else {
+			address = host
+		}
+		config.GetConfig().MasterInfo.ExternalAddress = address
+		config.GetConfig().Save()
+	}
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": user})
 	return
 }
@@ -210,7 +222,7 @@ func Register(c *gin.Context) {
 
 	e := email.NewEmail()
 	emailInfo := config.GetConfig().Email
-	domain := config.GetConfig().Distributed.ExternalAddress
+	domain := config.GetConfig().MasterInfo.ExternalAddress
 	e.From = emailInfo.From
 	e.To = []string{apimsg.Email}
 	//e.Cc = []string{"danielzhao2012@163.com"}

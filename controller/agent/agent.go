@@ -41,6 +41,11 @@ func CreateAgent(c *gin.Context) {
 		return
 	}
 
+	// 如果地址是localhost, 则转换成127.0.0.1, 目前只能支持ipv4地址
+	if createmsg.Address == "localhost" {
+		createmsg.Address = "127.0.0.1"
+	}
+
 	// 校验，这里暂时忽略
 	err := model.CreateAgent(&createmsg)
 	if err != nil {
@@ -80,24 +85,6 @@ func DeployAgent(c *gin.Context) {
 		}
 		agents = append(agents, mdl)
 	}
-
-	/*
-		type PubMsg struct {
-			TaskID string        `json:"taskid"`
-			Data   []model.Model `json:"data"`
-		}
-
-		var pubmsg PubMsg = PubMsg{
-			TaskID: taskid,
-			Data:   agents,
-		}
-		msg, err := json.Marshal(pubmsg)
-		if err != nil {
-			c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "convert to json failed"})
-			return
-		}*/
-
-	//rdb.GetCache(rdb.TaskCache).Publish(context.TODO(), "DeployAgent", msg)
 
 	err := Deploy(taskid, agents)
 	if err != nil {

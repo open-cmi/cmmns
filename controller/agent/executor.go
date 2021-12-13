@@ -1,7 +1,6 @@
 package agent
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +12,6 @@ import (
 func KeepAlive(c *gin.Context) {
 	clientIP := c.ClientIP()
 
-	fmt.Println("clientIP:", clientIP)
 	// 获取device id
 	deviceid := c.Query("deviceid")
 	if deviceid == "" {

@@ -1,10 +1,12 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
+	"github.com/open-cmi/cmmns/config"
 	"github.com/topmyself/redistore"
 )
 
@@ -52,7 +54,9 @@ func UserPermMiddleware(r *gin.Engine) {
 
 // Init init func
 func Init() (err error) {
-	store, err = redistore.NewRediStoreWithDB(2000, "tcp", "localhost:25431", "8ik,<KI*", "2")
+	host := fmt.Sprintf("%s:%d", config.GetConfig().Rdb.Host, config.GetConfig().Rdb.Port)
+	pass := config.GetConfig().Rdb.Password
+	store, err = redistore.NewRediStoreWithDB(2000, "tcp", host, pass, "2")
 	if err != nil {
 		return err
 	}

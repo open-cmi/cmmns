@@ -23,7 +23,7 @@ type MasterInfo struct {
 }
 
 func GetAgentPackage() string {
-	AgentPackage := config.GetConfig().Distributed.AgentLocation
+	AgentPackage := config.GetConfig().Distributed.AgentPackageLocation
 	if !strings.HasPrefix(AgentPackage, "/") {
 		rp := common.GetRootPath()
 		return filepath.Join(rp, "data", AgentPackage)
@@ -31,16 +31,16 @@ func GetAgentPackage() string {
 	return AgentPackage
 }
 
-func GetMasterInfoFile() string {
+func GetAgentConfigFile() string {
 	// 根据配置文件中，获取端口以及地址
-	masterInfoFile := config.GetConfig().MasterInfoConfig
+	masterInfoFile := config.GetConfig().Distributed.AgentConfigLocation
 	if !strings.HasPrefix(masterInfoFile, "/") {
 		rp := common.GetRootPath()
 		masterInfoFile = filepath.Join(rp, "etc", masterInfoFile)
 	}
 
 	/*
-		parser := confparser.New(masterInfoConfig)
+		parser := confparser.New(agentConfigFile)
 		if parser == nil {
 			return mi, errors.New("parse config failed")
 		}
@@ -49,7 +49,7 @@ func GetMasterInfoFile() string {
 	return masterInfoFile
 }
 
-func DeployRemote(agent *model.Model, agentPackage string, masterInfoConfig string) error {
+func DeployRemote(agent *model.Model, agentPackage string) error {
 	// 拷贝安装包
 	ss := goutils.NewSSHServer(agent.Address, agent.Port,
 		agent.ConnType, agent.User, agent.Password, agent.SecretKey)
@@ -68,10 +68,26 @@ func DeployRemote(agent *model.Model, agentPackage string, masterInfoConfig stri
 		return err
 	}
 
-	// 拷贝配置文件
-	name = filepath.Base(masterInfoConfig)
-	remoteFile = fmt.Sprintf("./nayagent/etc/%s", name)
-	err = ss.SSHCopyToRemote(masterInfoConfig, remoteFile)
+	// 读取配置文件
+	var agentConfig config.AgentConfig
+	content, err := ss.ReadAll("./nayagent/etc/config.json")
+	err = json.Unmarshal(content, &agentConfig)
+	if err != nil {
+		return err
+	}
+	masterInfo := config.GetConfig().MasterInfo
+	if masterInfo.ExternalPort == 80 || masterInfo.ExternalPort == 443 {
+		agentConfig.Master = fmt.Sprintf("%s://%s", masterInfo.ExternalProto, masterInfo.ExternalAddress)
+	} else {
+		agentConfig.Master = fmt.Sprintf("%s://%s:%d", masterInfo.ExternalProto, masterInfo.ExternalAddress, masterInfo.InternalPort)
+	}
+
+	// 写入配置文件
+	w, err := json.MarshalIndent(agentConfig, "", "  ")
+	if err != nil {
+		return err
+	}
+	_, err = ss.WriteString("./nayagent/etc/config.json", string(w))
 	if err != nil {
 		return err
 	}
@@ -80,6 +96,8 @@ func DeployRemote(agent *model.Model, agentPackage string, masterInfoConfig stri
 		// 生成密码文件
 
 		// 拷贝密码文件
+
+		// 运行
 
 	}
 
@@ -109,15 +127,12 @@ func Deploy(taskid string, agents []model.Model) error {
 
 	cache.HSet(context.TODO(), taskid, "total", len(agents))
 	for index, agent := range agents {
-		fmt.Println(agent)
-
 		var err error
-		if agent.Address == "127.0.0.1" || agent.Address == "localhost" {
+		if (agent.Address == "127.0.0.1" || agent.Address == "localhost") && agent.Port == 22 {
 			err = DeployLocal()
 		} else {
 			if goutils.FileExist(agentPackage) {
-				mic := GetMasterInfoFile()
-				err = DeployRemote(&agent, agentPackage, mic)
+				err = DeployRemote(&agent, agentPackage)
 			}
 		}
 		if err != nil {

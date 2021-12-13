@@ -37,24 +37,28 @@ type EmailInfo struct {
 }
 
 type DistributedConfig struct {
+	AgentPackageLocation string `json:"agent_package_location"` // agent packge的本地位置
+	AgentConfigLocation  string `json:"agent_config_location"`  // agent的远端配置文件位置
+}
+
+type MasterInfoConfig struct {
 	InternalAddress string `json:"internal_address"`
 	InternalPort    int    `json:"internal_port"`
 	InternalProto   string `json:"internal_proto"`
 	ExternalAddress string `json:"external_address"`
 	ExternalPort    int    `json:"external_port"`
 	ExternalProto   string `json:"external_proto"`
-	AgentLocation   string `json:"agent_location"`
 }
 
 // Config config
 type Config struct {
-	Debug            bool              `json:"debug"`
-	UnixSock         bool              `json:"unixsock"`
-	Model            DatabaseModel     `json:"model"`
-	Rdb              RedisCache        `json:"rdb"`
-	Email            EmailInfo         `json:"email"`
-	Distributed      DistributedConfig `json:"distributed"`
-	MasterInfoConfig string            `json:"master_info_config"`
+	Debug       bool              `json:"debug"`
+	UnixSock    bool              `json:"unixsock"`
+	Model       DatabaseModel     `json:"model"`
+	Rdb         RedisCache        `json:"rdb"`
+	Email       EmailInfo         `json:"email"`
+	MasterInfo  MasterInfoConfig  `json:"masterinfo"`
+	Distributed DistributedConfig `json:"distributed"`
 }
 
 var config Config
@@ -71,7 +75,7 @@ func Init(configfile string) (err error) {
 }
 
 // Save save config
-func Save(c *Config) {
+func (c *Config) Save() {
 	ConfParser.Save(c)
 }
 

@@ -10,6 +10,20 @@ import (
 	"github.com/open-cmi/cmmns/storage/db"
 )
 
+// 0: 刚创建，默认
+// 1: 部署成功
+// 2: 部署失败
+// 3: 在线
+// 4. 掉线
+
+const (
+	AGENT_STATE_INIT           = 0
+	AGNET_STATE_DEPLOY_SUCCESS = 1
+	AGNET_STATE_DEPLOY_FAILED  = 2
+	AGNET_STATE_DEPLOY_ONLINE  = 3
+	AGNET_STATE_DEPLOY_OFFLINE = 4
+)
+
 // ItemSummary agent item summary
 type ItemSummary struct {
 	Name     string `json:"name"`
@@ -107,7 +121,7 @@ func UpdateDeviceID(clientIP string, deviceID string) error {
 		return errors.New("client not exist")
 	}
 
-	updateClause := fmt.Sprintf(`update agent set deviceid='%s', state=4`, deviceID)
+	updateClause := fmt.Sprintf(`update agent set deviceid='%s', state=%d`, deviceID, AGNET_STATE_DEPLOY_ONLINE)
 	_, err = dbsql.Exec(updateClause)
 	if err != nil {
 		return errors.New("update agent failed")
