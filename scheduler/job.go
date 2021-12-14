@@ -26,14 +26,14 @@ type JobResult struct {
 }
 
 // NewJobScheduler new job request
-func NewJob(jobname string, priority int, jc JobContent) *Job {
+func NewJob(priority int, jc JobContent) *Job {
 	var job Job
 
-	job.Name = jobname
+	job.Name = jc.ID
 	job.Priority = priority
 	job.State = "init"
 	job.content = jc
-	job.scheduler = NewJobScheduler(jobname, priority)
+	job.scheduler = NewJobScheduler(jc.ID, priority)
 	return &job
 }
 

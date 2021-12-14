@@ -79,7 +79,7 @@ func GetSelfTask(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
-			"msg": "get task failed",
+			"msg": err.Error(),
 		})
 		return
 	}
