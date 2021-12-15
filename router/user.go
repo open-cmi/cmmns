@@ -24,6 +24,7 @@ func UserAuthGroup(e *gin.Engine) {
 		g.GET("/userinfo", userc.GetUserInfo)
 		g.GET("/", userc.List)
 		g.POST("/", userc.CreateUser)
+		g.POST("/changepass", userc.ChangePassword)
 		g.GET("/:id", userc.Get)
 		g.GET("/:id/self", userc.GetSelf)
 		g.DELETE("/:id", userc.DeleteUser)

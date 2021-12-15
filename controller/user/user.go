@@ -63,6 +63,55 @@ func GetUserInfo(c *gin.Context) {
 	return
 }
 
+func ChangePassword(c *gin.Context) {
+	var apimsg msg.ChangePasswordMsg
+	if err := c.ShouldBindJSON(&apimsg); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	sess, _ := c.Get("session")
+	session := sess.(*sessions.Session)
+	userinfo, ok := session.Values["user"].(map[string]interface{})
+	if !ok {
+		c.String(http.StatusUnauthorized, "authentication is required")
+		return
+	}
+	userid, ok := userinfo["id"].(string)
+	if !ok {
+		c.String(http.StatusUnauthorized, "authentication is required")
+		return
+	}
+	if apimsg.NewPassword != apimsg.ConfirmPassword {
+		c.JSON(200, gin.H{
+			"ret": 1,
+			"msg": "password confirmation doesn't match the password",
+		})
+		return
+	}
+
+	if !model.VerifyPasswordByID(userid, apimsg.OldPassword) {
+		c.JSON(200, gin.H{
+			"ret": 1,
+			"msg": "user password verify failed",
+		})
+		return
+	}
+
+	err := model.ChangePassword(userid, apimsg.NewPassword)
+	if err != nil {
+		c.JSON(200, gin.H{
+			"ret": 1,
+			"msg": "change password failed",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"ret": 0,
+		"msg": "",
+	})
+}
+
 // List list user
 func List(c *gin.Context) {
 

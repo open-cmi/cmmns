@@ -1,5 +1,12 @@
 package user
 
+// ChangePasswordMsg change password msg
+type ChangePasswordMsg struct {
+	OldPassword     string `json:"oldpass"`
+	NewPassword     string `json:"newpass"`
+	ConfirmPassword string `json:"confirmpass"`
+}
+
 // RegisterMsg register msg
 type RegisterMsg struct {
 	UserName      string `json:"username"`
