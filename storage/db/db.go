@@ -17,6 +17,7 @@ func Init() error {
 	var dbconf database.Config
 	model := config.GetConfig().Model
 	dbconf.Type = model.Type
+	dbconf.File = model.File
 	dbconf.Host = model.Host
 	dbconf.Port = model.Port
 	dbconf.User = model.User

@@ -3,7 +3,6 @@ package middleware
 import (
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
@@ -53,14 +52,12 @@ func UserPermMiddleware(r *gin.Engine) {
 		s, ok := c.Get("session")
 		session, ok := s.(*sessions.Session)
 		if !ok {
-			fmt.Println("session not ok")
 			c.String(http.StatusUnauthorized, "authenticate is required")
 			c.Abort()
 			return
 		}
 		_, ok = session.Values["user"]
 		if !ok {
-			fmt.Println("user not ok")
 			c.String(http.StatusUnauthorized, "authenticate is required")
 			c.Abort()
 			return
@@ -70,7 +67,7 @@ func UserPermMiddleware(r *gin.Engine) {
 
 // Init init func
 func Init() (err error) {
-	if os.Getenv("SESSION_STORE") == "memory" {
+	if config.GetConfig().StoreType == "memory" {
 		memoryStore = memstore.NewMemStore([]byte("memorystore"),
 			[]byte("enckey12341234567890123456789012"))
 		storeType = "memory"

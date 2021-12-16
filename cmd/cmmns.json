@@ -1,4 +1,5 @@
 {
+  "storetype": "redis",
   "model": {
     "type": "postgresql",
     "host": "127.0.0.1",

@@ -54,6 +54,7 @@ type MasterInfoConfig struct {
 type Config struct {
 	Debug       bool              `json:"debug"`
 	UnixSock    bool              `json:"unixsock"`
+	StoreType   string            `json:"storetype,omitempty"`
 	Model       DatabaseModel     `json:"model"`
 	Rdb         RedisCache        `json:"rdb"`
 	Email       EmailInfo         `json:"email"`
@@ -70,6 +71,9 @@ func Init(configfile string) (err error) {
 		return errors.New("parse config failed")
 	}
 	err = parser.Load(&config)
+	if config.StoreType == "" {
+		config.StoreType = "redis"
+	}
 	ConfParser = parser
 	return err
 }
