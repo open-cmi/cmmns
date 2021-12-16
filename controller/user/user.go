@@ -11,6 +11,7 @@ import (
 	"github.com/dchest/captcha"
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
+	"github.com/open-cmi/cmmns/auditlog"
 	model "github.com/open-cmi/cmmns/model/user"
 	commsg "github.com/open-cmi/cmmns/msg/common"
 	msg "github.com/open-cmi/cmmns/msg/user"
@@ -231,6 +232,9 @@ func Login(c *gin.Context) {
 		config.GetConfig().Save()
 	}
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": user})
+
+	// 写日志操作
+	go auditlog.InsertWebLog(c, "Login Success")
 	return
 }
 

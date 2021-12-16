@@ -23,4 +23,5 @@ func AuthInit(e *gin.Engine) {
 	UserAuthGroup(e)
 	SystemInfoGroup(e)
 	ProgressAuthGroup(e)
+	AuditLogAuthGroup(e)
 }
