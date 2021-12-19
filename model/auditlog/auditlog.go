@@ -12,13 +12,6 @@ import (
 	commonmsg "github.com/open-cmi/cmmns/msg/common"
 )
 
-const (
-	LoginType     = 0
-	OperationType = 1
-	SystemType    = 2
-	WarningType   = 3
-)
-
 type Model struct {
 	ID        string `json:"id"`
 	IP        string `json:"ip"`

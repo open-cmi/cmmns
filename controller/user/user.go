@@ -234,7 +234,7 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": user})
 
 	// 写日志操作
-	go auditlog.InsertWebLog(c, "Login Success")
+	go auditlog.InsertLog(c, auditlog.LoginType, "Login Success")
 	return
 }
 

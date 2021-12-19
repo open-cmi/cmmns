@@ -7,7 +7,14 @@ import (
 	"github.com/open-cmi/cmmns/model/user"
 )
 
-func InsertWebLog(c *gin.Context, action string) error {
+const (
+	LoginType     = 0
+	OperationType = 1
+	SystemType    = 2
+	WarningType   = 3
+)
+
+func InsertLog(c *gin.Context, logtype int, action string) error {
 	// 获取ip地址
 	ip := c.ClientIP()
 
@@ -22,6 +29,6 @@ func InsertWebLog(c *gin.Context, action string) error {
 		}
 	}
 
-	err := model.InsertLog(ip, username, model.LoginType, action)
+	err := model.InsertLog(ip, username, logtype, action)
 	return err
 }
