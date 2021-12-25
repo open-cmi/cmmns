@@ -13,25 +13,23 @@ import (
 )
 
 type Model struct {
-	UserName        string `json:"username"`
-	ID              string `json:"id"`
-	Email           string `json:"email"`
-	Password        string `json:"password"`
-	Role            int    `json:"role"`
-	Description     string `json:"description,omitempty"`
-	Status          int    `json:"status"`
-	PasswordExpired bool   `json:"passwordExpired"`
+	UserName    string `json:"username"`
+	ID          string `json:"id"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	Role        int    `json:"role"`
+	Description string `json:"description,omitempty"`
+	Status      int    `json:"status"`
 }
 
 // BasicInfo user basic info
 type BasicInfo struct {
-	UserName        string `json:"username"`
-	ID              string `json:"id"`
-	Email           string `json:"email"`
-	Role            int    `json:"role"`
-	Description     string `json:"description"`
-	Status          int    `json:"status"`
-	PasswordExpired bool   `json:"passwordExpired"`
+	UserName    string `json:"username"`
+	ID          string `json:"id"`
+	Email       string `json:"email"`
+	Role        int    `json:"role"`
+	Description string `json:"description"`
+	Status      int    `json:"status"`
 }
 
 // List list func
@@ -138,13 +136,13 @@ func GetByName(name string) (user BasicInfo, err error) {
 // Login  user login
 func Login(m *msg.LoginMsg) (authuser *BasicInfo, err error) {
 	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select id,username,email,password,status,firstlogin from users where username='%s'", m.UserName)
+	queryclause := fmt.Sprintf("select id,username,email,password,status from users where username='%s'", m.UserName)
 
 	var user BasicInfo
 	var password string
 	sqldb := db.GetDB()
 	row := sqldb.QueryRow(queryclause)
-	err = row.Scan(&user.ID, &user.UserName, &user.Email, &password, &user.Status, &user.PasswordExpired)
+	err = row.Scan(&user.ID, &user.UserName, &user.Email, &password, &user.Status)
 	if err != nil {
 		// 用户名不存在
 		return nil, errors.New("username and password not match")
