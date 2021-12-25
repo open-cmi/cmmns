@@ -35,8 +35,8 @@ var EmailTemplate string = `
 </div>
 `
 
-// GetUserInfo get userinfo
-func GetUserInfo(c *gin.Context) {
+// CheckAuth get userinfo
+func CheckAuth(c *gin.Context) {
 	sess, _ := c.Get("session")
 	session := sess.(*sessions.Session)
 	userinfo, ok := session.Values["user"].(map[string]interface{})
@@ -53,13 +53,10 @@ func GetUserInfo(c *gin.Context) {
 	fmt.Println(userinfo, userid)
 	fmt.Println(prod.GetProdInfo().Nav)
 	username, _ := userinfo["username"].(string)
+	fmt.Println(username)
 	c.JSON(200, gin.H{
 		"ret": 0,
 		"msg": "",
-		"data": map[string]interface{}{
-			"nav":      prod.GetProdInfo().Nav,
-			"username": username,
-		},
 	})
 	return
 }
@@ -231,10 +228,11 @@ func Login(c *gin.Context) {
 		config.GetConfig().MasterInfo.ExternalAddress = address
 		config.GetConfig().Save()
 	}
-	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": user})
-
 	// 写日志操作
-	go auditlog.InsertLog(c, auditlog.LoginType, "Login Success")
+	auditlog.InsertLog(c, auditlog.LoginType, "Login Success")
+
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": *user})
+
 	return
 }
 

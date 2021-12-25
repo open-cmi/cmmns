@@ -21,7 +21,7 @@ func UserAuthGroup(e *gin.Engine) {
 
 	g := e.Group("/api/common/v3/user")
 	{
-		g.GET("/userinfo", userc.GetUserInfo)
+		g.GET("/checkauth", userc.CheckAuth)
 		g.GET("/", userc.List)
 		g.POST("/", userc.CreateUser)
 		g.POST("/changepass", userc.ChangePassword)
