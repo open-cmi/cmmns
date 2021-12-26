@@ -236,6 +236,20 @@ func Login(c *gin.Context) {
 	return
 }
 
+func Logout(c *gin.Context) {
+	sess, _ := c.Get("session")
+	session := sess.(*sessions.Session)
+
+	// 写日志操作
+	auditlog.InsertLog(c, auditlog.LoginType, "Logout Success")
+
+	delete(session.Values, "user")
+
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+
+	return
+}
+
 // Register register user
 func Register(c *gin.Context) {
 	var apimsg msg.RegisterMsg
