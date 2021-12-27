@@ -212,7 +212,13 @@ func Login(c *gin.Context) {
 	s, _ := c.Get("session")
 	session, ok := s.(*sessions.Session)
 	if ok {
-		session.Values["user"] = user
+		session.Values["user"] = map[string]interface{}{
+			"username": user.UserName,
+			"id":       user.ID,
+			"email":    user.Email,
+			"status":   user.Status,
+			"role":     user.Role,
+		}
 	}
 
 	if config.GetConfig().MasterInfo.ExternalAddress == "" {

@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 	model "github.com/open-cmi/cmmns/model/auditlog"
-	"github.com/open-cmi/cmmns/model/user"
 )
 
 const (
@@ -22,10 +21,11 @@ func InsertLog(c *gin.Context, logtype int, action string) error {
 	var username string = "unknown"
 	s, ok := c.Get("session")
 	session, ok := s.(*sessions.Session)
+
 	if ok {
-		userinfo, ok := session.Values["user"].(*user.BasicInfo)
+		userinfo, ok := session.Values["user"].(map[string]interface{})
 		if ok {
-			username = userinfo.UserName
+			username = userinfo["username"].(string)
 		}
 	}
 
