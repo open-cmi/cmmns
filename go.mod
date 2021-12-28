@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/dchest/captcha v0.0.0-20200903113550-03f5f0333e1f
+	github.com/fatedier/frp v0.38.0
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/google/uuid v1.3.0
