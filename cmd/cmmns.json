@@ -32,5 +32,19 @@
     "cfgseq": 0,
     "agent_package_location": "/Users/zhaodianle/flyover/nay/nays/data/nayagent-1.0.1.tar.gz",
     "agent_config_location": "/opt/eyas/etc/config.json"
+  },
+  "remote_assist": {
+    "server_addr": "",
+    "server_port": 7000,
+    "token": "",
+    "services": [
+      {
+        "name": "ssh",
+        "type": "tcp",
+        "local_ip": "127.0.0.1",
+        "local_port": 22,
+        "remote_port": 9000
+      }
+    ]
   }
 }
