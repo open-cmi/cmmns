@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	msg "github.com/open-cmi/cmmns/msg/common"
+	msg "github.com/open-cmi/cmmns/msg/request"
 )
 
 // ParseParams parse param

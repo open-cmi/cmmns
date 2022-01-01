@@ -1,4 +1,4 @@
-package common
+package request
 
 // 条件比较
 type FilterQuery struct {

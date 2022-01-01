@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jameskeane/bcrypt"
-	commsg "github.com/open-cmi/cmmns/msg/common"
+	commsg "github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/user"
 	"github.com/open-cmi/cmmns/storage/db"
 	"github.com/open-cmi/cmmns/utils"

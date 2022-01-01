@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	model "github.com/open-cmi/cmmns/model/auditlog"
-	commonmsg "github.com/open-cmi/cmmns/msg/common"
+	commonmsg "github.com/open-cmi/cmmns/msg/request"
 	"github.com/open-cmi/cmmns/utils"
 )
 

@@ -9,7 +9,7 @@ import (
 	"github.com/open-cmi/cmmns/storage/db"
 	"github.com/open-cmi/cmmns/utils"
 
-	commonmsg "github.com/open-cmi/cmmns/msg/common"
+	commonmsg "github.com/open-cmi/cmmns/msg/request"
 )
 
 type Model struct {

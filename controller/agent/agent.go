@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	model "github.com/open-cmi/cmmns/model/agent"
 	agentmsg "github.com/open-cmi/cmmns/msg/agent"
-	msg "github.com/open-cmi/cmmns/msg/common"
+	msg "github.com/open-cmi/cmmns/msg/request"
 	"github.com/open-cmi/cmmns/utils"
 )
 
