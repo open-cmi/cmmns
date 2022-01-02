@@ -50,8 +50,22 @@ func BuildWhereClause(r *msg.RequestQuery) string {
 				clause += " and"
 			}
 
-			if filter.Condition == "like" {
-				clause += fmt.Sprintf(" %s like '%%%s%%'", filter.Key, filter.Value)
+			if filter.Type == "string" {
+				value := filter.Value.(string)
+				if filter.Condition == "contains" {
+					clause += fmt.Sprintf(" %s like '%%%s%%'", filter.Name, value)
+				} else if filter.Condition == "eq" {
+					clause += fmt.Sprintf(" %s = '%s'", filter.Name, value)
+				}
+			} else if filter.Type == "number" {
+				value := filter.Value.(int32)
+				if filter.Condition == "eq" {
+					clause += fmt.Sprintf(" %s = %d", filter.Name, value)
+				} else if filter.Condition == "lt" {
+					clause += fmt.Sprintf(" %s < %d", filter.Name, value)
+				} else if filter.Condition == "gt" {
+					clause += fmt.Sprintf(" %s > %d", filter.Name, value)
+				}
 			}
 		}
 	}
