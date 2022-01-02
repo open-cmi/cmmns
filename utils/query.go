@@ -39,9 +39,10 @@ func ParseParams(c *gin.Context, p *msg.RequestQuery) (err error) {
 	return err
 }
 
-func BuildWhereClause(r *msg.RequestQuery) string {
+func BuildWhereClause(r *msg.RequestQuery) (format string, args []interface{}) {
 	var clause string = ""
 
+	args = []interface{}{}
 	if len(r.Filters) != 0 {
 		for index, filter := range r.Filters {
 			if index == 0 {
@@ -53,24 +54,29 @@ func BuildWhereClause(r *msg.RequestQuery) string {
 			if filter.Type == "string" {
 				value := filter.Value.(string)
 				if filter.Condition == "contains" {
-					clause += fmt.Sprintf(" %s like '%%%s%%'", filter.Name, value)
+					clause += fmt.Sprintf(" %s like $%d", filter.Name, index+1)
+					args = append(args, value)
 				} else if filter.Condition == "eq" {
-					clause += fmt.Sprintf(" %s = '%s'", filter.Name, value)
+					clause += fmt.Sprintf(" %s = $%d", filter.Name, index+1)
+					args = append(args, value)
 				}
 			} else if filter.Type == "number" {
 				value := filter.Value.(int32)
 				if filter.Condition == "eq" {
-					clause += fmt.Sprintf(" %s = %d", filter.Name, value)
+					clause += fmt.Sprintf(" %s = $%d", filter.Name, index+1)
+					args = append(args, value)
 				} else if filter.Condition == "lt" {
-					clause += fmt.Sprintf(" %s < %d", filter.Name, value)
+					clause += fmt.Sprintf(" %s < $%d", filter.Name, index+1)
+					args = append(args, value)
 				} else if filter.Condition == "gt" {
-					clause += fmt.Sprintf(" %s > %d", filter.Name, value)
+					clause += fmt.Sprintf(" %s > $%d", filter.Name, index+1)
+					args = append(args, value)
 				}
 			}
 		}
 	}
 
-	return clause
+	return clause, args
 }
 
 func BuildFinalClause(r *msg.RequestQuery) string {
