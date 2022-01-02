@@ -2,23 +2,53 @@ package rassist
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"math/rand"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/fatedier/frp/client"
 	"github.com/fatedier/frp/pkg/config"
+	"github.com/fatedier/golib/crypto"
 )
 
+type Client struct {
+	IsRunning bool
+	Service   *client.Service
+}
+
+var defaultClient Client
+
 func RunClient(cfgFilePath string) error {
+
+	if defaultClient.IsRunning {
+		return errors.New("assist client is running")
+	}
+
+	crypto.DefaultSalt = "frp"
+	rand.Seed(time.Now().UnixNano())
+
 	cfg, pxyCfgs, visitorCfgs, err := config.ParseClientConfig(cfgFilePath)
 	if err != nil {
 		return err
 	}
-	fmt.Println("cfg:", cfg)
-	fmt.Println("pxyCfgs:", pxyCfgs)
-	fmt.Println("visitorCfgs:", visitorCfgs)
-	return startService(cfg, pxyCfgs, visitorCfgs, cfgFilePath)
+
+	service, err := startService(cfg, pxyCfgs, visitorCfgs, cfgFilePath)
+	if err != nil {
+		return err
+	}
+
+	defaultClient.IsRunning = true
+	defaultClient.Service = service
+	return nil
+}
+
+func Close() {
+	if defaultClient.IsRunning {
+		defaultClient.Service.Close()
+	}
+	return
 }
 
 func startService(
@@ -26,7 +56,7 @@ func startService(
 	pxyCfgs map[string]config.ProxyConf,
 	visitorCfgs map[string]config.VisitorConf,
 	cfgFile string,
-) (err error) {
+) (svr *client.Service, err error) {
 
 	if cfg.DNSServer != "" {
 		s := cfg.DNSServer
@@ -41,13 +71,11 @@ func startService(
 			},
 		}
 	}
-	svr, errRet := client.NewService(cfg, pxyCfgs, visitorCfgs, cfgFile)
-	if errRet != nil {
-		err = errRet
-		return
+	svr, err = client.NewService(cfg, pxyCfgs, visitorCfgs, cfgFile)
+	if err != nil {
+		return nil, err
 	}
 
-	fmt.Println(cfg)
 	err = svr.Run()
-	return
+	return svr, err
 }

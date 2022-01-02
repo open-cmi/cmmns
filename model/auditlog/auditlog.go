@@ -9,7 +9,7 @@ import (
 	"github.com/open-cmi/cmmns/storage/db"
 	"github.com/open-cmi/cmmns/utils"
 
-	commonmsg "github.com/open-cmi/cmmns/msg/common"
+	commonmsg "github.com/open-cmi/cmmns/msg/request"
 )
 
 type Model struct {
@@ -28,9 +28,9 @@ func List(p *commonmsg.RequestQuery) (int, []Model, error) {
 	var logs []Model = []Model{}
 
 	countClause := fmt.Sprintf("select count(*) from audit_log")
-	whereClause := utils.BuildSQLClause(p)
+	whereClause, args := utils.BuildWhereClause(p)
 	countClause += whereClause
-	row := dbsql.QueryRow(countClause)
+	row := dbsql.QueryRow(countClause, args...)
 
 	var count int
 	err := row.Scan(&count)
@@ -40,7 +40,7 @@ func List(p *commonmsg.RequestQuery) (int, []Model, error) {
 
 	queryClause := fmt.Sprintf(`select id,ip,type,username,action,timestamp from audit_log`)
 	queryClause += whereClause
-	rows, err := dbsql.Query(queryClause)
+	rows, err := dbsql.Query(queryClause, args...)
 	if err != nil {
 		// 没有的话，也不需要报错
 		return count, logs, nil

@@ -50,16 +50,32 @@ type MasterInfoConfig struct {
 	ExternalProto   string `json:"external_proto"`
 }
 
+type RemoteExposedService struct {
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	LocalIP    string `json:"local_ip"`
+	LocalPort  uint16 `json:"local_port"`
+	RemotePort uint16 `json:"remote_port"`
+}
+
+type RemoteAssistConfig struct {
+	ServerAddr     string                 `json:"server_addr"`
+	ServerPort     uint16                 `json:"server_port"`
+	Token          string                 `json:"token,omitempty"`
+	ExposedService []RemoteExposedService `json:"services"`
+}
+
 // Config config
 type Config struct {
-	Debug       bool              `json:"debug"`
-	UnixSock    bool              `json:"unixsock"`
-	StoreType   string            `json:"storetype,omitempty"`
-	Model       DatabaseModel     `json:"model"`
-	Rdb         RedisCache        `json:"rdb"`
-	Email       EmailInfo         `json:"email"`
-	MasterInfo  MasterInfoConfig  `json:"masterinfo"`
-	Distributed DistributedConfig `json:"distributed"`
+	Debug        bool               `json:"debug"`
+	UnixSock     bool               `json:"unixsock"`
+	StoreType    string             `json:"storetype,omitempty"`
+	Model        DatabaseModel      `json:"model"`
+	Rdb          RedisCache         `json:"rdb"`
+	Email        EmailInfo          `json:"email"`
+	MasterInfo   MasterInfoConfig   `json:"masterinfo"`
+	Distributed  DistributedConfig  `json:"distributed"`
+	RemoteAssist RemoteAssistConfig `json:"remote_assist"`
 }
 
 var config Config

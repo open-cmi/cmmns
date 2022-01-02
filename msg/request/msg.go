@@ -1,10 +1,11 @@
-package common
+package request
 
 // 条件比较
 type FilterQuery struct {
-	Key       string `json:"key"`
-	Value     string `json:"value"`
-	Condition string `json:"condition"`
+	Type      string      `json:"type"`
+	Name      string      `json:"name"`
+	Value     interface{} `json:"value"`
+	Condition string      `json:"condition"`
 }
 
 // RequestQuery request param

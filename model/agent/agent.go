@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	agentmsg "github.com/open-cmi/cmmns/msg/agent"
-	msg "github.com/open-cmi/cmmns/msg/common"
+	msg "github.com/open-cmi/cmmns/msg/request"
 	"github.com/open-cmi/cmmns/storage/db"
 )
 

@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/auditlog"
 	model "github.com/open-cmi/cmmns/model/user"
-	commsg "github.com/open-cmi/cmmns/msg/common"
+	commsg "github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/user"
 	"github.com/open-cmi/cmmns/prod"
 	"github.com/open-cmi/cmmns/utils"

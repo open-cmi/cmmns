@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	msg "github.com/open-cmi/cmmns/msg/common"
+	msg "github.com/open-cmi/cmmns/msg/request"
 )
 
 // ParseParams parse param
@@ -33,12 +33,16 @@ func ParseParams(c *gin.Context, p *msg.RequestQuery) (err error) {
 	if filters != "" {
 		err = json.Unmarshal([]byte(filters), &p.Filters)
 		// 记录日志
+	} else {
+		p.Filters = []msg.FilterQuery{}
 	}
 	return err
 }
 
-func BuildSQLClause(r *msg.RequestQuery) string {
+func BuildWhereClause(r *msg.RequestQuery) (format string, args []interface{}) {
 	var clause string = ""
+
+	args = []interface{}{}
 	if len(r.Filters) != 0 {
 		for index, filter := range r.Filters {
 			if index == 0 {
@@ -47,10 +51,42 @@ func BuildSQLClause(r *msg.RequestQuery) string {
 				clause += " and"
 			}
 
-			if filter.Condition == "like" {
-				clause += fmt.Sprintf(" %s like '%%%s%%'", filter.Key, filter.Value)
+			if filter.Type == "string" {
+				value := filter.Value.(string)
+				if filter.Condition == "contains" {
+					clause += fmt.Sprintf(" %s like $%d", filter.Name, index+1)
+					args = append(args, value)
+				} else if filter.Condition == "eq" {
+					clause += fmt.Sprintf(" %s = $%d", filter.Name, index+1)
+					args = append(args, value)
+				}
+			} else if filter.Type == "number" {
+				value := filter.Value.(int32)
+				if filter.Condition == "eq" {
+					clause += fmt.Sprintf(" %s = $%d", filter.Name, index+1)
+					args = append(args, value)
+				} else if filter.Condition == "lt" {
+					clause += fmt.Sprintf(" %s < $%d", filter.Name, index+1)
+					args = append(args, value)
+				} else if filter.Condition == "gt" {
+					clause += fmt.Sprintf(" %s > $%d", filter.Name, index+1)
+					args = append(args, value)
+				}
 			}
 		}
 	}
+
+	return clause, args
+}
+
+func BuildFinalClause(r *msg.RequestQuery) string {
+	var clause string = ""
+
+	if r.OrderBy != "" && r.Order != "" {
+		clause += fmt.Sprintf(` ORDER BY %s %s`, r.OrderBy, r.Order)
+	}
+	offset := r.Page * r.PageSize
+	clause += fmt.Sprintf(" OFFSET %d LIMIT %d", offset, r.PageSize)
+
 	return clause
 }
