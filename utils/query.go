@@ -33,12 +33,15 @@ func ParseParams(c *gin.Context, p *msg.RequestQuery) (err error) {
 	if filters != "" {
 		err = json.Unmarshal([]byte(filters), &p.Filters)
 		// 记录日志
+	} else {
+		p.Filters = []msg.FilterQuery{}
 	}
 	return err
 }
 
-func BuildSQLClause(r *msg.RequestQuery) string {
+func BuildWhereClause(r *msg.RequestQuery) string {
 	var clause string = ""
+
 	if len(r.Filters) != 0 {
 		for index, filter := range r.Filters {
 			if index == 0 {
@@ -52,5 +55,18 @@ func BuildSQLClause(r *msg.RequestQuery) string {
 			}
 		}
 	}
+
+	return clause
+}
+
+func BuildFinalClause(r *msg.RequestQuery) string {
+	var clause string = ""
+
+	if r.OrderBy != "" && r.Order != "" {
+		clause += fmt.Sprintf(` ORDER BY %s %s`, r.OrderBy, r.Order)
+	}
+	offset := r.Page * r.PageSize
+	clause += fmt.Sprintf(" OFFSET %d LIMIT %d", offset, r.PageSize)
+
 	return clause
 }

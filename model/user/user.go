@@ -39,7 +39,7 @@ func List(query *commsg.RequestQuery) (int, []BasicInfo, error) {
 	var users []BasicInfo = []BasicInfo{}
 	countClause := fmt.Sprintf("select count(*) from users")
 
-	var whereClause string = utils.BuildSQLClause(query)
+	var whereClause string = utils.BuildWhereClause(query)
 
 	countClause += whereClause
 	fmt.Println(countClause)

@@ -28,7 +28,7 @@ func List(p *commonmsg.RequestQuery) (int, []Model, error) {
 	var logs []Model = []Model{}
 
 	countClause := fmt.Sprintf("select count(*) from audit_log")
-	whereClause := utils.BuildSQLClause(p)
+	whereClause := utils.BuildWhereClause(p)
 	countClause += whereClause
 	row := dbsql.QueryRow(countClause)
 
