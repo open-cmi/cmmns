@@ -54,7 +54,7 @@ func BuildWhereClause(r *msg.RequestQuery) (format string, args []interface{}) {
 			if filter.Type == "string" {
 				value := filter.Value.(string)
 				if filter.Condition == "contains" {
-					clause += fmt.Sprintf(" %s like $%d", filter.Name, index+1)
+					clause += fmt.Sprintf(` %s like '%%' || $%d || '%%'`, filter.Name, index+1)
 					args = append(args, value)
 				} else if filter.Condition == "eq" {
 					clause += fmt.Sprintf(" %s = $%d", filter.Name, index+1)
