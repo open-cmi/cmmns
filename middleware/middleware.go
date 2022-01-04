@@ -30,7 +30,6 @@ func AuthMiddleware(r *gin.Engine) {
 
 		session, _ := GetSession(c)
 
-		fmt.Println("session: ", session)
 		// Save it before we write to the response/return from the handler.
 		c.Set("session", session)
 		sessions.Save(c.Request, c.Writer)
@@ -39,7 +38,6 @@ func AuthMiddleware(r *gin.Engine) {
 		// if handler change session, save it
 		s, _ := c.Get("session")
 		session2, ok := s.(*sessions.Session)
-		fmt.Println("session2: ", session2, ok)
 		if ok {
 			session2.Save(c.Request, c.Writer)
 		}
