@@ -51,9 +51,9 @@ func List(query *commsg.RequestQuery) (int, []BasicInfo, error) {
 	}
 
 	queryClause := fmt.Sprintf(`select id,username,email,role,description from users`)
-
-	queryClause += whereClause
-	rows, err := dbsql.Query(queryClause, args)
+	finalClause := utils.BuildFinalClause(query)
+	queryClause += (whereClause + finalClause)
+	rows, err := dbsql.Query(queryClause, args...)
 	if err != nil {
 		// 没有的话，也不需要报错
 		return count, users, nil
@@ -180,7 +180,7 @@ func DeleteByName(username string) error {
 }
 
 func DeleteByID(id string) error {
-	deleteClause := fmt.Sprintf("delete from users where id=$1", id)
+	deleteClause := fmt.Sprintf("delete from users where id=$1")
 	sqldb := db.GetDB()
 	_, err := sqldb.Exec(deleteClause, id)
 	if err != nil {
