@@ -11,8 +11,6 @@ import (
 	"github.com/fatedier/frp/client"
 	"github.com/fatedier/frp/pkg/config"
 	"github.com/fatedier/golib/crypto"
-
-	"github.com/open-cmi/goutils/logutils"
 )
 
 type Client struct {
@@ -37,13 +35,11 @@ func RunClient(cfgFilePath string) error {
 
 	cfg, pxyCfgs, visitorCfgs, err := config.ParseClientConfig(cfgFilePath)
 	if err != nil {
-		logutils.ErrorLogger.Printf("start assist failed: %s\n", err.Error())
 		return err
 	}
 
 	service, err := startService(cfg, pxyCfgs, visitorCfgs, cfgFilePath)
 	if err != nil {
-		logutils.ErrorLogger.Printf("start assist failed: %s\n", err.Error())
 		return err
 	}
 

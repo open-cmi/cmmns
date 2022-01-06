@@ -1,6 +1,8 @@
-package systeminfo
+package system
 
 import (
+	"os/exec"
+
 	model "github.com/open-cmi/cmmns/model/systeminfo"
 
 	"github.com/gin-gonic/gin"
@@ -18,5 +20,14 @@ func GetSystemInfo(c *gin.Context) {
 		"ret":  0,
 		"msg":  "",
 		"data": info,
+	})
+}
+
+func Reboot(c *gin.Context) {
+
+	exec.Command("/bin/sh", "-c", "reboot").Output()
+	c.JSON(200, gin.H{
+		"ret": 0,
+		"msg": "",
 	})
 }
