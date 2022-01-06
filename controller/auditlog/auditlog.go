@@ -5,12 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	model "github.com/open-cmi/cmmns/model/auditlog"
-	commonmsg "github.com/open-cmi/cmmns/msg/request"
+	"github.com/open-cmi/cmmns/msg/request"
 	"github.com/open-cmi/cmmns/utils"
 )
 
 func List(c *gin.Context) {
-	var param commonmsg.RequestQuery
+	var param request.RequestQuery
 	utils.ParseParams(c, &param)
 	count, list, err := model.List(&param)
 	if err != nil {

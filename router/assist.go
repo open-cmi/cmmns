@@ -10,7 +10,7 @@ import (
 func AssistAuthGroup(e *gin.Engine) {
 	g := e.Group("/api/common/v3/assist")
 	{
-		g.POST("/enable", assist.Enable)
-		g.POST("/disable", assist.Disable)
+		g.GET("/", assist.GetAssist)
+		g.POST("/", assist.SetAssist)
 	}
 }

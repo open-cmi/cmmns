@@ -8,12 +8,40 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/config"
-	"github.com/open-cmi/cmmns/modules/rassist"
+	massist "github.com/open-cmi/cmmns/modules/assist"
 
 	"gopkg.in/ini.v1"
 )
 
-func Enable(c *gin.Context) {
+func GetAssist(c *gin.Context) {
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret":  0,
+		"msg":  "",
+		"data": massist.IsRunning(),
+	})
+}
+
+func SetAssist(c *gin.Context) {
+
+	var msg struct {
+		Enable bool `json:"enable"`
+	}
+
+	if err := c.ShouldBindJSON(&msg); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	if !msg.Enable {
+		massist.Close()
+		c.JSON(http.StatusOK, gin.H{
+			"ret": 0,
+			"msg": "",
+		})
+		return
+	}
+
 	// 根据配置文件，生成临时ini文件，然后传入参数
 	tmpdir := os.TempDir()
 	frpCfg := filepath.Join(tmpdir, "./frpc.ini")
@@ -35,7 +63,7 @@ func Enable(c *gin.Context) {
 	}
 	file.SaveTo(frpCfg)
 
-	err := rassist.RunClient(frpCfg)
+	err := massist.RunClient(frpCfg)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
@@ -44,14 +72,6 @@ func Enable(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"ret": 0,
-		"msg": "",
-	})
-}
-
-func Disable(c *gin.Context) {
-	rassist.Close()
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
