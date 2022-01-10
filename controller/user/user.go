@@ -198,19 +198,6 @@ func Login(c *gin.Context) {
 		}
 	}
 
-	if config.GetConfig().MasterInfo.ExternalAddress == "" {
-		var address string = ""
-		host := c.Request.Host
-		// 目前只支持ipv4地址，不支持ipv6地址
-		if strings.Contains(host, ":") {
-			arr := strings.Split(host, ":")
-			address = arr[0]
-		} else {
-			address = host
-		}
-		config.GetConfig().MasterInfo.ExternalAddress = address
-		config.GetConfig().Save()
-	}
 	// 写日志操作
 	auditlog.InsertLog(c, auditlog.LoginType, "Login Success")
 
