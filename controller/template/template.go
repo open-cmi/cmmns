@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/open-cmi/cmmns/controller/ctl"
 	model "github.com/open-cmi/cmmns/model/template"
 	"github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/template"
@@ -14,7 +15,13 @@ import (
 func List(c *gin.Context) {
 	var param request.RequestQuery
 	utils.ParseParams(c, &param)
-	count, results, err := model.List(&param)
+
+	user := ctl.GetUser(c)
+	userID, _ := user["id"].(string)
+
+	count, results, err := model.List(&model.ModelOption{
+		UserID: userID,
+	}, &param)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -53,7 +60,12 @@ func Create(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	_, err := model.Create(&reqMsg)
+	user := ctl.GetUser(c)
+	userID, _ := user["id"].(string)
+
+	_, err := model.Create(&model.ModelOption{
+		UserID: userID,
+	}, &reqMsg)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -69,7 +81,13 @@ func Create(c *gin.Context) {
 func Get(c *gin.Context) {
 	identify := c.Param("id")
 
-	m := model.Get(identify)
+	user := ctl.GetUser(c)
+	userID, _ := user["id"].(string)
+
+	m := model.Get(&model.ModelOption{
+		UserID: userID,
+	}, identify)
+
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,
 		"msg":  "",
@@ -81,7 +99,11 @@ func Get(c *gin.Context) {
 func Delete(c *gin.Context) {
 	identify := c.Param("id")
 
-	err := model.Delete(identify)
+	user := ctl.GetUser(c)
+	userID, _ := user["id"].(string)
+	err := model.Delete(&model.ModelOption{
+		UserID: userID,
+	}, identify)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -103,7 +125,12 @@ func Edit(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	err := model.Edit(identify, &reqMsg)
+
+	user := ctl.GetUser(c)
+	userID, _ := user["id"].(string)
+	err := model.Edit(&model.ModelOption{
+		UserID: userID,
+	}, identify, &reqMsg)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return

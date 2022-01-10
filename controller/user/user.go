@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/auditlog"
+
 	model "github.com/open-cmi/cmmns/model/user"
 	commsg "github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/user"
@@ -19,11 +20,11 @@ import (
 	"github.com/open-cmi/cmmns/utils"
 	"github.com/open-cmi/goutils/verify"
 
-	"github.com/open-cmi/cmmns/config"
-	"github.com/open-cmi/cmmns/storage/rdb"
-
 	"github.com/gin-gonic/gin"
 	"github.com/jordan-wright/email"
+	"github.com/open-cmi/cmmns/config"
+	"github.com/open-cmi/cmmns/controller/ctl"
+	"github.com/open-cmi/cmmns/storage/rdb"
 )
 
 // EmailTemplate html content template
@@ -67,18 +68,11 @@ func ChangePassword(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	sess, _ := c.Get("session")
-	session := sess.(*sessions.Session)
-	userinfo, ok := session.Values["user"].(map[string]interface{})
-	if !ok {
-		c.String(http.StatusUnauthorized, "authentication is required")
+	user := ctl.GetUser(c)
+	if user == nil {
 		return
 	}
-	userid, ok := userinfo["id"].(string)
-	if !ok {
-		c.String(http.StatusUnauthorized, "authentication is required")
-		return
-	}
+
 	if apimsg.NewPassword != apimsg.ConfirmPassword {
 		c.JSON(200, gin.H{
 			"ret": 1,
@@ -86,8 +80,8 @@ func ChangePassword(c *gin.Context) {
 		})
 		return
 	}
-
-	if !model.VerifyPasswordByID(userid, apimsg.OldPassword) {
+	userID, _ := user["id"].(string)
+	if !model.VerifyPasswordByID(userID, apimsg.OldPassword) {
 		c.JSON(200, gin.H{
 			"ret": 1,
 			"msg": "user password verify failed",
@@ -95,7 +89,7 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	err := model.ChangePassword(userid, apimsg.NewPassword)
+	err := model.ChangePassword(userID, apimsg.NewPassword)
 	if err != nil {
 		c.JSON(200, gin.H{
 			"ret": 1,
