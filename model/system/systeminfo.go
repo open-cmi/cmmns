@@ -1,4 +1,4 @@
-package systeminfo
+package system
 
 import (
 	"errors"
@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/open-cmi/cmmns/pkg/device"
-	sysinfo "github.com/open-cmi/cmmns/pkg/systeminfo"
+	sysmod "github.com/open-cmi/cmmns/modules/system"
 	"github.com/open-cmi/cmmns/storage/db"
+	"github.com/open-cmi/goutils/device"
 
 	_ "github.com/lib/pq" //
 )
@@ -94,15 +94,15 @@ func UpdateSystemInfo() {
 
 	utime := time.Now().UTC().Format(time.RFC3339)
 
-	cpuUsage := sysinfo.CPUSummary()
+	cpuUsage := sysmod.CPUSummary()
 
-	diskUsed, diskTotal, diskUsedPercent := sysinfo.DiskSummary()
+	diskUsed, diskTotal, diskUsedPercent := sysmod.DiskSummary()
 
-	memUsed, memTotal, memUsedPercent := sysinfo.MemSummary()
+	memUsed, memTotal, memUsedPercent := sysmod.MemSummary()
 
-	netSent, netRecv := sysinfo.NetRateSummary()
+	netSent, netRecv := sysmod.NetRateSummary()
 
-	load1, load5, load15 := sysinfo.LoadSummary()
+	load1, load5, load15 := sysmod.LoadSummary()
 
 	sqlquery := fmt.Sprintf(`update systeminfo set utime='%s',
 		cpu_usage=%f, disk_total=%d, disk_used=%d, disk_used_percent=%f,

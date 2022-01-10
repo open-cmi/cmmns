@@ -12,18 +12,18 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/auditlog"
+
 	model "github.com/open-cmi/cmmns/model/user"
 	commsg "github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/user"
-	"github.com/open-cmi/cmmns/prod"
 	"github.com/open-cmi/cmmns/utils"
 	"github.com/open-cmi/goutils/verify"
 
-	"github.com/open-cmi/cmmns/config"
-	"github.com/open-cmi/cmmns/storage/rdb"
-
 	"github.com/gin-gonic/gin"
 	"github.com/jordan-wright/email"
+	"github.com/open-cmi/cmmns/config"
+	"github.com/open-cmi/cmmns/controller/ctl"
+	"github.com/open-cmi/cmmns/storage/rdb"
 )
 
 // EmailTemplate html content template
@@ -37,23 +37,6 @@ var EmailTemplate string = `
 
 // CheckAuth get userinfo
 func CheckAuth(c *gin.Context) {
-	sess, _ := c.Get("session")
-	session := sess.(*sessions.Session)
-	userinfo, ok := session.Values["user"].(map[string]interface{})
-	if !ok {
-		c.String(http.StatusUnauthorized, "authentication is required")
-		return
-	}
-	userid, ok := userinfo["id"].(string)
-	if !ok {
-		c.String(http.StatusUnauthorized, "authentication is required")
-		return
-	}
-
-	fmt.Println(userinfo, userid)
-	fmt.Println(prod.GetProdInfo().Nav)
-	username, _ := userinfo["username"].(string)
-	fmt.Println(username)
 	c.JSON(200, gin.H{
 		"ret": 0,
 		"msg": "",
@@ -67,18 +50,12 @@ func ChangePassword(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	sess, _ := c.Get("session")
-	session := sess.(*sessions.Session)
-	userinfo, ok := session.Values["user"].(map[string]interface{})
-	if !ok {
-		c.String(http.StatusUnauthorized, "authentication is required")
+
+	user := ctl.GetUser(c)
+	if user == nil {
 		return
 	}
-	userid, ok := userinfo["id"].(string)
-	if !ok {
-		c.String(http.StatusUnauthorized, "authentication is required")
-		return
-	}
+
 	if apimsg.NewPassword != apimsg.ConfirmPassword {
 		c.JSON(200, gin.H{
 			"ret": 1,
@@ -86,8 +63,8 @@ func ChangePassword(c *gin.Context) {
 		})
 		return
 	}
-
-	if !model.VerifyPasswordByID(userid, apimsg.OldPassword) {
+	userID, _ := user["id"].(string)
+	if !model.VerifyPasswordByID(userID, apimsg.OldPassword) {
 		c.JSON(200, gin.H{
 			"ret": 1,
 			"msg": "user password verify failed",
@@ -95,7 +72,7 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	err := model.ChangePassword(userid, apimsg.NewPassword)
+	err := model.ChangePassword(userID, apimsg.NewPassword)
 	if err != nil {
 		c.JSON(200, gin.H{
 			"ret": 1,
@@ -221,19 +198,6 @@ func Login(c *gin.Context) {
 		}
 	}
 
-	if config.GetConfig().MasterInfo.ExternalAddress == "" {
-		var address string = ""
-		host := c.Request.Host
-		// 目前只支持ipv4地址，不支持ipv6地址
-		if strings.Contains(host, ":") {
-			arr := strings.Split(host, ":")
-			address = arr[0]
-		} else {
-			address = host
-		}
-		config.GetConfig().MasterInfo.ExternalAddress = address
-		config.GetConfig().Save()
-	}
 	// 写日志操作
 	auditlog.InsertLog(c, auditlog.LoginType, "Login Success")
 

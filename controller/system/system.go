@@ -3,7 +3,7 @@ package system
 import (
 	"os/exec"
 
-	model "github.com/open-cmi/cmmns/model/systeminfo"
+	model "github.com/open-cmi/cmmns/model/system"
 
 	"github.com/gin-gonic/gin"
 )

@@ -25,8 +25,8 @@
     "internal_port": 30000,
     "internal_proto": "http",
     "external_address": "",
-    "external_port": 80,
-    "external_proto": "http"
+    "external_port": 443,
+    "external_proto": "https"
   },
   "distributed": {
     "cfgseq": 0,
