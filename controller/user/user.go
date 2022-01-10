@@ -16,7 +16,6 @@ import (
 	model "github.com/open-cmi/cmmns/model/user"
 	commsg "github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/user"
-	"github.com/open-cmi/cmmns/prod"
 	"github.com/open-cmi/cmmns/utils"
 	"github.com/open-cmi/goutils/verify"
 
@@ -38,23 +37,6 @@ var EmailTemplate string = `
 
 // CheckAuth get userinfo
 func CheckAuth(c *gin.Context) {
-	sess, _ := c.Get("session")
-	session := sess.(*sessions.Session)
-	userinfo, ok := session.Values["user"].(map[string]interface{})
-	if !ok {
-		c.String(http.StatusUnauthorized, "authentication is required")
-		return
-	}
-	userid, ok := userinfo["id"].(string)
-	if !ok {
-		c.String(http.StatusUnauthorized, "authentication is required")
-		return
-	}
-
-	fmt.Println(userinfo, userid)
-	fmt.Println(prod.GetProdInfo().Nav)
-	username, _ := userinfo["username"].(string)
-	fmt.Println(username)
 	c.JSON(200, gin.H{
 		"ret": 0,
 		"msg": "",
@@ -68,6 +50,7 @@ func ChangePassword(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+
 	user := ctl.GetUser(c)
 	if user == nil {
 		return
