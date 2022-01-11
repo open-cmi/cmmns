@@ -29,6 +29,7 @@ func AgentAuthGroup(e *gin.Engine) {
 	g2 := e.Group("/api/common/v3/agent-setting")
 	{
 		g2.GET("/", agent.GetSetting)
+		g2.GET("/auto-get-master", agent.AutoGetMaster)
 		g2.POST("/", agent.EditSetting)
 	}
 }

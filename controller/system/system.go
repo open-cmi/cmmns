@@ -25,7 +25,7 @@ func GetSystemInfo(c *gin.Context) {
 
 func Reboot(c *gin.Context) {
 
-	exec.Command("/bin/sh", "-c", "reboot").Output()
+	exec.Command("/bin/sh", "-c", "reboot -f").Output()
 	c.JSON(200, gin.H{
 		"ret": 0,
 		"msg": "",
