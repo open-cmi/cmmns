@@ -3,8 +3,8 @@ package log
 import (
 	"path/filepath"
 
-	"github.com/open-cmi/goutils/common"
-	"github.com/open-cmi/goutils/logutils"
+	"github.com/open-cmi/goutils/logutil"
+	"github.com/open-cmi/goutils/pathutil"
 )
 
 const (
@@ -14,16 +14,16 @@ const (
 	Error
 )
 
-var Logger *logutils.Logger
+var Logger *logutil.Logger
 
 func Init() {
-	rp := common.GetRootPath()
+	rp := pathutil.GetRootPath()
 	logDir := filepath.Join(rp, "data")
 
-	Logger = logutils.NewLogger(&logutils.Option{
+	Logger = logutil.NewLogger(&logutil.Option{
 		Dir:        logDir,
 		Compress:   true,
-		Level:      logutils.Info,
+		Level:      logutil.Info,
 		ReserveDay: 30,
 	})
 	return

@@ -12,8 +12,9 @@ import (
 	"github.com/open-cmi/cmmns/config"
 	model "github.com/open-cmi/cmmns/model/agent"
 	"github.com/open-cmi/cmmns/storage/rdb"
-	"github.com/open-cmi/goutils"
-	"github.com/open-cmi/goutils/common"
+	"github.com/open-cmi/goutils/fileutil"
+	"github.com/open-cmi/goutils/pathutil"
+	"github.com/open-cmi/goutils/sshutil"
 )
 
 type MasterInfo struct {
@@ -25,7 +26,7 @@ type MasterInfo struct {
 func GetAgentPackage() string {
 	AgentPackage := config.GetConfig().Distributed.AgentPackageLocation
 	if !strings.HasPrefix(AgentPackage, "/") {
-		rp := common.GetRootPath()
+		rp := pathutil.GetRootPath()
 		return filepath.Join(rp, "data", AgentPackage)
 	}
 	return AgentPackage
@@ -35,7 +36,7 @@ func GetAgentConfigFile() string {
 	// 根据配置文件中，获取端口以及地址
 	masterInfoFile := config.GetConfig().Distributed.AgentConfigLocation
 	if !strings.HasPrefix(masterInfoFile, "/") {
-		rp := common.GetRootPath()
+		rp := pathutil.GetRootPath()
 		masterInfoFile = filepath.Join(rp, "etc", masterInfoFile)
 	}
 
@@ -51,7 +52,7 @@ func GetAgentConfigFile() string {
 
 func DeployRemote(agent *model.Model, agentPackage string) error {
 	// 拷贝安装包
-	ss := goutils.NewSSHServer(agent.Address, agent.Port,
+	ss := sshutil.NewSSHServer(agent.Address, agent.Port,
 		agent.ConnType, agent.User, agent.Password, agent.SecretKey)
 	name := filepath.Base(agentPackage)
 
@@ -131,7 +132,7 @@ func Deploy(taskid string, agents []model.Model) error {
 		if (agent.Address == "127.0.0.1" || agent.Address == "localhost") && agent.Port == 22 {
 			err = DeployLocal()
 		} else {
-			if goutils.FileExist(agentPackage) {
+			if fileutil.FileExist(agentPackage) {
 				err = DeployRemote(&agent, agentPackage)
 			}
 		}

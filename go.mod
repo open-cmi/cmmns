@@ -14,7 +14,7 @@ require (
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/lib/pq v1.10.2
-	github.com/open-cmi/goutils v0.2.4
+	github.com/open-cmi/goutils v0.3.1
 	github.com/open-cmi/memstore v0.1.0
 	github.com/pkg/sftp v1.13.4 // indirect
 	github.com/robfig/cron/v3 v3.0.1

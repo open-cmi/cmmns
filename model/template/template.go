@@ -29,21 +29,6 @@ func Get(mo *ModelOption, name string) *Model {
 	return nil
 }
 
-func IsExist(name string) bool {
-	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select name from template where name=$1")
-
-	var un string
-	sqldb := db.GetDB()
-	row := sqldb.QueryRow(queryclause, name)
-	err := row.Scan(&un)
-	if err == nil {
-		// 用户名已经被占用
-		return true
-	}
-	return false
-}
-
 // List list
 func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 	dbsql := db.GetDB()
@@ -113,9 +98,10 @@ func MultiDelete(mo *ModelOption, arrs []string) error {
 
 func Create(mo *ModelOption, reqMsg *msg.CreateMsg) (m *Model, err error) {
 	// 先检查用户名是否存在
-	if IsExist(reqMsg.Name) {
+	model := Get(mo, reqMsg.Name)
+	if model != nil {
 		// 用户名已经被占用
-		return nil, errors.New("username or email has been used")
+		return nil, errors.New("name has been used")
 	}
 
 	m = New(reqMsg)

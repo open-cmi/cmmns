@@ -35,7 +35,7 @@
   },
   "remote_assist": {
     "server_addr": "",
-    "server_port": 7000,
+    "server_port": 7001,
     "token": "",
     "services": [
       {
