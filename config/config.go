@@ -50,7 +50,7 @@ type MasterInfoConfig struct {
 	ExternalProto   string `json:"external_proto"`
 }
 
-type RemoteExposedService struct {
+type RemoteService struct {
 	Name       string `json:"name"`
 	Type       string `json:"type"`
 	LocalIP    string `json:"local_ip"`
@@ -59,10 +59,10 @@ type RemoteExposedService struct {
 }
 
 type RemoteAssistConfig struct {
-	ServerAddr     string                 `json:"server_addr"`
-	ServerPort     uint16                 `json:"server_port"`
-	Token          string                 `json:"token,omitempty"`
-	ExposedService []RemoteExposedService `json:"services"`
+	ServerAddr string          `json:"server_addr"`
+	ServerPort uint16          `json:"server_port"`
+	Token      string          `json:"token,omitempty"`
+	Service    []RemoteService `json:"services"`
 }
 
 // Config config

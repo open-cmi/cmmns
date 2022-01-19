@@ -17,7 +17,7 @@ import (
 	commsg "github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/user"
 	"github.com/open-cmi/cmmns/utils"
-	"github.com/open-cmi/goutils/verify"
+	"github.com/open-cmi/goutils/typeutil"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jordan-wright/email"
@@ -235,7 +235,7 @@ func Register(c *gin.Context) {
 	}
 
 	// 验证邮箱有效性
-	if !verify.EmailIsValid(apimsg.Email) {
+	if !typeutil.EmailIsValid(apimsg.Email) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email is not valid"})
 		return
 	}
@@ -300,7 +300,7 @@ func CreateUser(c *gin.Context) {
 	}
 
 	// 验证邮箱有效性
-	if !verify.EmailIsValid(apimsg.Email) {
+	if !typeutil.EmailIsValid(apimsg.Email) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email is not valid"})
 		return
 	}

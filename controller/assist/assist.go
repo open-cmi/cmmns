@@ -54,12 +54,12 @@ func SetAssist(c *gin.Context) {
 	if conf.Token != "" {
 		comsec.NewKey("token", conf.Token)
 	}
-	for _, es := range conf.ExposedService {
-		section, _ := file.NewSection(es.Name)
-		section.NewKey("type", es.Type)
-		section.NewKey("local_ip", es.LocalIP)
-		section.NewKey("local_port", strconv.Itoa(int(es.LocalPort)))
-		section.NewKey("remote_port", strconv.Itoa(int(es.RemotePort)))
+	for _, rs := range conf.Service {
+		section, _ := file.NewSection(rs.Name)
+		section.NewKey("type", rs.Type)
+		section.NewKey("local_ip", rs.LocalIP)
+		section.NewKey("local_port", strconv.Itoa(int(rs.LocalPort)))
+		section.NewKey("remote_port", strconv.Itoa(int(rs.RemotePort)))
 	}
 	file.SaveTo(frpCfg)
 

@@ -8,7 +8,7 @@ import (
 
 	sysmod "github.com/open-cmi/cmmns/modules/system"
 	"github.com/open-cmi/cmmns/storage/db"
-	"github.com/open-cmi/goutils/device"
+	"github.com/open-cmi/goutils/devutil"
 
 	_ "github.com/lib/pq" //
 )
@@ -66,7 +66,7 @@ func GetSystemInfo() (info SystemInfo, err error) {
 // InitDeviceID init device id
 func InitDeviceID() {
 	utime := time.Now().UTC().Format(time.RFC3339)
-	deviceid := device.GetDeviceID()
+	deviceid := devutil.GetDeviceID()
 	if deviceid == "" {
 		return
 	}
@@ -87,7 +87,7 @@ func InitDeviceID() {
 
 // UpdateSystemInfo update device info
 func UpdateSystemInfo() {
-	deviceid := device.GetDeviceID()
+	deviceid := devutil.GetDeviceID()
 	if deviceid == "" {
 		return
 	}
