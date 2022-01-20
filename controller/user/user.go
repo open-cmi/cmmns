@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/auditlog"
+	"github.com/open-cmi/cmmns/controller"
 
 	model "github.com/open-cmi/cmmns/model/user"
 	commsg "github.com/open-cmi/cmmns/msg/request"
@@ -22,7 +23,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jordan-wright/email"
 	"github.com/open-cmi/cmmns/config"
-	"github.com/open-cmi/cmmns/controller/ctl"
 	"github.com/open-cmi/cmmns/storage/rdb"
 )
 
@@ -51,7 +51,7 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	if user == nil {
 		return
 	}

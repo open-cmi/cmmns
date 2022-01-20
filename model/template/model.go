@@ -35,8 +35,8 @@ func (m *Model) Save() error {
 			return errors.New("create model failed")
 		}
 	} else {
-		updateClause := fmt.Sprintf("update template set name=$1")
-		_, err := dbsql.Exec(updateClause, m.Name)
+		updateClause := fmt.Sprintf("update template set name=$1 where id=$2")
+		_, err := dbsql.Exec(updateClause, m.Name, m.ID)
 		if err != nil {
 			return errors.New("update model failed")
 		}
@@ -48,8 +48,8 @@ func (m *Model) Save() error {
 func (m *Model) Remove() error {
 	dbsql := db.GetDB()
 
-	deleteClause := fmt.Sprintf("delete from template where name=$1")
-	_, err := dbsql.Exec(deleteClause, m.Name)
+	deleteClause := fmt.Sprintf("delete from template where id=$1")
+	_, err := dbsql.Exec(deleteClause, m.ID)
 	if err != nil {
 		return errors.New("delete model failed")
 	}

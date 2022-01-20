@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/config"
-	"github.com/open-cmi/cmmns/controller/ctl"
+	"github.com/open-cmi/cmmns/controller"
 )
 
 type MasterSetting struct {
@@ -48,7 +48,7 @@ func GetSetting(c *gin.Context) {
 }
 
 func EditSetting(c *gin.Context) {
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	role, _ := user["role"].(int)
 	if role != 0 {
 		c.JSON(http.StatusOK, gin.H{

@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/open-cmi/cmmns/controller/ctl"
+	"github.com/open-cmi/cmmns/controller"
 	model "github.com/open-cmi/cmmns/model/template"
 	"github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/template"
@@ -16,7 +16,7 @@ func List(c *gin.Context) {
 	var param request.RequestQuery
 	utils.ParseParams(c, &param)
 
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
 
 	count, results, err := model.List(&model.ModelOption{
@@ -60,7 +60,7 @@ func Create(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
 
 	_, err := model.Create(&model.ModelOption{
@@ -81,7 +81,7 @@ func Create(c *gin.Context) {
 func Get(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
 
 	m := model.Get(&model.ModelOption{
@@ -99,7 +99,7 @@ func Get(c *gin.Context) {
 func Delete(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
 	err := model.Delete(&model.ModelOption{
 		UserID: userID,
@@ -126,7 +126,7 @@ func Edit(c *gin.Context) {
 		return
 	}
 
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
 	err := model.Edit(&model.ModelOption{
 		UserID: userID,
