@@ -1,4 +1,4 @@
-package template
+package secretkey
 
 import (
 	"net/http"
@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/open-cmi/cmmns/controller"
-	model "github.com/open-cmi/cmmns/model/template"
+	model "github.com/open-cmi/cmmns/model/secretkey"
 	"github.com/open-cmi/cmmns/msg/request"
-	msg "github.com/open-cmi/cmmns/msg/template"
+	msg "github.com/open-cmi/cmmns/msg/secretkey"
 	"github.com/open-cmi/cmmns/utils"
 )
 

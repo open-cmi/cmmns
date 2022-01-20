@@ -9,6 +9,8 @@ import (
 
 	"github.com/open-cmi/cmmns"
 	"github.com/open-cmi/cmmns/middleware"
+	"github.com/open-cmi/cmmns/migration"
+	"github.com/open-cmi/migrate"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,6 +18,11 @@ import (
 var configfile string = ""
 
 func main() {
+	if len(os.Args) > 1 && migrate.IsMigrateCommand(os.Args[1]) {
+		migration.Migrate()
+		return
+	}
+
 	flag.StringVar(&configfile, "config", configfile, "config file")
 	flag.Parse()
 
