@@ -23,10 +23,10 @@ func UserAuthGroup(e *gin.Engine) {
 	{
 		g.GET("/checkauth", userc.CheckAuth)
 		g.GET("/", userc.List)
-		g.POST("/", userc.CreateUser)
+		g.POST("/", userc.Create)
 		g.POST("/changepass", userc.ChangePassword)
 		g.POST("/logout", userc.Logout)
 		g.GET("/:id", userc.Get)
-		g.DELETE("/:id", userc.DeleteUser)
+		g.DELETE("/:id", userc.Delete)
 	}
 }

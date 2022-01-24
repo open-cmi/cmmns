@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/config"
-	massist "github.com/open-cmi/cmmns/modules/assist"
+	massist "github.com/open-cmi/cmmns/module/assist"
 
 	"gopkg.in/ini.v1"
 )

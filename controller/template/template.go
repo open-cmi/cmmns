@@ -99,7 +99,7 @@ func Get(c *gin.Context) {
 
 	m := model.Get(&model.ModelOption{
 		UserID: userID,
-	}, identify)
+	}, "id", identify)
 
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,

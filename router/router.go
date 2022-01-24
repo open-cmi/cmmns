@@ -18,7 +18,7 @@ func NauthInit(e *gin.Engine) {
 // AuthInit auth router init
 func AuthInit(e *gin.Engine) {
 	AgentAuthGroup(e)
-	AgentGroupGroup(e)
+	AgentGroupAuthGroup(e)
 	UserAuthGroup(e)
 	SystemGroup(e)
 	ProgressAuthGroup(e)

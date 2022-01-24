@@ -1,17 +1,15 @@
 package agent
 
 import (
-	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/open-cmi/cmmns/config"
 	model "github.com/open-cmi/cmmns/model/agent"
-	"github.com/open-cmi/cmmns/storage/rdb"
 	"github.com/open-cmi/goutils/fileutil"
 	"github.com/open-cmi/goutils/pathutil"
 	"github.com/open-cmi/goutils/sshutil"
@@ -112,52 +110,33 @@ func DeployLocal() error {
 	nayargs := []string{"start", "nayagent"}
 	cmd := exec.Command("systemctl", nayargs...)
 	err := cmd.Run()
-	if err != nil {
-		return err
-	}
-	v2rayargs := []string{"start", "v2ray"}
-	cmd = exec.Command("systemctl", v2rayargs...)
-	err = cmd.Run()
 	return err
 }
 
 func Deploy(taskid string, agents []model.Model) error {
-	cache := rdb.GetCache(rdb.TaskCache)
-
 	agentPackage := GetAgentPackage()
 
-	cache.HSet(context.TODO(), taskid, "total", len(agents))
-	for index, agent := range agents {
+	for index := 0; index < len(agents); index++ {
+		agent := &agents[index]
 		var err error
-		if (agent.Address == "127.0.0.1" || agent.Address == "localhost") && agent.Port == 22 {
+		if agent.IsLocal {
 			err = DeployLocal()
 		} else {
 			if fileutil.FileExist(agentPackage) {
-				err = DeployRemote(&agent, agentPackage)
+				err = DeployRemote(agent, agentPackage)
+			} else {
+				err = errors.New("agent package is not exist")
 			}
 		}
 		if err != nil {
 			// 部署失败，写任务日志信息
-			keyMsg := fmt.Sprintf("task_log_%d", index)
-			errMsg := fmt.Sprintf("deploy failed, remote server %s, %s", agent.Address, err.Error())
-			cache.HSet(context.TODO(), taskid, keyMsg, errMsg)
-			// 写failed
-			cache.HIncrBy(context.TODO(), taskid, "failed", 1)
+			agent.Reason = err.Error()
+			agent.State = model.StateDeployFailed
 		} else {
-			cache.HIncrBy(context.TODO(), taskid, "success", 1)
+			agent.State = model.StateDeploySuccess
 		}
+		agent.Save()
 	}
 
-	taskret, err := cache.HGetAll(context.TODO(), taskid).Result()
-	if err != nil {
-		return err
-	}
-
-	cache.Expire(context.TODO(), taskid, 60*time.Second)
-	taskret[taskid] = taskid
-	notifyMsg, err := json.Marshal(taskret)
-
-	cache.LPush(context.TODO(), "task_complete_msg_list", notifyMsg)
-	// 通知任务完成
 	return nil
 }

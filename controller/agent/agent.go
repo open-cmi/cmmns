@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/controller"
 	model "github.com/open-cmi/cmmns/model/agent"
 	agentmsg "github.com/open-cmi/cmmns/msg/agent"
 	msg "github.com/open-cmi/cmmns/msg/request"
@@ -14,10 +15,14 @@ import (
 
 // List list agents
 func List(c *gin.Context) {
-
 	var param msg.RequestQuery
 	utils.ParseParams(c, &param)
-	count, list, err := model.List(&param)
+	user := controller.GetUser(c)
+	userID, _ := user["id"].(string)
+
+	count, list, err := model.List(&model.ModelOption{
+		UserID: userID,
+	}, &param)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -33,8 +38,8 @@ func List(c *gin.Context) {
 	return
 }
 
-// CreateAgent create agent
-func CreateAgent(c *gin.Context) {
+// Create create agent
+func Create(c *gin.Context) {
 	var createmsg agentmsg.CreateMsg
 	if err := c.ShouldBindJSON(&createmsg); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
@@ -45,9 +50,13 @@ func CreateAgent(c *gin.Context) {
 	if createmsg.Address == "localhost" {
 		createmsg.Address = "127.0.0.1"
 	}
+	user := controller.GetUser(c)
+	userID, _ := user["id"].(string)
 
 	// 校验，这里暂时忽略
-	err := model.CreateAgent(&createmsg)
+	_, err := model.Create(&model.ModelOption{
+		UserID: userID,
+	}, &createmsg)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -56,10 +65,15 @@ func CreateAgent(c *gin.Context) {
 	return
 }
 
-// DelAgent del agent
-func DelAgent(c *gin.Context) {
+// Delete del agent
+func Delete(c *gin.Context) {
 	id := c.Param("id")
-	err := model.DelAgent(id)
+	user := controller.GetUser(c)
+	userID, _ := user["id"].(string)
+
+	err := model.Delete(&model.ModelOption{
+		UserID: userID,
+	}, id)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -75,25 +89,32 @@ func DeployAgent(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+	user := controller.GetUser(c)
+	userID, _ := user["id"].(string)
 
 	taskid := fmt.Sprintf("deploy-task-%d", time.Now().Unix())
 	var agents []model.Model = []model.Model{}
-	for _, id := range dmsg.NodeID {
-		mdl, err := model.GetAgent(id)
-		if err != nil {
+	for _, id := range dmsg.ID {
+		mdl := model.Get(&model.ModelOption{
+			UserID: userID,
+		}, "id", id)
+		if mdl == nil {
 			continue
 		}
-		agents = append(agents, mdl)
+		agents = append(agents, *mdl)
 	}
 
-	err := Deploy(taskid, agents)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"ret": 1,
-			"msg": err.Error(),
-		})
-		return
+	if len(agents) != 0 {
+		err := Deploy(taskid, agents)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"ret": 1,
+				"msg": err.Error(),
+			})
+			return
+		}
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,
 		"msg":  "",

@@ -3,6 +3,7 @@ package template
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/open-cmi/cmmns/storage/db"
@@ -27,16 +28,28 @@ func (m *Model) Save() error {
 
 	if m.isNew {
 		// 存储到数据库
-		id := uuid.New()
-		insertClause := fmt.Sprintf("insert into template(id, name) values($1, $2)")
+		columns := []string{"id", "name"}
+		var values []string = []string{}
+		for index, _ := range columns {
+			seq := fmt.Sprintf(`$%d`, index+1)
+			values = append(values, seq)
+		}
 
-		_, err := dbsql.Exec(insertClause, id.String(), m.Name)
+		insertClause := fmt.Sprintf("insert into template(%s) values(%s)",
+			strings.Join(columns, ","), strings.Join(values, ","))
+		_, err := dbsql.Exec(insertClause, m.ID, m.Name)
 		if err != nil {
 			return errors.New("create model failed")
 		}
+
 	} else {
-		updateClause := fmt.Sprintf("update template set name=$1 where id=$2")
-		_, err := dbsql.Exec(updateClause, m.Name, m.ID)
+		columns := []string{"name"}
+		var updates []string = []string{}
+		for index, column := range columns {
+			updates = append(updates, fmt.Sprintf(`%s=%d`, column, index+1))
+		}
+		updateClause := fmt.Sprintf("update template set %s where id=$%d", strings.Join(updates, ","), len(columns)+1)
+		_, err := dbsql.Exec(updateClause, m.Name)
 		if err != nil {
 			return errors.New("update model failed")
 		}
@@ -58,6 +71,7 @@ func (m *Model) Remove() error {
 
 func New(reqMsg *msg.CreateMsg) (m *Model) {
 	return &Model{
+		ID:    uuid.NewString(),
 		Name:  reqMsg.Name,
 		isNew: true,
 	}

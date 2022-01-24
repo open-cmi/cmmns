@@ -15,7 +15,7 @@ import (
 	"github.com/open-cmi/cmmns/controller"
 
 	model "github.com/open-cmi/cmmns/model/user"
-	commsg "github.com/open-cmi/cmmns/msg/request"
+	"github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/user"
 	"github.com/open-cmi/cmmns/utils"
 	"github.com/open-cmi/goutils/typeutil"
@@ -90,7 +90,7 @@ func ChangePassword(c *gin.Context) {
 // List list user
 func List(c *gin.Context) {
 
-	var query commsg.RequestQuery
+	var query request.RequestQuery
 	utils.ParseParams(c, &query)
 
 	count, users, err := model.List(&query)
@@ -142,7 +142,6 @@ func Get(c *gin.Context) {
 // Activate activate user
 func Activate(c *gin.Context) {
 	code := c.Param("code")
-	fmt.Println("code:", code)
 	_, err := uuid.Parse(code)
 	if err != nil {
 		c.String(200, "activate code is not valid")
@@ -291,8 +290,8 @@ func GetSelf(c *gin.Context) {
 	})
 }
 
-// CreateUser create user
-func CreateUser(c *gin.Context) {
+// Create create user
+func Create(c *gin.Context) {
 	var apimsg msg.CreateMsg
 	if err := c.ShouldBindJSON(&apimsg); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
@@ -314,8 +313,8 @@ func CreateUser(c *gin.Context) {
 	return
 }
 
-// DeleteUser delete user
-func DeleteUser(c *gin.Context) {
+// Delete delete user
+func Delete(c *gin.Context) {
 	id := c.Param("id")
 	err := model.DeleteByID(id)
 	if err != nil {

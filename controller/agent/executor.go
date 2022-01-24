@@ -13,28 +13,31 @@ func KeepAlive(c *gin.Context) {
 	clientIP := c.ClientIP()
 
 	// 获取device id
-	deviceid := c.Query("deviceid")
-	if deviceid == "" {
-		c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": "need deviceid is required"})
+	devID := c.Query("dev_id")
+	if devID == "" {
+		c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": "dev id is required"})
 		return
 	}
 
 	// 先查缓存是否存在
-	executor, err := scheduler.GetExecutor(deviceid)
+	executor, err := scheduler.GetExecutor(devID)
 	if err != nil {
-		mdl, err := model.GetAgentByAddress(clientIP)
-		if err != nil {
+		mdl := model.Get(&model.ModelOption{
+			UserID: "",
+		}, "address", clientIP)
+		if mdl == nil {
 			c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": "agent not exist"})
 			return
 		}
 		// 新节点，需要查询数据进行更新
-		err = model.UpdateDeviceID(clientIP, deviceid)
+		mdl.DeviceID = devID
+		err = mdl.Save()
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": err.Error()})
 			return
 		}
 
-		err = scheduler.RegisterExecutor(mdl.Name, deviceid, clientIP, 0)
+		err = scheduler.RegisterExecutor(mdl.Name, devID, clientIP, 0)
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": "register executor failed"})
 			return

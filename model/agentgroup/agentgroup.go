@@ -1,11 +1,11 @@
-package secretkey
+package agentgroup
 
 import (
 	"errors"
 	"fmt"
 
+	msg "github.com/open-cmi/cmmns/msg/agentgroup"
 	"github.com/open-cmi/cmmns/msg/request"
-	msg "github.com/open-cmi/cmmns/msg/secretkey"
 	"github.com/open-cmi/cmmns/storage/db"
 	"github.com/open-cmi/cmmns/utils"
 )
@@ -16,12 +16,12 @@ type ModelOption struct {
 
 func Get(mo *ModelOption, id string) *Model {
 	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select id,name,key_type,key_length,comment from secret_key where id=$1")
+	queryclause := fmt.Sprintf("select * from agent_group where id=$1")
 
 	var model Model
 	sqldb := db.GetDB()
 	row := sqldb.QueryRow(queryclause, id)
-	err := row.Scan(&model.ID, &model.Name, &model.KeyType, &model.KeyLength, &model.Comment)
+	err := row.Scan(&model.ID, &model.Name)
 	if err == nil {
 		// 用户名已经被占用
 		return &model
@@ -35,7 +35,7 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 
 	var results []Model = []Model{}
 
-	countClause := fmt.Sprintf("select count(*) from secret_key")
+	countClause := fmt.Sprintf("select count(*) from agent_group")
 	whereClause, args := utils.BuildWhereClause(p)
 	countClause += whereClause
 	row := dbsql.QueryRow(countClause, args...)
@@ -46,7 +46,7 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 		return 0, results, errors.New("get count failed")
 	}
 
-	queryClause := fmt.Sprintf(`select id,name,key_type,key_length,comment,public_key from secret_key`)
+	queryClause := fmt.Sprintf(`select id,name,description from agent_group`)
 	queryClause += whereClause
 	rows, err := dbsql.Query(queryClause, args...)
 	if err != nil {
@@ -56,7 +56,7 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 
 	for rows.Next() {
 		var item Model
-		err := rows.Scan(&item.ID, &item.Name, &item.KeyType, &item.KeyLength, &item.Comment, &item.PublicKey)
+		err := rows.Scan(&item.ID, &item.Name, &item.Description)
 		if err != nil {
 			break
 		}
@@ -88,7 +88,7 @@ func MultiDelete(mo *ModelOption, ids []string) error {
 		args = append(args, item)
 	}
 
-	deleteClause := fmt.Sprintf("delete from secret_key where id in %s", list)
+	deleteClause := fmt.Sprintf("delete from agent_group where id in %s", list)
 	_, err := dbsql.Exec(deleteClause, args...)
 	if err != nil {
 		return errors.New("delete item failed")
@@ -110,8 +110,8 @@ func Create(mo *ModelOption, reqMsg *msg.CreateMsg) (m *Model, err error) {
 	return m, err
 }
 
-func Edit(mo *ModelOption, id string, reqMsg *msg.EditMsg) error {
-	m := Get(mo, id)
+func Edit(mo *ModelOption, name string, reqMsg *msg.EditMsg) error {
+	m := Get(mo, name)
 	if m == nil {
 		return errors.New("item not exist")
 	}
@@ -121,8 +121,8 @@ func Edit(mo *ModelOption, id string, reqMsg *msg.EditMsg) error {
 	return err
 }
 
-func Delete(mo *ModelOption, id string) error {
-	m := Get(mo, id)
+func Delete(mo *ModelOption, name string) error {
+	m := Get(mo, name)
 	if m == nil {
 		return errors.New("item not exist")
 	}

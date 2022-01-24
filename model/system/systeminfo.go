@@ -6,7 +6,8 @@ import (
 	"strings"
 	"time"
 
-	sysmod "github.com/open-cmi/cmmns/modules/system"
+	"github.com/open-cmi/cmmns/logger"
+	sysmod "github.com/open-cmi/cmmns/module/system"
 	"github.com/open-cmi/cmmns/storage/db"
 	"github.com/open-cmi/goutils/devutil"
 
@@ -116,6 +117,7 @@ func UpdateSystemInfo() {
 	sqldb := db.DB
 	_, err := sqldb.Exec(sqlquery)
 	if err != nil {
+		logger.Logger.Printf(logger.Error, "update system info failed: %s\n", err.Error())
 	}
 	return
 }
@@ -123,12 +125,4 @@ func UpdateSystemInfo() {
 // StartMonitor start to UpdateSystemInfo device resource
 func StartMonitor() {
 	UpdateSystemInfo()
-	ticker := time.NewTicker(30 * time.Second)
-	defer ticker.Stop()
-	for {
-		select {
-		case <-ticker.C:
-			UpdateSystemInfo()
-		}
-	}
 }

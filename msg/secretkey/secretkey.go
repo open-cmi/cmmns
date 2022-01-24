@@ -5,7 +5,7 @@ type CreateMsg struct {
 	KeyType      string `json:"key_type"`
 	KeyLength    int    `json:"key_length"`
 	Comment      string `json:"comment"`
-	PassPrase    string `json:"passprase"`
+	PassPhrase   string `json:"passphrase"`
 	Confirmation string `json:"confirmation"`
 }
 
@@ -18,6 +18,6 @@ type EditMsg struct {
 	KeyType      string `json:"key_type"`
 	KeyLength    int    `json:"key_length"`
 	Comment      string `json:"comment"`
-	PassPrase    string `json:"passprase"`
+	PassPhrase   string `json:"passphrase"`
 	Confirmation string `json:"confirmation"`
 }

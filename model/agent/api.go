@@ -1,11 +1,12 @@
-package template
+package agent
 
 import (
 	"errors"
 	"fmt"
+	"strings"
 
+	msg "github.com/open-cmi/cmmns/msg/agent"
 	"github.com/open-cmi/cmmns/msg/request"
-	msg "github.com/open-cmi/cmmns/msg/template"
 	"github.com/open-cmi/cmmns/storage/db"
 	"github.com/open-cmi/cmmns/utils"
 )
@@ -14,19 +15,23 @@ type ModelOption struct {
 	UserID string
 }
 
-func Get(mo *ModelOption, id string) *Model {
-	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select * from template where id=$1")
+func Get(mo *ModelOption, field string, value string) *Model {
+	columns := []string{"id", "dev_id", "name", "address", "port",
+		"conn_type", "username", "password", "secret_key", "location", "state"}
 
-	var model Model
-	sqldb := db.GetDB()
-	row := sqldb.QueryRow(queryclause, id)
-	err := row.Scan(&model.ID, &model.Name)
-	if err == nil {
-		// 用户名已经被占用
-		return &model
+	queryClause := fmt.Sprintf(`select %s from agent where %s=$1`, strings.Join(columns, ","), field)
+	dbsql := db.GetDB()
+	row := dbsql.QueryRow(queryClause, value)
+
+	var mdl Model
+	err := row.Scan(&mdl.ID, &mdl.DeviceID, &mdl.Name, &mdl.Address,
+		&mdl.Port, &mdl.ConnType, &mdl.User, &mdl.Password, &mdl.SecretKey,
+		&mdl.Location, &mdl.State)
+	if err != nil {
+		return nil
 	}
-	return nil
+
+	return &mdl
 }
 
 // List list
@@ -35,7 +40,7 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 
 	var results []Model = []Model{}
 
-	countClause := fmt.Sprintf("select count(*) from template")
+	countClause := fmt.Sprintf("select count(*) from agent")
 	whereClause, args := utils.BuildWhereClause(p)
 	countClause += whereClause
 	row := dbsql.QueryRow(countClause, args...)
@@ -46,8 +51,13 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 		return 0, results, errors.New("get count failed")
 	}
 
-	queryClause := fmt.Sprintf(`select id,name from template`)
-	queryClause += whereClause
+	columns := []string{
+		"id", "dev_id", "name", "address",
+		"port", "conn_type", "username", "password", "secret_key", "location", "state",
+	}
+	queryClause := fmt.Sprintf(`select %s from agent`, strings.Join(columns, ","))
+	finalClause := utils.BuildFinalClause(p)
+	queryClause += (whereClause + finalClause)
 	rows, err := dbsql.Query(queryClause, args...)
 	if err != nil {
 		// 没有的话，也不需要报错
@@ -56,7 +66,9 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 
 	for rows.Next() {
 		var item Model
-		err := rows.Scan(&item.ID, &item.Name)
+		err := rows.Scan(&item.ID, &item.DeviceID, &item.Name, &item.Address,
+			&item.Port, &item.ConnType, &item.User, &item.Password,
+			&item.SecretKey, &item.Location, &item.State)
 		if err != nil {
 			break
 		}
@@ -88,7 +100,7 @@ func MultiDelete(mo *ModelOption, ids []string) error {
 		args = append(args, item)
 	}
 
-	deleteClause := fmt.Sprintf("delete from template where id in %s", list)
+	deleteClause := fmt.Sprintf("delete from agent where id in %s", list)
 	_, err := dbsql.Exec(deleteClause, args...)
 	if err != nil {
 		return errors.New("delete item failed")
@@ -98,7 +110,7 @@ func MultiDelete(mo *ModelOption, ids []string) error {
 
 func Create(mo *ModelOption, reqMsg *msg.CreateMsg) (m *Model, err error) {
 	// 先检查用户名是否存在
-	model := Get(mo, reqMsg.Name)
+	model := Get(mo, "name", reqMsg.Name)
 	if model != nil {
 		// 用户名已经被占用
 		return nil, errors.New("name has been used")
@@ -110,8 +122,8 @@ func Create(mo *ModelOption, reqMsg *msg.CreateMsg) (m *Model, err error) {
 	return m, err
 }
 
-func Edit(mo *ModelOption, name string, reqMsg *msg.EditMsg) error {
-	m := Get(mo, name)
+func Edit(mo *ModelOption, id string, reqMsg *msg.EditMsg) error {
+	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")
 	}
@@ -120,8 +132,8 @@ func Edit(mo *ModelOption, name string, reqMsg *msg.EditMsg) error {
 	return err
 }
 
-func Delete(mo *ModelOption, name string) error {
-	m := Get(mo, name)
+func Delete(mo *ModelOption, id string) error {
+	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")
 	}
