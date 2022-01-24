@@ -53,7 +53,8 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 
 	columns := []string{
 		"id", "dev_id", "name", "address",
-		"port", "conn_type", "username", "password", "secret_key", "location", "state",
+		"port", "conn_type", "username",
+		"password", "secret_key", "location", "state",
 	}
 	queryClause := fmt.Sprintf(`select %s from agent`, strings.Join(columns, ","))
 	finalClause := utils.BuildFinalClause(p)

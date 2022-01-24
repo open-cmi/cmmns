@@ -12,7 +12,7 @@ func Init() {
 	c := cron.New(cron.WithSeconds())
 
 	// run every minitue
-	c.AddFunc("0 */1 * * * *", func() {
+	c.AddFunc("0 */5 * * * *", func() {
 		logger.Logger.Debug("system monitor start\n")
 		system.StartMonitor()
 	})

@@ -19,7 +19,7 @@ func NewScheduler(namespace string) *Scheduler {
 
 	sched.Namespace = namespace
 	sched.ShouldStop = false
-	sched.Jobs = make(map[string]*Job, 1)
+	sched.Jobs = make(map[string]*Job, 0)
 	return &sched
 }
 

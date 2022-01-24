@@ -50,23 +50,21 @@ func main() {
 	middleware.UserPermMiddleware(r)
 	cmmns.AuthInit(r)
 
-	useSocket := false
-	if useSocket {
-		const sockAddr = "/tmp/cmmns.sock"
-		os.Remove(sockAddr)
-		unixAddr, err := net.ResolveUnixAddr("unix", sockAddr)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		listener, err := net.ListenUnix("unix", unixAddr)
-		if err != nil {
-			fmt.Println("listening error:", err)
-		}
-		fmt.Printf("listening unix socket: %s\n", sockAddr)
-		http.Serve(listener, r)
-	} else {
-		r.Run(":30000")
+	// unix sock api
+	const sockAddr = "/tmp/cmmns.sock"
+	os.Remove(sockAddr)
+	unixAddr, err := net.ResolveUnixAddr("unix", sockAddr)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
+
+	listener, err := net.ListenUnix("unix", unixAddr)
+	if err != nil {
+		fmt.Println("listening error:", err)
+	}
+	fmt.Printf("listening unix socket: %s\n", sockAddr)
+	go http.Serve(listener, r)
+
+	r.Run(":30000")
 }
