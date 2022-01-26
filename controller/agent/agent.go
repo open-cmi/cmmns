@@ -1,21 +1,19 @@
 package agent
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/controller"
 	model "github.com/open-cmi/cmmns/model/agent"
-	agentmsg "github.com/open-cmi/cmmns/msg/agent"
-	msg "github.com/open-cmi/cmmns/msg/request"
+	msg "github.com/open-cmi/cmmns/msg/agent"
+	"github.com/open-cmi/cmmns/msg/request"
 	"github.com/open-cmi/cmmns/utils"
 )
 
 // List list agents
 func List(c *gin.Context) {
-	var param msg.RequestQuery
+	var param request.RequestQuery
 	utils.ParseParams(c, &param)
 	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
@@ -40,7 +38,7 @@ func List(c *gin.Context) {
 
 // Create create agent
 func Create(c *gin.Context) {
-	var createmsg agentmsg.CreateMsg
+	var createmsg msg.CreateMsg
 	if err := c.ShouldBindJSON(&createmsg); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -82,43 +80,71 @@ func Delete(c *gin.Context) {
 	return
 }
 
-// DeployAgent deploy agent
-func DeployAgent(c *gin.Context) {
-	var dmsg agentmsg.DeployMsg
+// Deploy deploy agent
+func Deploy(c *gin.Context) {
+	var dmsg msg.DeployMsg
 	if err := c.ShouldBindJSON(&dmsg); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+
+	// get user
 	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	taskid := fmt.Sprintf("deploy-task-%d", time.Now().Unix())
-	var agents []model.Model = []model.Model{}
 	for _, id := range dmsg.ID {
-		mdl := model.Get(&model.ModelOption{
+		agent := model.Get(&model.ModelOption{
 			UserID: userID,
 		}, "id", id)
-		if mdl == nil {
+		if agent == nil {
 			continue
 		}
-		agents = append(agents, *mdl)
-	}
-
-	if len(agents) != 0 {
-		err := Deploy(taskid, agents)
-		if err != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"ret": 1,
-				"msg": err.Error(),
-			})
-			return
+		var err error
+		if agent.IsLocal {
+			err = DeployLocal()
+		} else {
+			err = DeployRemote(agent)
 		}
+		if err != nil {
+			// 部署失败，写任务日志信息
+			agent.Reason = err.Error()
+			agent.State = model.StateDeployFailed
+		} else {
+			agent.State = model.StateDeploySuccess
+		}
+		agent.Save()
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"ret":  0,
-		"msg":  "",
-		"data": taskid,
+		"ret": 0,
+		"msg": "",
+	})
+	return
+}
+
+func Edit(c *gin.Context) {
+	identify := c.Param("id")
+
+	var reqMsg msg.EditMsg
+
+	if err := c.ShouldBindJSON(&reqMsg); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	user := controller.GetUser(c)
+	userID, _ := user["id"].(string)
+	err := model.Edit(&model.ModelOption{
+		UserID: userID,
+	}, identify, &reqMsg)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
 	})
 	return
 }

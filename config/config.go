@@ -36,18 +36,17 @@ type EmailInfo struct {
 	SMTPHost   string `json:"smtp_host"`
 }
 
-type DistributedConfig struct {
-	AgentPackageLocation string `json:"agent_package_location"` // agent packge的本地位置
-	AgentConfigLocation  string `json:"agent_config_location"`  // agent的远端配置文件位置
+type AgentConfig struct {
+	LinuxPackage string `json:"linux_package"` // linux packge的位置，相对root path路径
 }
 
-type MasterInfoConfig struct {
-	InternalAddress string `json:"internal_address"`
-	InternalPort    int    `json:"internal_port"`
-	InternalProto   string `json:"internal_proto"`
-	ExternalAddress string `json:"external_address"`
-	ExternalPort    int    `json:"external_port"`
-	ExternalProto   string `json:"external_proto"`
+type MasterConfig struct {
+	LocalAddress string `json:"local_address"`
+	LocalPort    int    `json:"local_port"`
+	LocalProto   string `json:"local_proto"`
+	Address      string `json:"address"`
+	Port         int    `json:"port"`
+	Proto        string `json:"proto"`
 }
 
 type RemoteService struct {
@@ -73,8 +72,8 @@ type Config struct {
 	Model        DatabaseModel      `json:"model"`
 	Rdb          RedisCache         `json:"rdb"`
 	Email        EmailInfo          `json:"email"`
-	MasterInfo   MasterInfoConfig   `json:"masterinfo"`
-	Distributed  DistributedConfig  `json:"distributed"`
+	Master       MasterConfig       `json:"master,omitempty"`
+	Agent        AgentConfig        `json:"agent,omitempty"`
 	RemoteAssist RemoteAssistConfig `json:"remote_assist"`
 }
 

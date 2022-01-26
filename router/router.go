@@ -1,15 +1,11 @@
 package router
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 )
 
 // NauthInit no auth router init
 func NauthInit(e *gin.Engine) {
-	fmt.Println("NauthInit")
-
 	CaptchaGroup(e)
 	UserNauthGroup(e)
 	AgentNauthGroup(e)
@@ -18,6 +14,7 @@ func NauthInit(e *gin.Engine) {
 // AuthInit auth router init
 func AuthInit(e *gin.Engine) {
 	AgentAuthGroup(e)
+	MasterAuthGroup(e)
 	AgentGroupAuthGroup(e)
 	UserAuthGroup(e)
 	SystemGroup(e)

@@ -49,7 +49,7 @@ func (s *Scheduler) Run() {
 
 // CheckAppointedJob check self job
 func (r *Scheduler) HasAppointedJob(executor *Executor) bool {
-	queue := fmt.Sprintf("%s_appointed_job_%s", r.Namespace, executor.DeviceID)
+	queue := fmt.Sprintf("%s_appointed_job_%s", r.Namespace, executor.DevID)
 	cache := rdb.GetCache(rdb.TaskCache)
 	l, err := cache.LLen(context.TODO(), queue).Result()
 	if err != nil || l == 0 {
@@ -98,7 +98,7 @@ func (r *Scheduler) GetGroupJob(executor *Executor) (req JobContent, err error) 
 
 // GetAppointedJob pop self task
 func (r *Scheduler) GetAppointedJob(executor *Executor) (req JobContent, err error) {
-	queue := fmt.Sprintf("%s_appointed_job_%s", r.Namespace, executor.DeviceID)
+	queue := fmt.Sprintf("%s_appointed_job_%s", r.Namespace, executor.DevID)
 	cache := rdb.GetCache(rdb.TaskCache)
 	taskstr, err := cache.LPop(context.TODO(), queue).Result()
 	if err != nil {

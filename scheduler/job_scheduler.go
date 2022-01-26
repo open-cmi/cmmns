@@ -115,7 +115,7 @@ func (r *JobScheduler) EnqueueAppointed(executor *Executor, job JobContent) erro
 		return err
 	}
 
-	queue := fmt.Sprintf("%s_appointed_job_%s", r.Namespace, executor.DeviceID)
+	queue := fmt.Sprintf("%s_appointed_job_%s", r.Namespace, executor.DevID)
 	err = cache.LPush(context.TODO(), queue, string(jsonTask)).Err()
 	if err != nil {
 		return err

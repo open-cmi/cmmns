@@ -11,7 +11,7 @@ import (
 // parseMsg
 func dispatchMsg(msgchannel string, msg string) {
 	switch msgchannel {
-	case "DeployAgent":
+	case "Deploy":
 	default:
 	}
 }
@@ -20,7 +20,7 @@ func dispatchMsg(msgchannel string, msg string) {
 func Init() {
 	cache := rdb.GetCache(rdb.TaskCache)
 	pubsub := cache.Subscribe(context.TODO(),
-		"DeployAgent",
+		"Deploy",
 	)
 
 	for {

@@ -24,7 +24,7 @@ func Get(mo *ModelOption, field string, value string) *Model {
 	row := dbsql.QueryRow(queryClause, value)
 
 	var mdl Model
-	err := row.Scan(&mdl.ID, &mdl.DeviceID, &mdl.Name, &mdl.Address,
+	err := row.Scan(&mdl.ID, &mdl.DevID, &mdl.Name, &mdl.Address,
 		&mdl.Port, &mdl.ConnType, &mdl.User, &mdl.Password, &mdl.SecretKey,
 		&mdl.Location, &mdl.State)
 	if err != nil {
@@ -52,9 +52,9 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 	}
 
 	columns := []string{
-		"id", "dev_id", "name", "address",
+		"id", "dev_id", "name", "address", "group_name",
 		"port", "conn_type", "username",
-		"password", "secret_key", "location", "state",
+		"password", "secret_key", "location", "state", "reason", "description",
 	}
 	queryClause := fmt.Sprintf(`select %s from agent`, strings.Join(columns, ","))
 	finalClause := utils.BuildFinalClause(p)
@@ -67,9 +67,9 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 
 	for rows.Next() {
 		var item Model
-		err := rows.Scan(&item.ID, &item.DeviceID, &item.Name, &item.Address,
+		err := rows.Scan(&item.ID, &item.DevID, &item.Name, &item.Address, &item.Group,
 			&item.Port, &item.ConnType, &item.User, &item.Password,
-			&item.SecretKey, &item.Location, &item.State)
+			&item.SecretKey, &item.Location, &item.State, &item.Reason, &item.Description)
 		if err != nil {
 			break
 		}
@@ -129,6 +129,15 @@ func Edit(mo *ModelOption, id string, reqMsg *msg.EditMsg) error {
 		return errors.New("item not exist")
 	}
 	m.Name = reqMsg.Name
+	m.Address = reqMsg.Address
+	m.ConnType = reqMsg.ConnType
+	m.Description = reqMsg.Description
+	m.Group = reqMsg.Group
+	m.Password = reqMsg.Password
+	m.Port = reqMsg.Port
+	m.SecretKey = reqMsg.SecretKey
+	m.User = reqMsg.UserName
+
 	err := m.Save()
 	return err
 }

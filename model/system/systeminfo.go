@@ -16,7 +16,7 @@ import (
 
 // SystemInfo device info
 type SystemInfo struct {
-	DeviceID        string  `json:"deviceid"`
+	DevID           string  `json:"deviceid"`
 	CPUUsage        float64 `json:"cpu_usage"`
 	DiskUsed        uint64  `json:"disk_used"`
 	DiskTotal       uint64  `json:"disk_total"`
@@ -55,7 +55,7 @@ func GetSystemInfo() (info SystemInfo, err error) {
 		return info, errors.New("get db system info failed")
 	}
 
-	err = row.Scan(&info.DeviceID, &info.CPUUsage, &info.DiskUsed, &info.DiskTotal, &info.DiskUsedPercent,
+	err = row.Scan(&info.DevID, &info.CPUUsage, &info.DiskUsed, &info.DiskTotal, &info.DiskUsedPercent,
 		&info.MemUsed, &info.MemTotal, &info.MemUsedPercent, &info.NetSent, &info.NetRecv, &info.LoadAvg1,
 		&info.LoadAvg5, &info.LoadAvg15)
 	if err != nil {
@@ -64,8 +64,8 @@ func GetSystemInfo() (info SystemInfo, err error) {
 	return info, nil
 }
 
-// InitDeviceID init device id
-func InitDeviceID() {
+// InitDevID init device id
+func InitDevID() {
 	utime := time.Now().UTC().Format(time.RFC3339)
 	deviceid := devutil.GetDeviceID()
 	if deviceid == "" {

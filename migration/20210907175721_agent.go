@@ -14,7 +14,7 @@ type AgentInstance struct {
 func (mi AgentInstance) Up() error {
 	db := global.DB
 
-	// conntype: password表示用户名密码 secretkey表示密钥
+	// conn_type: password表示用户名密码 secretkey表示密钥
 	// state:
 	// 0: 刚创建，默认
 	// 1: 部署成功,等待连接
@@ -28,9 +28,9 @@ func (mi AgentInstance) Up() error {
 			name varchar(128) NOT NULL unique,
 			group_name varchar(128) NOT NULL default '',
 			address varchar(134) unique NOT NULL,
+			local_address varchar(134) UNIQUE NOT NULL DEFAULT '',
 			port int NOT NULL default 22,
-			conn_type varchar(64) NOT NULL default 'userpass',
-			ctime int NOT NULL default 0,
+			conn_type varchar(64) NOT NULL default 'password',
 			username varchar(256) NOT NULL default '',
 			password varchar(256) NOT NULL default '',
 			secret_key varchar(256) NOT NULL default '',
@@ -38,6 +38,7 @@ func (mi AgentInstance) Up() error {
 			reason varchar(256) NOT NULL DEFAULT '',
 			active_time int NOT NULL default 0,
 			description varchar(256) NOT NULL DEFAULT '',
+			ctime int NOT NULL default 0,
 			location varchar(64) default 'unknown'
 		);
 	`

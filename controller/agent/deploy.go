@@ -1,7 +1,6 @@
 package agent
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os/exec"
@@ -15,40 +14,26 @@ import (
 	"github.com/open-cmi/goutils/sshutil"
 )
 
-type MasterInfo struct {
-	Address string `json:"address"`
-	Port    uint   `json:"port"`
-	Proto   string `json:"proto"`
-}
-
 func GetAgentPackage() string {
-	AgentPackage := config.GetConfig().Distributed.AgentPackageLocation
+	AgentPackage := config.GetConfig().Agent.LinuxPackage
 	if !strings.HasPrefix(AgentPackage, "/") {
 		rp := pathutil.GetRootPath()
-		return filepath.Join(rp, "data", AgentPackage)
+		return filepath.Join(rp, AgentPackage)
 	}
 	return AgentPackage
 }
 
-func GetAgentConfigFile() string {
-	// 根据配置文件中，获取端口以及地址
-	masterInfoFile := config.GetConfig().Distributed.AgentConfigLocation
-	if !strings.HasPrefix(masterInfoFile, "/") {
+func DeployRemote(agent *model.Model) error {
+	agentPackage := config.GetConfig().Agent.LinuxPackage
+	if !strings.HasPrefix(agentPackage, "/") {
 		rp := pathutil.GetRootPath()
-		masterInfoFile = filepath.Join(rp, "etc", masterInfoFile)
+		agentPackage = filepath.Join(rp, agentPackage)
 	}
 
-	/*
-		parser := confparser.New(agentConfigFile)
-		if parser == nil {
-			return mi, errors.New("parse config failed")
-		}
-		err = parser.Load(&mi)
-	*/
-	return masterInfoFile
-}
+	if !fileutil.FileExist(agentPackage) {
+		return errors.New("agent package is not exist")
+	}
 
-func DeployRemote(agent *model.Model, agentPackage string) error {
 	// 拷贝安装包
 	ss := sshutil.NewSSHServer(agent.Address, agent.Port,
 		agent.ConnType, agent.User, agent.Password, agent.SecretKey)
@@ -63,30 +48,6 @@ func DeployRemote(agent *model.Model, agentPackage string) error {
 	// 安装
 	tarCmd := fmt.Sprintf("tar xzvf %s", name)
 	err = ss.SSHRun(tarCmd)
-	if err != nil {
-		return err
-	}
-
-	// 读取配置文件
-	var agentConfig config.AgentConfig
-	content, err := ss.ReadAll("./nayagent/etc/config.json")
-	err = json.Unmarshal(content, &agentConfig)
-	if err != nil {
-		return err
-	}
-	masterInfo := config.GetConfig().MasterInfo
-	if masterInfo.ExternalPort == 80 || masterInfo.ExternalPort == 443 {
-		agentConfig.Master = fmt.Sprintf("%s://%s", masterInfo.ExternalProto, masterInfo.ExternalAddress)
-	} else {
-		agentConfig.Master = fmt.Sprintf("%s://%s:%d", masterInfo.ExternalProto, masterInfo.ExternalAddress, masterInfo.InternalPort)
-	}
-
-	// 写入配置文件
-	w, err := json.MarshalIndent(agentConfig, "", "  ")
-	if err != nil {
-		return err
-	}
-	_, err = ss.WriteString("./nayagent/etc/config.json", string(w))
 	if err != nil {
 		return err
 	}
@@ -111,32 +72,4 @@ func DeployLocal() error {
 	cmd := exec.Command("systemctl", nayargs...)
 	err := cmd.Run()
 	return err
-}
-
-func Deploy(taskid string, agents []model.Model) error {
-	agentPackage := GetAgentPackage()
-
-	for index := 0; index < len(agents); index++ {
-		agent := &agents[index]
-		var err error
-		if agent.IsLocal {
-			err = DeployLocal()
-		} else {
-			if fileutil.FileExist(agentPackage) {
-				err = DeployRemote(agent, agentPackage)
-			} else {
-				err = errors.New("agent package is not exist")
-			}
-		}
-		if err != nil {
-			// 部署失败，写任务日志信息
-			agent.Reason = err.Error()
-			agent.State = model.StateDeployFailed
-		} else {
-			agent.State = model.StateDeploySuccess
-		}
-		agent.Save()
-	}
-
-	return nil
 }

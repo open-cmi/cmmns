@@ -37,14 +37,14 @@ func main() {
 		return
 	}
 	// init router
-	r := gin.Default()
+	r := gin.New()
 
 	err = middleware.Init()
 	if err != nil {
 		fmt.Printf("middleware init failed")
 		return
 	}
-
+	middleware.DefaultMiddleware(r)
 	middleware.AuthMiddleware(r)
 	cmmns.NauthInit(r)
 	middleware.UserPermMiddleware(r)

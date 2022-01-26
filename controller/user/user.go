@@ -256,7 +256,7 @@ func Register(c *gin.Context) {
 
 	e := email.NewEmail()
 	emailInfo := config.GetConfig().Email
-	domain := config.GetConfig().MasterInfo.ExternalAddress
+	domain := config.GetConfig().Master.Address
 	e.From = emailInfo.From
 	e.To = []string{apimsg.Email}
 	//e.Cc = []string{"danielzhao2012@163.com"}

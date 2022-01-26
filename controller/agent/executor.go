@@ -19,7 +19,7 @@ func KeepAlive(c *gin.Context) {
 		return
 	}
 
-	// 先查缓存是否存在
+	// 先检查executor是否存在，如果不存在，则查询model
 	executor, err := scheduler.GetExecutor(devID)
 	if err != nil {
 		mdl := model.Get(&model.ModelOption{
@@ -29,8 +29,9 @@ func KeepAlive(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": "agent not exist"})
 			return
 		}
-		// 新节点，需要查询数据进行更新
-		mdl.DeviceID = devID
+		// 节点存在，需要更新信息
+		mdl.DevID = devID
+		mdl.State = model.StateOnline
 		err = mdl.Save()
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": err.Error()})

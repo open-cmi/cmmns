@@ -11,10 +11,10 @@ import (
 
 // Executor job executor
 type Executor struct {
-	Name     string `json:"name"`
-	DeviceID string `json:"deviceid"`
-	Address  string `json:"address"`
-	Group    int    `json:"group"`
+	Name    string `json:"name"`
+	DevID   string `json:"deviceid"`
+	Address string `json:"address"`
+	Group   int    `json:"group"`
 }
 
 var ExecutorPrefix string = "executor_"
@@ -30,7 +30,7 @@ func RegisterExecutor(name string, deviceid string, address string, group int) e
 	var exer Executor
 
 	exer.Name = name
-	exer.DeviceID = deviceid
+	exer.DevID = deviceid
 	exer.Address = address
 	exer.Group = group
 
@@ -72,7 +72,7 @@ func (e *Executor) Unregister(name string) {
 // Refresh executor refresh
 func (e *Executor) Refresh() error {
 	cache := rdb.GetCache(rdb.AgentCache)
-	key := getExecutorKey(e.DeviceID)
+	key := getExecutorKey(e.DevID)
 	_, err := cache.Expire(context.TODO(), key, time.Second*5*60).Result()
 	return err
 }

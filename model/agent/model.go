@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/open-cmi/cmmns/logger"
 	"github.com/open-cmi/cmmns/storage/db"
-	"github.com/open-cmi/goutils/logutil"
 
 	msg "github.com/open-cmi/cmmns/msg/agent"
 )
@@ -23,22 +22,23 @@ const (
 
 // Model  model
 type Model struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	DeviceID    string `json:"dev_id"`
-	Group       string `json:"group"`
-	Address     string `json:"address"`
-	Port        int    `json:"port"`
-	IsLocal     bool   `json:"is_local"`
-	ConnType    string `json:"conn_type"`
-	User        string `json:"user"`
-	Password    string `json:"-"`
-	SecretKey   string `json:"secret_key"`
-	Location    string `json:"location"`
-	State       int    `json:"state"`
-	Reason      string `json:"reason"`
-	Description string `json:"description"`
-	isNew       bool
+	ID           string `json:"id" db:"id"`
+	Name         string `json:"name" db:"name"`
+	DevID        string `json:"dev_id" db:"dev_id"`
+	Group        string `json:"group" db:"group_name"`
+	Address      string `json:"address" db:"address"`
+	LocalAddress string `json:"local_address" db:"local_address"`
+	Port         int    `json:"port" db:"port"`
+	IsLocal      bool   `json:"is_local" db:"is_local"`
+	ConnType     string `json:"conn_type" db:"conn_type"`
+	User         string `json:"user" db:"username"`
+	Password     string `json:"-" db:"password"`
+	SecretKey    string `json:"secret_key" db:"secret_key"`
+	Location     string `json:"location" db:"location"`
+	State        int    `json:"state" db:"state"`
+	Reason       string `json:"reason" db:"reason"`
+	Description  string `json:"description" db:"description"`
+	isNew        bool
 }
 
 // GetPassword 获取敏感使用
@@ -47,40 +47,37 @@ func (m *Model) GetPassword() {
 }
 
 func (m *Model) Save() error {
-	dbsql := db.GetDB()
+	sqldb := db.GetDB()
 
 	if m.isNew {
 		// 存储到数据库
 		columns := []string{"id", "name", "group_name",
 			"address", "port", "conn_type", "username", "password",
 			"secret_key", "description", "location"}
-		var values []string = []string{}
-		for index, _ := range columns {
-			seq := fmt.Sprintf(`$%d`, index+1)
-			values = append(values, seq)
-		}
+		values := db.GetColumnNamed(columns)
 
 		insertClause := fmt.Sprintf("insert into agent(%s) values(%s)",
 			strings.Join(columns, ","), strings.Join(values, ","))
-		logger.Logger.Printf(logger.Info, "%s", insertClause)
-		_, err := dbsql.Exec(insertClause, m.ID, m.Name, m.Group, m.Address, m.Port, m.ConnType, m.User,
-			m.Password, m.SecretKey, m.Description, m.Location)
+
+		logger.Logger.Debug("start to exec sql clause: %s", insertClause)
+
+		_, err := sqldb.NamedExec(insertClause, m)
 		if err != nil {
+			logger.Logger.Error("create model failed: %s", err.Error())
 			return errors.New("create model failed")
 		}
 	} else {
-		columns := []string{"name", "group_name",
-			"address", "port", "conn_type", "username", "password",
-			"secret_key", "description", "location", "state", "reason"}
+		columns := []string{"name", "group_name", "address", "port", "conn_type",
+			"username", "password", "secret_key", "description", "location", "state", "reason"}
 		var updates []string = []string{}
-		for index, column := range columns {
-			updates = append(updates, fmt.Sprintf(`%s=$%d`, column, index+1))
+		for _, column := range columns {
+			updates = append(updates, fmt.Sprintf(`%s=:%s`, column, column))
 		}
-		updateClause := fmt.Sprintf("update agent set %s where id=$%d", strings.Join(updates, ","), len(columns)+1)
-		_, err := dbsql.Exec(updateClause, m.Name, m.Group, m.Address, m.Port, m.ConnType, m.User,
-			m.Password, m.SecretKey, m.Description, m.Location, m.State, m.Reason, m.ID)
+		updateClause := fmt.Sprintf("update agent set %s where id=:id", strings.Join(updates, ","))
+		logger.Logger.Debug("start to exec sql clause: %s", updateClause)
+		_, err := sqldb.NamedExec(updateClause, m)
 		if err != nil {
-			logger.Logger.Printf(logutil.Error, "update agent model failed: %s", err.Error())
+			logger.Logger.Error("update agent model failed: %s", err.Error())
 			return errors.New("update model failed")
 		}
 	}
@@ -89,10 +86,10 @@ func (m *Model) Save() error {
 }
 
 func (m *Model) Remove() error {
-	dbsql := db.GetDB()
+	sqldb := db.GetDB()
 
 	deleteClause := fmt.Sprintf("delete from agent where id=$1")
-	_, err := dbsql.Exec(deleteClause, m.ID)
+	_, err := sqldb.Exec(deleteClause, m.ID)
 	if err != nil {
 		return errors.New("delete model failed")
 	}
