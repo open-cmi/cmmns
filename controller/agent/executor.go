@@ -22,9 +22,10 @@ func KeepAlive(c *gin.Context) {
 	// 先检查executor是否存在，如果不存在，则查询model
 	executor, err := scheduler.GetExecutor(devID)
 	if err != nil {
-		mdl := model.Get(&model.ModelOption{
-			UserID: "",
-		}, "address", clientIP)
+		var option model.Option
+		option.Option.UserID = ""
+
+		mdl := model.Get(&option, "address", clientIP)
 		if mdl == nil {
 			c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": "agent not exist"})
 			return
@@ -38,7 +39,7 @@ func KeepAlive(c *gin.Context) {
 			return
 		}
 
-		err = scheduler.RegisterExecutor(mdl.Name, devID, clientIP, 0)
+		err = scheduler.RegisterExecutor(devID, clientIP, 0)
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": "register executor failed"})
 			return

@@ -26,10 +26,9 @@ func getExecutorKey(deviceid string) string {
 
 // RegisterExecutor 注册新的执行器
 // name表示执行器的名称
-func RegisterExecutor(name string, deviceid string, address string, group int) error {
+func RegisterExecutor(deviceid string, address string, group int) error {
 	var exer Executor
 
-	exer.Name = name
 	exer.DevID = deviceid
 	exer.Address = address
 	exer.Group = group

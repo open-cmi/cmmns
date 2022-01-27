@@ -5,29 +5,25 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/open-cmi/cmmns/logger"
+	"github.com/open-cmi/cmmns/model"
 	msg "github.com/open-cmi/cmmns/msg/agent"
-	"github.com/open-cmi/cmmns/msg/request"
 	"github.com/open-cmi/cmmns/storage/db"
-	"github.com/open-cmi/cmmns/utils"
 )
 
-type ModelOption struct {
-	UserID string
+type Option struct {
+	model.Option
 }
 
-func Get(mo *ModelOption, field string, value string) *Model {
-	columns := []string{"id", "dev_id", "name", "address", "port",
-		"conn_type", "username", "password", "secret_key", "location", "state"}
-
-	queryClause := fmt.Sprintf(`select %s from agent where %s=$1`, strings.Join(columns, ","), field)
+func Get(mo *Option, field string, value string) *Model {
+	queryClause := fmt.Sprintf(`select * from agent where %s=$1`, field)
 	dbsql := db.GetDB()
-	row := dbsql.QueryRow(queryClause, value)
+	row := dbsql.QueryRowx(queryClause, value)
 
 	var mdl Model
-	err := row.Scan(&mdl.ID, &mdl.DevID, &mdl.Name, &mdl.Address,
-		&mdl.Port, &mdl.ConnType, &mdl.User, &mdl.Password, &mdl.SecretKey,
-		&mdl.Location, &mdl.State)
+	err := row.StructScan(&mdl)
 	if err != nil {
+		logger.Logger.Error(err.Error())
 		return nil
 	}
 
@@ -35,13 +31,13 @@ func Get(mo *ModelOption, field string, value string) *Model {
 }
 
 // List list
-func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
+func List(option *Option) (int, []Model, error) {
 	dbsql := db.GetDB()
 
 	var results []Model = []Model{}
 
 	countClause := fmt.Sprintf("select count(*) from agent")
-	whereClause, args := utils.BuildWhereClause(p)
+	whereClause, args := model.BuildWhereClause(&option.Option)
 	countClause += whereClause
 	row := dbsql.QueryRow(countClause, args...)
 
@@ -51,26 +47,22 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 		return 0, results, errors.New("get count failed")
 	}
 
-	columns := []string{
-		"id", "dev_id", "name", "address", "group_name",
-		"port", "conn_type", "username",
-		"password", "secret_key", "location", "state", "reason", "description",
-	}
+	columns := model.GetColumn(Model{}, []string{})
 	queryClause := fmt.Sprintf(`select %s from agent`, strings.Join(columns, ","))
-	finalClause := utils.BuildFinalClause(p)
+	finalClause := model.BuildFinalClause(&option.Option)
 	queryClause += (whereClause + finalClause)
-	rows, err := dbsql.Query(queryClause, args...)
+	rows, err := dbsql.Queryx(queryClause, args...)
 	if err != nil {
 		// 没有的话，也不需要报错
+		logger.Logger.Error(err.Error())
 		return count, results, nil
 	}
 
 	for rows.Next() {
 		var item Model
-		err := rows.Scan(&item.ID, &item.DevID, &item.Name, &item.Address, &item.Group,
-			&item.Port, &item.ConnType, &item.User, &item.Password,
-			&item.SecretKey, &item.Location, &item.State, &item.Reason, &item.Description)
+		err := rows.StructScan(&item)
 		if err != nil {
+			logger.Logger.Error(err.Error())
 			break
 		}
 
@@ -80,7 +72,7 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 }
 
 // List list
-func MultiDelete(mo *ModelOption, ids []string) error {
+func MultiDelete(mo *Option, ids []string) error {
 	dbsql := db.GetDB()
 
 	if len(ids) == 0 {
@@ -109,40 +101,46 @@ func MultiDelete(mo *ModelOption, ids []string) error {
 	return nil
 }
 
-func Create(mo *ModelOption, reqMsg *msg.CreateMsg) (m *Model, err error) {
+func Create(mo *Option, reqMsg *msg.CreateMsg) (m *Model, err error) {
 	// 先检查用户名是否存在
-	model := Get(mo, "name", reqMsg.Name)
+	model := Get(mo, "address", reqMsg.Address)
 	if model != nil {
 		// 用户名已经被占用
-		return nil, errors.New("name has been used")
+		return nil, errors.New("address has been used")
 	}
-
-	m = New(reqMsg)
+	m = New()
+	m.Group = reqMsg.Group
+	m.Address = reqMsg.Address
+	m.Port = reqMsg.Port
+	m.ConnType = reqMsg.ConnType
+	m.UserName = reqMsg.UserName
+	m.Passwd = reqMsg.Passwd
+	m.SecretKey = reqMsg.SecretKey
+	m.Description = reqMsg.Description
 	err = m.Save()
 
 	return m, err
 }
 
-func Edit(mo *ModelOption, id string, reqMsg *msg.EditMsg) error {
+func Edit(mo *Option, id string, reqMsg *msg.EditMsg) error {
 	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")
 	}
-	m.Name = reqMsg.Name
 	m.Address = reqMsg.Address
 	m.ConnType = reqMsg.ConnType
 	m.Description = reqMsg.Description
 	m.Group = reqMsg.Group
-	m.Password = reqMsg.Password
+	m.Passwd = reqMsg.Passwd
 	m.Port = reqMsg.Port
 	m.SecretKey = reqMsg.SecretKey
-	m.User = reqMsg.UserName
+	m.UserName = reqMsg.UserName
 
 	err := m.Save()
 	return err
 }
 
-func Delete(mo *ModelOption, id string) error {
+func Delete(mo *Option, id string) error {
 	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")

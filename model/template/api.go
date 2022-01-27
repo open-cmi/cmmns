@@ -3,62 +3,67 @@ package template
 import (
 	"errors"
 	"fmt"
+	"strings"
 
-	"github.com/open-cmi/cmmns/msg/request"
+	"github.com/open-cmi/cmmns/logger"
+	"github.com/open-cmi/cmmns/model"
 	msg "github.com/open-cmi/cmmns/msg/template"
 	"github.com/open-cmi/cmmns/storage/db"
-	"github.com/open-cmi/cmmns/utils"
 )
 
-type ModelOption struct {
-	UserID string
+type Option struct {
+	model.Option
 }
 
-func Get(mo *ModelOption, field string, value string) *Model {
-	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select * from template where %s=$1", field)
+func Get(mo *Option, field string, value string) *Model {
+	queryClause := fmt.Sprintf(`select * from template where %s=$1`, field)
+	dbsql := db.GetDB()
+	row := dbsql.QueryRowx(queryClause, value)
 
-	var model Model
-	sqldb := db.GetDB()
-	row := sqldb.QueryRow(queryclause, value)
-	err := row.Scan(&model.ID, &model.Name)
-	if err == nil {
-		// 用户名已经被占用
-		return &model
+	var mdl Model
+	err := row.StructScan(&mdl)
+	if err != nil {
+		logger.Logger.Error(err.Error())
+		return nil
 	}
-	return nil
+
+	return &mdl
 }
 
 // List list
-func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
+func List(option *Option) (int, []Model, error) {
 	dbsql := db.GetDB()
 
 	var results []Model = []Model{}
 
 	countClause := fmt.Sprintf("select count(*) from template")
-	whereClause, args := utils.BuildWhereClause(p)
+	whereClause, args := model.BuildWhereClause(&option.Option)
 	countClause += whereClause
 	row := dbsql.QueryRow(countClause, args...)
 
 	var count int
 	err := row.Scan(&count)
 	if err != nil {
+		logger.Logger.Error("count failed: %s\n", err.Error())
 		return 0, results, errors.New("get count failed")
 	}
 
-	queryClause := fmt.Sprintf(`select id,name from template`)
-	finalClause := utils.BuildFinalClause(p)
+	columns := model.GetColumn(Model{}, []string{})
+	queryClause := fmt.Sprintf(`select %s from template`, strings.Join(columns, ","))
+	finalClause := model.BuildFinalClause(&option.Option)
 	queryClause += (whereClause + finalClause)
-	rows, err := dbsql.Query(queryClause, args...)
+	rows, err := dbsql.Queryx(queryClause, args...)
 	if err != nil {
 		// 没有的话，也不需要报错
+		logger.Logger.Error(err.Error())
 		return count, results, nil
 	}
 
 	for rows.Next() {
 		var item Model
-		err := rows.Scan(&item.ID, &item.Name)
+		err := rows.StructScan(&item)
 		if err != nil {
+			logger.Logger.Error(err.Error())
 			break
 		}
 
@@ -68,7 +73,7 @@ func List(mo *ModelOption, p *request.RequestQuery) (int, []Model, error) {
 }
 
 // List list
-func MultiDelete(mo *ModelOption, ids []string) error {
+func MultiDelete(mo *Option, ids []string) error {
 	dbsql := db.GetDB()
 
 	if len(ids) == 0 {
@@ -97,31 +102,32 @@ func MultiDelete(mo *ModelOption, ids []string) error {
 	return nil
 }
 
-func Create(mo *ModelOption, reqMsg *msg.CreateMsg) (m *Model, err error) {
+func Create(mo *Option, reqMsg *msg.CreateMsg) (m *Model, err error) {
 	// 先检查用户名是否存在
 	model := Get(mo, "name", reqMsg.Name)
 	if model != nil {
 		// 用户名已经被占用
-		return nil, errors.New("name has been used")
+		return nil, errors.New("address has been used")
 	}
-
-	m = New(reqMsg)
+	m = New()
+	m.Name = reqMsg.Name
 	err = m.Save()
 
 	return m, err
 }
 
-func Edit(mo *ModelOption, id string, reqMsg *msg.EditMsg) error {
+func Edit(mo *Option, id string, reqMsg *msg.EditMsg) error {
 	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")
 	}
 	m.Name = reqMsg.Name
+
 	err := m.Save()
 	return err
 }
 
-func Delete(mo *ModelOption, id string) error {
+func Delete(mo *Option, id string) error {
 	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")

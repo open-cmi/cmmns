@@ -11,7 +11,9 @@ func SystemGroup(e *gin.Engine) {
 
 	g := e.Group("/api/common/v3/system")
 	{
-		g.GET("/info", system.GetSystemInfo)
+		g.GET("/", system.List)
+		g.GET("/:id", system.Get)
+
 		g.POST("/reboot", system.Reboot)
 	}
 }

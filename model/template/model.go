@@ -4,18 +4,19 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/open-cmi/cmmns/storage/db"
-
-	msg "github.com/open-cmi/cmmns/msg/template"
 )
 
 // Model  model
 type Model struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	isNew bool
+	ID          string `json:"id"`
+	CreatedTime int64  `json:"created_time" db:"created_time"`
+	UpdatedTime int64  `json:"updated_time" db:"updated_time"`
+	Name        string `json:"name"`
+	isNew       bool
 }
 
 // GetPassword 获取敏感使用
@@ -69,10 +70,12 @@ func (m *Model) Remove() error {
 	return nil
 }
 
-func New(reqMsg *msg.CreateMsg) (m *Model) {
+func New() (m *Model) {
+	now := time.Now().Unix()
 	return &Model{
-		ID:    uuid.NewString(),
-		Name:  reqMsg.Name,
-		isNew: true,
+		ID:          uuid.NewString(),
+		CreatedTime: now,
+		UpdatedTime: now,
+		isNew:       true,
 	}
 }

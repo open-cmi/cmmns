@@ -25,21 +25,19 @@ func (mi AgentInstance) Up() error {
 		CREATE TABLE IF NOT EXISTS agent (
 			id CHAR(64) NOT NULL primary key,
 			dev_id varchar(64) NOT NULL default '',
-			name varchar(128) NOT NULL unique,
-			group_name varchar(128) NOT NULL default '',
 			address varchar(134) unique NOT NULL,
+			hostname varchar(128) NOT NULL unique,
+			group_name varchar(128) NOT NULL default '',
 			local_address varchar(134) UNIQUE NOT NULL DEFAULT '',
 			port int NOT NULL default 22,
 			conn_type varchar(64) NOT NULL default 'password',
 			username varchar(256) NOT NULL default '',
-			password varchar(256) NOT NULL default '',
+			passwd varchar(256) NOT NULL default '',
 			secret_key varchar(256) NOT NULL default '',
 			state int NOT NULL default 0,
-			reason varchar(256) NOT NULL DEFAULT '',
-			active_time int NOT NULL default 0,
 			description varchar(256) NOT NULL DEFAULT '',
-			ctime int NOT NULL default 0,
-			location varchar(64) default 'unknown'
+			created_time int NOT NULL default 0,
+			updated_time int NOT NULL default 0
 		);
 	`
 	_, err := db.Exec(dbsql)

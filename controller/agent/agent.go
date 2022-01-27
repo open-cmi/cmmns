@@ -7,20 +7,14 @@ import (
 	"github.com/open-cmi/cmmns/controller"
 	model "github.com/open-cmi/cmmns/model/agent"
 	msg "github.com/open-cmi/cmmns/msg/agent"
-	"github.com/open-cmi/cmmns/msg/request"
-	"github.com/open-cmi/cmmns/utils"
 )
 
 // List list agents
 func List(c *gin.Context) {
-	var param request.RequestQuery
-	utils.ParseParams(c, &param)
-	user := controller.GetUser(c)
-	userID, _ := user["id"].(string)
+	var option model.Option
+	controller.ParseParams(c, &option.Option)
 
-	count, list, err := model.List(&model.ModelOption{
-		UserID: userID,
-	}, &param)
+	count, list, err := model.List(&option)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -52,9 +46,9 @@ func Create(c *gin.Context) {
 	userID, _ := user["id"].(string)
 
 	// 校验，这里暂时忽略
-	_, err := model.Create(&model.ModelOption{
-		UserID: userID,
-	}, &createmsg)
+	var option model.Option
+	option.Option.UserID = userID
+	_, err := model.Create(&option, &createmsg)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -69,9 +63,9 @@ func Delete(c *gin.Context) {
 	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	err := model.Delete(&model.ModelOption{
-		UserID: userID,
-	}, id)
+	var option model.Option
+	option.Option.UserID = userID
+	err := model.Delete(&option, id)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -91,23 +85,18 @@ func Deploy(c *gin.Context) {
 	// get user
 	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
+	var option model.Option
+	option.Option.UserID = userID
 
 	for _, id := range dmsg.ID {
-		agent := model.Get(&model.ModelOption{
-			UserID: userID,
-		}, "id", id)
+		agent := model.Get(&option, "id", id)
 		if agent == nil {
 			continue
 		}
 		var err error
-		if agent.IsLocal {
-			err = DeployLocal()
-		} else {
-			err = DeployRemote(agent)
-		}
+		err = DeployRemote(agent)
 		if err != nil {
 			// 部署失败，写任务日志信息
-			agent.Reason = err.Error()
 			agent.State = model.StateDeployFailed
 		} else {
 			agent.State = model.StateDeploySuccess
@@ -134,9 +123,10 @@ func Edit(c *gin.Context) {
 
 	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
-	err := model.Edit(&model.ModelOption{
-		UserID: userID,
-	}, identify, &reqMsg)
+	var option model.Option
+	option.Option.UserID = userID
+
+	err := model.Edit(&option, identify, &reqMsg)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return

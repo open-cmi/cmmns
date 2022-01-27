@@ -1,8 +1,6 @@
 package db
 
 import (
-	"fmt"
-
 	"github.com/open-cmi/cmmns/config"
 
 	"github.com/open-cmi/goutils/database"
@@ -38,13 +36,4 @@ func Init() error {
 // GetDB get db
 func GetDB() *sqlx.DB {
 	return DB
-}
-
-func GetColumnNamed(columns []string) []string {
-	var named []string = []string{}
-	for _, col := range columns {
-		seq := fmt.Sprintf(`:%s`, col)
-		named = append(named, seq)
-	}
-	return named
 }

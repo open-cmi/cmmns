@@ -4,45 +4,45 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/open-cmi/cmmns/logger"
+	"github.com/open-cmi/cmmns/model"
 	"github.com/open-cmi/cmmns/storage/db"
-
-	msg "github.com/open-cmi/cmmns/msg/agent"
 )
 
 const (
-	StateInit = iota
-	StateDeploySuccess
-	StateDeployFailed
-	StateOnline
-	StateOffline
+	StateInit          = iota
+	StateDeploySuccess // 部署成功
+	StateDeployFailed  // 部署失败
+	StateOnline        // 在线
+	StateOffline       // 离线
+	StateDeny          // 被用户禁用
 )
 
 // Model  model
 type Model struct {
 	ID           string `json:"id" db:"id"`
-	Name         string `json:"name" db:"name"`
+	CreatedTime  int64  `json:"created_time" db:"created_time"`
+	UpdatedTime  int64  `json:"updated_time" db:"updated_time"`
+	HostName     string `json:"hostname" db:"hostname"`
 	DevID        string `json:"dev_id" db:"dev_id"`
 	Group        string `json:"group" db:"group_name"`
 	Address      string `json:"address" db:"address"`
 	LocalAddress string `json:"local_address" db:"local_address"`
 	Port         int    `json:"port" db:"port"`
-	IsLocal      bool   `json:"is_local" db:"is_local"`
 	ConnType     string `json:"conn_type" db:"conn_type"`
-	User         string `json:"user" db:"username"`
-	Password     string `json:"-" db:"password"`
+	UserName     string `json:"username" db:"username"`
+	Passwd       string `json:"-" db:"passwd"`
 	SecretKey    string `json:"secret_key" db:"secret_key"`
-	Location     string `json:"location" db:"location"`
 	State        int    `json:"state" db:"state"`
-	Reason       string `json:"reason" db:"reason"`
 	Description  string `json:"description" db:"description"`
 	isNew        bool
 }
 
-// GetPassword 获取敏感使用
-func (m *Model) GetPassword() {
+// GetPasswd 获取敏感使用
+func (m *Model) GetPasswd() {
 	// 这里获取密码等敏感信息
 }
 
@@ -51,15 +51,13 @@ func (m *Model) Save() error {
 
 	if m.isNew {
 		// 存储到数据库
-		columns := []string{"id", "name", "group_name",
-			"address", "port", "conn_type", "username", "password",
-			"secret_key", "description", "location"}
-		values := db.GetColumnNamed(columns)
+		columns := model.GetColumn(*m, []string{})
+		values := model.GetColumnNamed(columns)
 
 		insertClause := fmt.Sprintf("insert into agent(%s) values(%s)",
 			strings.Join(columns, ","), strings.Join(values, ","))
 
-		logger.Logger.Debug("start to exec sql clause: %s", insertClause)
+		logger.Logger.Info("start to exec sql clause: %s", insertClause)
 
 		_, err := sqldb.NamedExec(insertClause, m)
 		if err != nil {
@@ -67,8 +65,9 @@ func (m *Model) Save() error {
 			return errors.New("create model failed")
 		}
 	} else {
-		columns := []string{"name", "group_name", "address", "port", "conn_type",
-			"username", "password", "secret_key", "description", "location", "state", "reason"}
+		columns := model.GetColumn(*m, []string{"id", "created_time"})
+
+		m.UpdatedTime = time.Now().Unix()
 		var updates []string = []string{}
 		for _, column := range columns {
 			updates = append(updates, fmt.Sprintf(`%s=:%s`, column, column))
@@ -96,19 +95,12 @@ func (m *Model) Remove() error {
 	return nil
 }
 
-func New(reqMsg *msg.CreateMsg) (m *Model) {
+func New() (m *Model) {
+	now := time.Now().Unix()
 	return &Model{
 		ID:          uuid.NewString(),
-		Name:        reqMsg.Name,
-		Group:       reqMsg.Group,
-		Address:     reqMsg.Address,
-		Port:        reqMsg.Port,
-		ConnType:    reqMsg.ConnType,
-		User:        reqMsg.UserName,
-		Password:    reqMsg.Password,
-		SecretKey:   reqMsg.SecretKey,
-		Location:    reqMsg.Location,
-		Description: reqMsg.Description,
+		CreatedTime: now,
+		UpdatedTime: now,
 		isNew:       true,
 	}
 }

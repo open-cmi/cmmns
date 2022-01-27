@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/open-cmi/cmmns"
+	"github.com/open-cmi/cmmns/logger"
 	"github.com/open-cmi/cmmns/middleware"
 	"github.com/open-cmi/cmmns/migration"
 	"github.com/open-cmi/migrate"
@@ -33,7 +34,7 @@ func main() {
 
 	err := cmmns.Init(configfile)
 	if err != nil {
-		fmt.Printf("service init failed\n")
+		logger.Logger.Error("service init failed\n")
 		return
 	}
 	// init router
@@ -41,7 +42,7 @@ func main() {
 
 	err = middleware.Init()
 	if err != nil {
-		fmt.Printf("middleware init failed")
+		logger.Logger.Error("middleware init failed")
 		return
 	}
 	middleware.DefaultMiddleware(r)

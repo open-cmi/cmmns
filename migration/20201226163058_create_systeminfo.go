@@ -16,9 +16,8 @@ func (mi SystemInfoMigration) Up() error {
 
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS system_status (
-			id CHAR(64) primary key,
-			utime integer NOT NULL default 0,
-			deviceid varchar(128) NOT NULL default '',
+			id varchar(128) NOT NULL PRIMARY KEY default '',
+			updated_time BIGINT NOT NULL default 0,
 			is_master boolean default false,
 			cpu_usage REAL DEFAULT 0,
 			disk_total BIGINT DEFAULT 0,

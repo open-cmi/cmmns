@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+
+	"github.com/open-cmi/cmmns/logger"
 )
 
 func GenerateSecretKey(name, keyType string, keyLength int, comment string, passphrase string) (privateKey string, publicKey string, err error) {
@@ -21,7 +23,7 @@ func GenerateSecretKey(name, keyType string, keyLength int, comment string, pass
 
 	cmd := exec.Command("ssh-keygen", args...)
 	if err = cmd.Start(); err != nil {
-		fmt.Println(err)
+		logger.Logger.Error(err.Error())
 	}
 
 	// Lastly, wait for the process to exit
