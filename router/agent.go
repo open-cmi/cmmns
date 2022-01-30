@@ -10,8 +10,9 @@ import (
 func AgentNauthGroup(e *gin.Engine) {
 	g := e.Group("/api/common/v3/agent")
 	{
-		g.GET("/self", agent.GetSelfTask)
+		g.GET("/self", agent.GetJob)
 		g.GET("/keepalive", agent.KeepAlive)
+		g.POST("/register", agent.Register)
 	}
 }
 

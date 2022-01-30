@@ -3,9 +3,12 @@ package user
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jameskeane/bcrypt"
+	"github.com/open-cmi/cmmns/logger"
+	"github.com/open-cmi/cmmns/model"
 	commsg "github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/user"
 	"github.com/open-cmi/cmmns/storage/db"
@@ -13,30 +16,24 @@ import (
 )
 
 type Model struct {
-	UserName    string `json:"username"`
-	ID          string `json:"id"`
-	Email       string `json:"email"`
-	Password    string `json:"password"`
-	Role        int    `json:"role"`
-	Description string `json:"description,omitempty"`
-	Status      int    `json:"status"`
+	UserName    string `json:"username" db:"username"`
+	ID          string `json:"id" db:"id"`
+	Email       string `json:"email" db:"email"`
+	Password    string `json:"-" db:"password"`
+	Role        int    `json:"role" db:"role"`
+	Description string `json:"description,omitempty" db:"description"`
+	Status      int    `json:"status" db:"status"`
 }
 
-// BasicInfo user basic info
-type BasicInfo struct {
-	UserName    string `json:"username"`
-	ID          string `json:"id"`
-	Email       string `json:"email"`
-	Role        int    `json:"role"`
-	Description string `json:"description"`
-	Status      int    `json:"status"`
+type Option struct {
+	model.Option
 }
 
 // List list func
-func List(query *commsg.RequestQuery) (int, []BasicInfo, error) {
+func List(query *commsg.RequestQuery) (int, []Model, error) {
 	dbsql := db.GetDB()
 
-	var users []BasicInfo = []BasicInfo{}
+	var users []Model = []Model{}
 	countClause := fmt.Sprintf("select count(*) from users")
 
 	whereClause, args := utils.BuildWhereClause(query)
@@ -60,7 +57,7 @@ func List(query *commsg.RequestQuery) (int, []BasicInfo, error) {
 	}
 
 	for rows.Next() {
-		var item BasicInfo
+		var item Model
 		err := rows.Scan(&item.ID, &item.UserName, &item.Email, &item.Role, &item.Description)
 		if err != nil {
 			break
@@ -72,20 +69,21 @@ func List(query *commsg.RequestQuery) (int, []BasicInfo, error) {
 }
 
 // Get get id
-func Get(id string) (user *BasicInfo, err error) {
-	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select id,username,email,role,description from users where id=$1")
+func Get(option *Option, field string, value string) (user *Model) {
+	columns := model.GetColumn(Model{}, []string{})
 
-	var tmpuser BasicInfo
+	queryClause := fmt.Sprintf(`select %s from users where %s=$1`, strings.Join(columns, ","), field)
 	sqldb := db.GetDB()
-	row := sqldb.QueryRow(queryclause, id)
-	err = row.Scan(&tmpuser.ID, &tmpuser.UserName, &tmpuser.Email, &tmpuser.Role, &tmpuser.Description)
+	row := sqldb.QueryRowx(queryClause, value)
+
+	var mdl Model
+	err := row.StructScan(&mdl)
 	if err != nil {
-		// 用户名不存在
-		return nil, errors.New("user not exist")
+		logger.Logger.Error(err.Error())
+		return nil
 	}
 
-	return &tmpuser, nil
+	return &mdl
 }
 
 func VerifyPasswordByID(userid string, password string) bool {
@@ -116,7 +114,7 @@ func ChangePassword(userid string, password string) error {
 }
 
 // GetByName get by name
-func GetByName(name string) (user BasicInfo, err error) {
+func GetByName(name string) (user Model, err error) {
 	// 先检查用户名是否存在
 	queryclause := fmt.Sprintf("select id,username,email,role,description from users where username='%s'", name)
 
@@ -132,11 +130,11 @@ func GetByName(name string) (user BasicInfo, err error) {
 }
 
 // Login  user login
-func Login(m *msg.LoginMsg) (authuser *BasicInfo, err error) {
+func Login(m *msg.LoginMsg) (authuser *Model, err error) {
 	// 先检查用户名是否存在
 	queryclause := fmt.Sprintf("select id,username,email,password,status from users where username=$1")
 
-	var user BasicInfo
+	var user Model
 	var password string
 	sqldb := db.GetDB()
 	row := sqldb.QueryRow(queryclause, m.UserName)

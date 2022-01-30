@@ -16,7 +16,9 @@ type Option struct {
 }
 
 func Get(mo *Option, field string, value string) *Model {
-	queryClause := fmt.Sprintf(`select * from agent where %s=$1`, field)
+	columns := model.GetColumn(Model{}, []string{})
+
+	queryClause := fmt.Sprintf(`select %s from agent where %s=$1`, strings.Join(columns, ","), field)
 	dbsql := db.GetDB()
 	row := dbsql.QueryRowx(queryClause, value)
 

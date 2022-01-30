@@ -1,4 +1,5 @@
 {
+  "log_level": "debug",
   "storetype": "redis",
   "model": {
     "type": "postgresql",

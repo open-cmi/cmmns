@@ -78,11 +78,11 @@ func DeployRemote(agent *model.Model) error {
 			err = ss.SSHRun("./agent/scripts/remote_install.sh")
 		} else {
 			// 安装
-			err = ss.SSHRun("sudo -n ./agent/scripts/install.sh")
+			err = ss.SSHRun("sudo -n ./agent/scripts/install.sh -a")
 		}
 	} else {
 		// 安装
-		err = ss.SSHRun("./agent/scripts/install.sh")
+		err = ss.SSHRun("./agent/scripts/install.sh -a")
 	}
 
 	if err != nil {
@@ -90,12 +90,30 @@ func DeployRemote(agent *model.Model) error {
 		return err
 	}
 	// 获取设备ID
-	return err
+	output, err := ss.SSHOutput("/opt/agent/bin/agent get -dev")
+	if err != nil {
+		logger.Logger.Error("show dev failed: %s\n", err.Error())
+		return err
+	}
+	arr := strings.Split(string(output), "\n")
+	devStr := strings.Split(arr[0], ":")
+	devID := strings.Trim(devStr[1], " \n\t")
+	agent.DevID = devID
+
+	return nil
 }
 
 func DeployLocal() error {
-	nayargs := []string{"start", "agent"}
-	cmd := exec.Command("systemctl", nayargs...)
+	enableArgs := []string{"enable", "agent"}
+	cmd := exec.Command("systemctl", enableArgs...)
 	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	startArgs := []string{"start", "agent"}
+	cmd = exec.Command("systemctl", startArgs...)
+	err = cmd.Run()
+
 	return err
 }

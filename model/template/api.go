@@ -16,9 +16,11 @@ type Option struct {
 }
 
 func Get(mo *Option, field string, value string) *Model {
-	queryClause := fmt.Sprintf(`select * from template where %s=$1`, field)
-	dbsql := db.GetDB()
-	row := dbsql.QueryRowx(queryClause, value)
+	columns := model.GetColumn(Model{}, []string{})
+
+	queryClause := fmt.Sprintf(`select %s from template where %s=$1`, strings.Join(columns, ","), field)
+	sqldb := db.GetDB()
+	row := sqldb.QueryRowx(queryClause, value)
 
 	var mdl Model
 	err := row.StructScan(&mdl)
@@ -32,14 +34,14 @@ func Get(mo *Option, field string, value string) *Model {
 
 // List list
 func List(option *Option) (int, []Model, error) {
-	dbsql := db.GetDB()
+	sqldb := db.GetDB()
 
 	var results []Model = []Model{}
 
 	countClause := fmt.Sprintf("select count(*) from template")
 	whereClause, args := model.BuildWhereClause(&option.Option)
 	countClause += whereClause
-	row := dbsql.QueryRow(countClause, args...)
+	row := sqldb.QueryRow(countClause, args...)
 
 	var count int
 	err := row.Scan(&count)
@@ -52,7 +54,7 @@ func List(option *Option) (int, []Model, error) {
 	queryClause := fmt.Sprintf(`select %s from template`, strings.Join(columns, ","))
 	finalClause := model.BuildFinalClause(&option.Option)
 	queryClause += (whereClause + finalClause)
-	rows, err := dbsql.Queryx(queryClause, args...)
+	rows, err := sqldb.Queryx(queryClause, args...)
 	if err != nil {
 		// 没有的话，也不需要报错
 		logger.Logger.Error(err.Error())
@@ -74,7 +76,7 @@ func List(option *Option) (int, []Model, error) {
 
 // List list
 func MultiDelete(mo *Option, ids []string) error {
-	dbsql := db.GetDB()
+	sqldb := db.GetDB()
 
 	if len(ids) == 0 {
 		return errors.New("no items deleted")
@@ -95,7 +97,7 @@ func MultiDelete(mo *Option, ids []string) error {
 	}
 
 	deleteClause := fmt.Sprintf("delete from template where id in %s", list)
-	_, err := dbsql.Exec(deleteClause, args...)
+	_, err := sqldb.Exec(deleteClause, args...)
 	if err != nil {
 		return errors.New("delete item failed")
 	}
@@ -107,7 +109,7 @@ func Create(mo *Option, reqMsg *msg.CreateMsg) (m *Model, err error) {
 	model := Get(mo, "name", reqMsg.Name)
 	if model != nil {
 		// 用户名已经被占用
-		return nil, errors.New("address has been used")
+		return nil, errors.New("name has been used")
 	}
 	m = New()
 	m.Name = reqMsg.Name

@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/auditlog"
 	"github.com/open-cmi/cmmns/controller"
+	"github.com/open-cmi/cmmns/errcode"
 
 	model "github.com/open-cmi/cmmns/model/user"
 	"github.com/open-cmi/cmmns/msg/request"
@@ -125,11 +126,11 @@ func Get(c *gin.Context) {
 	}
 
 	id := c.Param("id")
-	user, err := model.Get(id)
-	if err != nil {
+	user := model.Get(nil, "id", id)
+	if user == nil {
 		c.JSON(200, gin.H{
-			"ret": -1,
-			"msg": err.Error(),
+			"ret": errcode.ErrFailed,
+			"msg": "user not exist",
 		})
 		return
 	}
@@ -275,19 +276,6 @@ func Register(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 	return
-}
-
-// GetSelf get by self
-func GetSelf(c *gin.Context) {
-	cache, _ := c.Get("user")
-	user, _ := cache.(model.BasicInfo)
-	c.JSON(200, gin.H{
-		"ret": 0,
-		"msg": "",
-		"data": map[string]interface{}{
-			"username": user.UserName,
-		},
-	})
 }
 
 // Create create user

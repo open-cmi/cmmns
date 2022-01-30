@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -46,8 +45,8 @@ func main() {
 		return
 	}
 	middleware.DefaultMiddleware(r)
-	middleware.AuthMiddleware(r)
 	cmmns.NauthInit(r)
+	middleware.AuthMiddleware(r)
 	middleware.UserPermMiddleware(r)
 	cmmns.AuthInit(r)
 
@@ -56,15 +55,15 @@ func main() {
 	os.Remove(sockAddr)
 	unixAddr, err := net.ResolveUnixAddr("unix", sockAddr)
 	if err != nil {
-		fmt.Println(err)
+		logger.Logger.Error(err.Error() + "\n")
 		return
 	}
 
 	listener, err := net.ListenUnix("unix", unixAddr)
 	if err != nil {
-		fmt.Println("listening error:", err)
+		logger.Logger.Error("listening error: %s\n", err.Error())
 	}
-	fmt.Printf("listening unix socket: %s\n", sockAddr)
+	logger.Logger.Debug("listening unix socket: %s\n", sockAddr)
 	go http.Serve(listener, r)
 
 	r.Run(":30000")

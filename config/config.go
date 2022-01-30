@@ -67,6 +67,7 @@ type RemoteAssistConfig struct {
 // Config config
 type Config struct {
 	Debug        bool               `json:"debug"`
+	LogLevel     string             `json:"log_level,omitempty"`
 	UnixSock     bool               `json:"unixsock"`
 	StoreType    string             `json:"storetype,omitempty"`
 	Model        DatabaseModel      `json:"model"`
@@ -88,6 +89,9 @@ func Init(configfile string) (err error) {
 	err = parser.Load(&config)
 	if config.StoreType == "" {
 		config.StoreType = "redis"
+	}
+	if config.LogLevel == "" {
+		config.LogLevel = "info"
 	}
 	ConfParser = parser
 	return err

@@ -96,7 +96,6 @@ func Deploy(c *gin.Context) {
 		var err error
 		err = DeployRemote(agent)
 		if err != nil {
-			// 部署失败，写任务日志信息
 			agent.State = model.StateDeployFailed
 		} else {
 			agent.State = model.StateDeploySuccess

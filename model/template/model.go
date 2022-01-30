@@ -7,51 +7,51 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/open-cmi/cmmns/logger"
+	"github.com/open-cmi/cmmns/model"
 	"github.com/open-cmi/cmmns/storage/db"
 )
 
 // Model  model
 type Model struct {
-	ID          string `json:"id"`
+	ID          string `json:"id" db:"id"`
 	CreatedTime int64  `json:"created_time" db:"created_time"`
 	UpdatedTime int64  `json:"updated_time" db:"updated_time"`
-	Name        string `json:"name"`
+	Name        string `json:"name" db:"name"`
 	isNew       bool
 }
 
-// GetPassword 获取敏感使用
-func (m *Model) GetPassword() {
-	// 这里获取密码等敏感信息
-}
-
 func (m *Model) Save() error {
-	dbsql := db.GetDB()
+	sqldb := db.GetDB()
 
 	if m.isNew {
 		// 存储到数据库
-		columns := []string{"id", "name"}
-		var values []string = []string{}
-		for index, _ := range columns {
-			seq := fmt.Sprintf(`$%d`, index+1)
-			values = append(values, seq)
-		}
+		columns := model.GetColumn(*m, []string{})
+		values := model.GetColumnNamed(columns)
 
 		insertClause := fmt.Sprintf("insert into template(%s) values(%s)",
 			strings.Join(columns, ","), strings.Join(values, ","))
-		_, err := dbsql.Exec(insertClause, m.ID, m.Name)
+
+		logger.Logger.Info("start to exec sql clause: %s", insertClause)
+
+		_, err := sqldb.NamedExec(insertClause, m)
 		if err != nil {
+			logger.Logger.Error("create model failed: %s", err.Error())
 			return errors.New("create model failed")
 		}
-
 	} else {
-		columns := []string{"name"}
+		columns := model.GetColumn(*m, []string{"id", "created_time"})
+
+		m.UpdatedTime = time.Now().Unix()
 		var updates []string = []string{}
-		for index, column := range columns {
-			updates = append(updates, fmt.Sprintf(`%s=%d`, column, index+1))
+		for _, column := range columns {
+			updates = append(updates, fmt.Sprintf(`%s=:%s`, column, column))
 		}
-		updateClause := fmt.Sprintf("update template set %s where id=$%d", strings.Join(updates, ","), len(columns)+1)
-		_, err := dbsql.Exec(updateClause, m.Name)
+		updateClause := fmt.Sprintf("update template set %s where id=:id", strings.Join(updates, ","))
+		logger.Logger.Debug("start to exec sql clause: %s", updateClause)
+		_, err := sqldb.NamedExec(updateClause, m)
 		if err != nil {
+			logger.Logger.Error("update template model failed: %s", err.Error())
 			return errors.New("update model failed")
 		}
 	}
@@ -60,10 +60,10 @@ func (m *Model) Save() error {
 }
 
 func (m *Model) Remove() error {
-	dbsql := db.GetDB()
+	sqldb := db.GetDB()
 
 	deleteClause := fmt.Sprintf("delete from template where id=$1")
-	_, err := dbsql.Exec(deleteClause, m.ID)
+	_, err := sqldb.Exec(deleteClause, m.ID)
 	if err != nil {
 		return errors.New("delete model failed")
 	}
