@@ -99,7 +99,8 @@ func MultiDelete(mo *Option, ids []string) error {
 	deleteClause := fmt.Sprintf("delete from template where id in %s", list)
 	_, err := sqldb.Exec(deleteClause, args...)
 	if err != nil {
-		return errors.New("delete item failed")
+		logger.Logger.Error("delete failed: %s\n", err.Error())
+		return errors.New("delete failed")
 	}
 	return nil
 }

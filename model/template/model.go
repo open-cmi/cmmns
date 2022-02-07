@@ -32,7 +32,7 @@ func (m *Model) Save() error {
 		insertClause := fmt.Sprintf("insert into template(%s) values(%s)",
 			strings.Join(columns, ","), strings.Join(values, ","))
 
-		logger.Logger.Info("start to exec sql clause: %s", insertClause)
+		logger.Logger.Debug("start to exec sql clause: %s\n", insertClause)
 
 		_, err := sqldb.NamedExec(insertClause, m)
 		if err != nil {

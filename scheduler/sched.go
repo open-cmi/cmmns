@@ -2,8 +2,8 @@ package scheduler
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 
@@ -15,7 +15,7 @@ var Sched *Scheduler
 
 // scheduler.hash.namespace.group
 // scheduler.zset.namespace.group
-// scheduler.zset.namespace.group.consumer
+// scheduler.zset.namespace.group
 
 // Scheduler scheduler
 type Scheduler struct {
@@ -23,18 +23,6 @@ type Scheduler struct {
 	Mutex     sync.Mutex
 	Providers map[string]*Provider
 	Consumers map[string]*Consumer
-}
-
-type ProviderOption struct {
-	Identity   string
-	Type       string
-	Group      string
-	ConsumerID string
-}
-
-type ConsumerOption struct {
-	Identity string
-	Group    string
 }
 
 func NewScheduler(namespace string) *Scheduler {
@@ -48,79 +36,95 @@ func NewScheduler(namespace string) *Scheduler {
 
 func (s *Scheduler) AddJob(job *Job, option *ProviderOption) error {
 	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 
 	// 添加任务
 	cache := rdb.GetCache(rdb.TaskCache)
 
+	var count int = 1
 	if option.Type == "anyone" {
 		zkey := fmt.Sprintf("scheduler.zset.%s.%s", s.Namespace, option.Group)
 
 		cache.ZAddNX(context.TODO(), zkey, &redis.Z{
-			Score:  float64(time.Now().Unix()) / 1000,
+			Score:  float64(time.Now().Unix())/1000000 + float64(job.Priority)*10000,
 			Member: job.ID,
 		})
+	} else if option.Type == "everyone" {
+		for key, _ := range s.Consumers {
+			zkey := fmt.Sprintf("scheduler.zset.%s.%s.%s", s.Namespace, option.Group, key)
+
+			cache.ZAddNX(context.TODO(), zkey, &redis.Z{
+				Score:  float64(time.Now().Unix())/1000000 + float64(job.Priority)*10000,
+				Member: job.ID,
+			})
+		}
+		count = len(s.Consumers)
 	}
 	job.State = "Pending"
-	jobJson, err := json.Marshal(*job)
-	if err != nil {
-		s.Mutex.Unlock()
-		return err
-	}
+	job.Count = count
 
-	key := fmt.Sprintf("scheduler.hash.%s.%s", s.Namespace, option.Group)
-	cache.HSet(context.TODO(), key, job.ID, jobJson)
-	s.Mutex.Unlock()
+	key := fmt.Sprintf("scheduler.hash.%s.%s.%s", s.Namespace, option.Group, job.ID)
+	cache.HSet(context.TODO(), key, "id", job.ID, "type", job.Type, "priority", job.Priority,
+		"state", job.State, "count", job.Count, "content", job.Content)
+
 	return nil
 }
 
 func (s *Scheduler) GetJob(option *ConsumerOption) *Job {
 	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 
 	// 添加任务
 	cache := rdb.GetCache(rdb.TaskCache)
 
-	key := fmt.Sprintf("scheduler.zset.%s.%s", s.Namespace, option.Group)
+	key := fmt.Sprintf("scheduler.zset.%s.%s.%s", s.Namespace, option.Group, option.Identity)
 	z, _ := cache.ZPopMax(context.TODO(), key, 1).Result()
 	if len(z) == 0 {
-		s.Mutex.Unlock()
-		return nil
+		key = fmt.Sprintf("scheduler.zset.%s.%s", s.Namespace, option.Group)
+		z, _ = cache.ZPopMax(context.TODO(), key, 1).Result()
+		if len(z) == 0 {
+			return nil
+		}
 	}
+
 	jobID := z[0].Member.(string)
-	key = fmt.Sprintf("scheduler.hash.%s.%s", s.Namespace, option.Group)
-	jsonTask, err := cache.HGet(context.TODO(), key, jobID).Result()
+	key = fmt.Sprintf("scheduler.hash.%s.%s.%s", s.Namespace, option.Group, jobID)
+	jobMap, err := cache.HGetAll(context.TODO(), key).Result()
 	if err != nil {
-		s.Mutex.Unlock()
 		return nil
 	}
 	var job Job
-	err = json.Unmarshal([]byte(jsonTask), &job)
-	if err != nil {
-		s.Mutex.Unlock()
-		return nil
-	}
-	s.Mutex.Unlock()
+	job.ID = jobMap["id"]
+	job.Type = jobMap["type"]
+	job.Priority, _ = strconv.Atoi(jobMap["priority"])
+	job.State = "Running"
+	job.Count, _ = strconv.Atoi(jobMap["count"])
+	job.Content = jobMap["content"]
+
+	// 改变job 状态
+	key = fmt.Sprintf("scheduler.hash.%s.%s.%s", s.Namespace, option.Group, jobID)
+	_, err = cache.HSet(context.TODO(), key, "state", job.State).Result()
+
 	return &job
 }
 
 func (s *Scheduler) HasJob(option *ConsumerOption) bool {
 	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 
 	// 添加任务
 	cache := rdb.GetCache(rdb.TaskCache)
 
 	key := fmt.Sprintf("scheduler.zset.%s.%s", s.Namespace, option.Group)
-	z, _ := cache.ZPopMax(context.TODO(), key, 1).Result()
-	if len(z) == 0 {
-		s.Mutex.Unlock()
-		return false
+	count, _ := cache.ZCard(context.TODO(), key).Result()
+	if count == 0 {
+		key = fmt.Sprintf("scheduler.zset.%s.%s.%s", s.Namespace, option.Group, option.Identity)
+		count, _ = cache.ZCard(context.TODO(), key).Result()
+		if count == 0 {
+			return false
+		}
 	}
-	s.Mutex.Unlock()
 	return true
-}
-
-type Provider struct {
-	Sched  *Scheduler
-	Option *ProviderOption
 }
 
 func (sched *Scheduler) NewProvider(option *ProviderOption) *Provider {
@@ -137,17 +141,6 @@ func (sched *Scheduler) GetProvider(identity string) *Provider {
 	defer sched.Mutex.Unlock()
 
 	return sched.Providers[identity]
-}
-
-func (p *Provider) AddJob(job *Job) error {
-
-	err := p.Sched.AddJob(job, p.Option)
-	return err
-}
-
-type Consumer struct {
-	Sched  *Scheduler
-	Option *ConsumerOption
 }
 
 func (sched *Scheduler) NewConsumer(option *ConsumerOption) *Consumer {
@@ -167,29 +160,10 @@ func (sched *Scheduler) GetConsumer(identity string) *Consumer {
 	return sched.Consumers[identity]
 }
 
-func (c *Consumer) GetJob() *Job {
-
-	job := c.Sched.GetJob(c.Option)
-	return job
-}
-
-func (c *Consumer) HasJob() bool {
-	return c.Sched.HasJob(c.Option)
-}
-
-// Job job
-type Job struct {
-	ID       string      `json:"id"`
-	Type     string      `json:"type"`
-	Priority int         `json:"priority"`
-	State    string      `json:"state"`
-	Content  interface{} `json:"content,omitempty"`
-}
-
 func GetScheduler() *Scheduler {
 	return Sched
 }
 
 func Init() {
-	Sched = NewScheduler("global")
+	Sched = NewScheduler("default")
 }

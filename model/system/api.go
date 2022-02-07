@@ -51,7 +51,7 @@ func Get(mo *Option, field string, value string) *Model {
 	var mdl Model
 	err := row.StructScan(&mdl)
 	if err != nil {
-		logger.Logger.Error(err.Error())
+		logger.Logger.Error("row scan failed: %s\n", err.Error())
 		return nil
 	}
 
@@ -100,16 +100,20 @@ func List(option *Option) (int, []Model, error) {
 }
 
 var LocalModel *Model
+var devID string
 
 // StartMonitor start to Update device resource
 func StartMonitor() {
-	devID := devutil.GetDeviceID()
+
 	if devID == "" {
-		return
+		devID = devutil.GetDeviceID()
+		if devID == "" {
+			return
+		}
 	}
 
 	if LocalModel == nil {
-		LocalModel = Get(&Option{}, "id", devID)
+		LocalModel = Get(nil, "id", devID)
 		if LocalModel == nil {
 			LocalModel = New()
 			LocalModel.ID = devID
