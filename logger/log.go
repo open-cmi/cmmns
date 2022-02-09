@@ -8,13 +8,6 @@ import (
 	"github.com/open-cmi/goutils/pathutil"
 )
 
-const (
-	Debug = iota
-	Info
-	Warn
-	Error
-)
-
 var Logger *logutil.Logger
 
 func Init() {
@@ -40,3 +33,37 @@ func Init() {
 	})
 	return
 }
+
+/*
+func Error(v ...interface{}) {
+	Logger.Error(v...)
+}
+
+func Errorf(format string, v ...interface{}) {
+	Logger.Errorf(format, v...)
+}
+
+func Warn(v ...interface{}) {
+	Logger.Warn(v...)
+}
+
+func Warnf(format string, v ...interface{}) {
+	Logger.Warnf(format, v...)
+}
+
+func Info(v ...interface{}) {
+	Logger.Info(v...)
+}
+
+func Infof(format string, v ...interface{}) {
+	Logger.Infof(format, v...)
+}
+
+func Debug(v ...interface{}) {
+	Logger.Debug(v...)
+}
+
+func Debugf(format string, v ...interface{}) {
+	Logger.Debugf(format, v...)
+}
+*/

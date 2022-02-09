@@ -94,12 +94,12 @@ func (s *Scheduler) GetJob(option *ConsumerOption) *Job {
 		return nil
 	}
 	var job Job
-	job.ID = jobMap["id"]
-	job.Type = jobMap["type"]
+	job.ID, _ = jobMap["id"]
+	job.Type, _ = jobMap["type"]
 	job.Priority, _ = strconv.Atoi(jobMap["priority"])
 	job.State = "Running"
 	job.Count, _ = strconv.Atoi(jobMap["count"])
-	job.Content = jobMap["content"]
+	job.Content, _ = jobMap["content"]
 
 	// 改变job 状态
 	key = fmt.Sprintf("scheduler.hash.%s.%s.%s", s.Namespace, option.Group, jobID)
@@ -140,12 +140,24 @@ func (sched *Scheduler) GetProvider(identity string) *Provider {
 	sched.Mutex.Lock()
 	defer sched.Mutex.Unlock()
 
-	return sched.Providers[identity]
+	provider, ok := sched.Providers[identity]
+	if ok {
+		return provider
+	}
+	return nil
 }
 
 func (sched *Scheduler) NewConsumer(option *ConsumerOption) *Consumer {
 
-	consumer := &Consumer{
+	sched.Mutex.Lock()
+	defer sched.Mutex.Unlock()
+
+	consumer, found := sched.Consumers[option.Identity]
+	if found {
+		return nil
+	}
+
+	consumer = &Consumer{
 		Sched:  sched,
 		Option: option,
 	}
@@ -157,7 +169,11 @@ func (sched *Scheduler) GetConsumer(identity string) *Consumer {
 	sched.Mutex.Lock()
 	defer sched.Mutex.Unlock()
 
-	return sched.Consumers[identity]
+	consumer, ok := sched.Consumers[identity]
+	if ok {
+		return consumer
+	}
+	return nil
 }
 
 func GetScheduler() *Scheduler {

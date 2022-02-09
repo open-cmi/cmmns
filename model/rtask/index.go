@@ -9,6 +9,7 @@ import (
 
 	"github.com/open-cmi/cmmns/logger"
 	"github.com/open-cmi/cmmns/storage/db"
+	"github.com/open-cmi/goutils/logutil"
 )
 
 // realtime task
@@ -49,7 +50,7 @@ func (t *Task) Persist() {
 	_, err := db.DB.Exec(clause, t.ID, t.Type, t.Total,
 		t.Success, t.Failed, t.StartTime, t.EndTime)
 	if err != nil {
-		logger.Logger.Printf(logger.Error, err.Error())
+		logger.Logger.Printf(logutil.Error, err.Error())
 	}
 
 	// 存储到任务日志中
@@ -62,7 +63,7 @@ func (t *Task) Persist() {
 
 	_, err = db.DB.Exec(logClause, t.ID, t.Type, t.LogContent, t.LogFileName, t.EndTime)
 	if err != nil {
-		logger.Logger.Printf(logger.Error, err.Error())
+		logger.Logger.Printf(logutil.Error, err.Error())
 	}
 	return
 }
