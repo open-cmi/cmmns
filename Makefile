@@ -8,7 +8,7 @@ endif
 
 .PHONY:build
 build:
-	cd cmd && go build -ldflags "-s -w" -o $(TARGET)/cmmns main.go
+	cd main && go build -ldflags "-s -w" -o $(TARGET)/cmmns main.go
 
 clean:
 	rm -r build/*
