@@ -17,7 +17,7 @@ require (
 	github.com/lib/pq v1.10.2
 	github.com/open-cmi/goutils v0.4.1
 	github.com/open-cmi/memstore v0.1.0
-	github.com/open-cmi/migrate v0.3.0 // indirect
+	github.com/open-cmi/migrate v0.4.0 // indirect
 	github.com/pkg/sftp v1.13.4 // indirect
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil v3.21.7+incompatible

@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/config"
 	"github.com/open-cmi/cmmns/logger"
+	_ "github.com/open-cmi/cmmns/migration"
 	"github.com/open-cmi/cmmns/router"
 	"github.com/open-cmi/cmmns/scheduler"
 	"github.com/open-cmi/cmmns/storage"
