@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/config"
+	"github.com/open-cmi/cmmns/logger"
 	"github.com/open-cmi/memstore"
 	"github.com/topmyself/redistore"
 )
@@ -61,6 +62,12 @@ func UserPermMiddleware(r *gin.Engine) {
 			return
 		}
 	})
+}
+
+func DefaultMiddleware(r *gin.Engine) {
+	r.Use(LoggerWithConfig(LoggerConfig{
+		Logger: logger.Logger,
+	}), gin.Recovery())
 }
 
 // Init init func

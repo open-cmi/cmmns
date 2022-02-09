@@ -1,16 +1,16 @@
 package db
 
 import (
-	"database/sql"
-
 	"github.com/open-cmi/cmmns/config"
 
 	"github.com/open-cmi/goutils/database"
 	"github.com/open-cmi/goutils/database/dbsql"
+
+	"github.com/jmoiron/sqlx"
 )
 
 // DB sql db
-var DB *sql.DB
+var DB *sqlx.DB
 
 // Init db init
 func Init() error {
@@ -34,6 +34,6 @@ func Init() error {
 }
 
 // GetDB get db
-func GetDB() *sql.DB {
+func GetDB() *sqlx.DB {
 	return DB
 }

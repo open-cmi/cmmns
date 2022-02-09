@@ -12,9 +12,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/auditlog"
+	"github.com/open-cmi/cmmns/controller"
+	"github.com/open-cmi/cmmns/errcode"
 
 	model "github.com/open-cmi/cmmns/model/user"
-	commsg "github.com/open-cmi/cmmns/msg/request"
+	"github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/user"
 	"github.com/open-cmi/cmmns/utils"
 	"github.com/open-cmi/goutils/typeutil"
@@ -22,7 +24,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jordan-wright/email"
 	"github.com/open-cmi/cmmns/config"
-	"github.com/open-cmi/cmmns/controller/ctl"
 	"github.com/open-cmi/cmmns/storage/rdb"
 )
 
@@ -51,7 +52,7 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	if user == nil {
 		return
 	}
@@ -90,7 +91,7 @@ func ChangePassword(c *gin.Context) {
 // List list user
 func List(c *gin.Context) {
 
-	var query commsg.RequestQuery
+	var query request.RequestQuery
 	utils.ParseParams(c, &query)
 
 	count, users, err := model.List(&query)
@@ -125,11 +126,11 @@ func Get(c *gin.Context) {
 	}
 
 	id := c.Param("id")
-	user, err := model.Get(id)
-	if err != nil {
+	user := model.Get(nil, "id", id)
+	if user == nil {
 		c.JSON(200, gin.H{
-			"ret": -1,
-			"msg": err.Error(),
+			"ret": errcode.ErrFailed,
+			"msg": "user not exist",
 		})
 		return
 	}
@@ -142,7 +143,6 @@ func Get(c *gin.Context) {
 // Activate activate user
 func Activate(c *gin.Context) {
 	code := c.Param("code")
-	fmt.Println("code:", code)
 	_, err := uuid.Parse(code)
 	if err != nil {
 		c.String(200, "activate code is not valid")
@@ -257,7 +257,7 @@ func Register(c *gin.Context) {
 
 	e := email.NewEmail()
 	emailInfo := config.GetConfig().Email
-	domain := config.GetConfig().MasterInfo.ExternalAddress
+	domain := config.GetConfig().Master.Address
 	e.From = emailInfo.From
 	e.To = []string{apimsg.Email}
 	//e.Cc = []string{"danielzhao2012@163.com"}
@@ -278,21 +278,8 @@ func Register(c *gin.Context) {
 	return
 }
 
-// GetSelf get by self
-func GetSelf(c *gin.Context) {
-	cache, _ := c.Get("user")
-	user, _ := cache.(model.BasicInfo)
-	c.JSON(200, gin.H{
-		"ret": 0,
-		"msg": "",
-		"data": map[string]interface{}{
-			"username": user.UserName,
-		},
-	})
-}
-
-// CreateUser create user
-func CreateUser(c *gin.Context) {
+// Create create user
+func Create(c *gin.Context) {
 	var apimsg msg.CreateMsg
 	if err := c.ShouldBindJSON(&apimsg); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
@@ -314,8 +301,8 @@ func CreateUser(c *gin.Context) {
 	return
 }
 
-// DeleteUser delete user
-func DeleteUser(c *gin.Context) {
+// Delete delete user
+func Delete(c *gin.Context) {
 	id := c.Param("id")
 	err := model.DeleteByID(id)
 	if err != nil {

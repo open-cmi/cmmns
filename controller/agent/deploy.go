@@ -1,64 +1,51 @@
 package agent
 
 import (
-	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/open-cmi/cmmns/config"
+	"github.com/open-cmi/cmmns/logger"
 	model "github.com/open-cmi/cmmns/model/agent"
-	"github.com/open-cmi/cmmns/storage/rdb"
 	"github.com/open-cmi/goutils/fileutil"
 	"github.com/open-cmi/goutils/pathutil"
 	"github.com/open-cmi/goutils/sshutil"
 )
 
-type MasterInfo struct {
-	Address string `json:"address"`
-	Port    uint   `json:"port"`
-	Proto   string `json:"proto"`
-}
-
 func GetAgentPackage() string {
-	AgentPackage := config.GetConfig().Distributed.AgentPackageLocation
+	AgentPackage := config.GetConfig().Agent.LinuxPackage
 	if !strings.HasPrefix(AgentPackage, "/") {
 		rp := pathutil.GetRootPath()
-		return filepath.Join(rp, "data", AgentPackage)
+		return filepath.Join(rp, AgentPackage)
 	}
 	return AgentPackage
 }
 
-func GetAgentConfigFile() string {
-	// 根据配置文件中，获取端口以及地址
-	masterInfoFile := config.GetConfig().Distributed.AgentConfigLocation
-	if !strings.HasPrefix(masterInfoFile, "/") {
+func DeployRemote(agent *model.Model) error {
+	agentPackage := config.GetConfig().Agent.LinuxPackage
+	if !strings.HasPrefix(agentPackage, "/") {
 		rp := pathutil.GetRootPath()
-		masterInfoFile = filepath.Join(rp, "etc", masterInfoFile)
+		agentPackage = filepath.Join(rp, agentPackage)
 	}
 
-	/*
-		parser := confparser.New(agentConfigFile)
-		if parser == nil {
-			return mi, errors.New("parse config failed")
-		}
-		err = parser.Load(&mi)
-	*/
-	return masterInfoFile
-}
+	if !fileutil.FileExist(agentPackage) {
+		logger.Logger.Error("agent package is not exist")
+		return errors.New("agent package is not exist")
+	}
 
-func DeployRemote(agent *model.Model, agentPackage string) error {
 	// 拷贝安装包
 	ss := sshutil.NewSSHServer(agent.Address, agent.Port,
-		agent.ConnType, agent.User, agent.Password, agent.SecretKey)
+		agent.ConnType, agent.UserName, agent.Passwd, agent.SecretKey)
 	name := filepath.Base(agentPackage)
 
 	remoteFile := fmt.Sprintf("./%s", name)
 	err := ss.SSHCopyToRemote(agentPackage, remoteFile)
 	if err != nil {
+		logger.Logger.Error("transform agent package failed: %s\n", err.Error())
 		return err
 	}
 
@@ -66,98 +53,67 @@ func DeployRemote(agent *model.Model, agentPackage string) error {
 	tarCmd := fmt.Sprintf("tar xzvf %s", name)
 	err = ss.SSHRun(tarCmd)
 	if err != nil {
+		logger.Logger.Error("run tar command failed: %s\n", err.Error())
 		return err
 	}
 
-	// 读取配置文件
-	var agentConfig config.AgentConfig
-	content, err := ss.ReadAll("./nayagent/etc/config.json")
-	err = json.Unmarshal(content, &agentConfig)
-	if err != nil {
-		return err
-	}
-	masterInfo := config.GetConfig().MasterInfo
-	if masterInfo.ExternalPort == 80 || masterInfo.ExternalPort == 443 {
-		agentConfig.Master = fmt.Sprintf("%s://%s", masterInfo.ExternalProto, masterInfo.ExternalAddress)
+	if agent.UserName != "root" {
+		if agent.ConnType == "password" {
+			// 生成密码文件， 注意这里需要密码的解密过程
+			passfile := filepath.Join(os.TempDir(), agent.ID)
+			wf, err := os.OpenFile(passfile, os.O_CREATE|os.O_RDWR, 0644)
+			if err != nil {
+				logger.Logger.Error("create password file failed: %s\n", err.Error())
+				return err
+			}
+			wf.WriteString(agent.Passwd)
+			// 拷贝密码文件
+			err = ss.SSHCopyToRemote(passfile, "./agent/data/passfile")
+			if err != nil {
+				logger.Logger.Error("copy password file failed: %s\n", err.Error())
+				return err
+			}
+			// 运行
+			// 安装
+			err = ss.SSHRun("./agent/scripts/remote_install.sh")
+		} else {
+			// 安装
+			err = ss.SSHRun("sudo -n ./agent/scripts/install.sh -a")
+		}
 	} else {
-		agentConfig.Master = fmt.Sprintf("%s://%s:%d", masterInfo.ExternalProto, masterInfo.ExternalAddress, masterInfo.InternalPort)
+		// 安装
+		err = ss.SSHRun("./agent/scripts/install.sh -a")
 	}
 
-	// 写入配置文件
-	w, err := json.MarshalIndent(agentConfig, "", "  ")
 	if err != nil {
+		logger.Logger.Error("install failed: %s\n", err.Error())
 		return err
 	}
-	_, err = ss.WriteString("./nayagent/etc/config.json", string(w))
+	// 获取设备ID
+	output, err := ss.SSHOutput("/opt/agent/bin/agent get -dev")
 	if err != nil {
+		logger.Logger.Error("show dev failed: %s\n", err.Error())
 		return err
 	}
+	arr := strings.Split(string(output), "\n")
+	devStr := strings.Split(arr[0], ":")
+	devID := strings.Trim(devStr[1], " \n\t")
+	agent.DevID = devID
 
-	if agent.User != "root" && agent.ConnType == "password" {
-		// 生成密码文件
-
-		// 拷贝密码文件
-
-		// 运行
-
-	}
-
-	// 安装
-	err = ss.SSHRun("./nayagent/scripts/install.sh")
-
-	return err
+	return nil
 }
 
 func DeployLocal() error {
-	nayargs := []string{"start", "nayagent"}
-	cmd := exec.Command("systemctl", nayargs...)
+	enableArgs := []string{"enable", "agent"}
+	cmd := exec.Command("systemctl", enableArgs...)
 	err := cmd.Run()
 	if err != nil {
 		return err
 	}
-	v2rayargs := []string{"start", "v2ray"}
-	cmd = exec.Command("systemctl", v2rayargs...)
+
+	startArgs := []string{"start", "agent"}
+	cmd = exec.Command("systemctl", startArgs...)
 	err = cmd.Run()
+
 	return err
-}
-
-func Deploy(taskid string, agents []model.Model) error {
-	cache := rdb.GetCache(rdb.TaskCache)
-
-	agentPackage := GetAgentPackage()
-
-	cache.HSet(context.TODO(), taskid, "total", len(agents))
-	for index, agent := range agents {
-		var err error
-		if (agent.Address == "127.0.0.1" || agent.Address == "localhost") && agent.Port == 22 {
-			err = DeployLocal()
-		} else {
-			if fileutil.FileExist(agentPackage) {
-				err = DeployRemote(&agent, agentPackage)
-			}
-		}
-		if err != nil {
-			// 部署失败，写任务日志信息
-			keyMsg := fmt.Sprintf("task_log_%d", index)
-			errMsg := fmt.Sprintf("deploy failed, remote server %s, %s", agent.Address, err.Error())
-			cache.HSet(context.TODO(), taskid, keyMsg, errMsg)
-			// 写failed
-			cache.HIncrBy(context.TODO(), taskid, "failed", 1)
-		} else {
-			cache.HIncrBy(context.TODO(), taskid, "success", 1)
-		}
-	}
-
-	taskret, err := cache.HGetAll(context.TODO(), taskid).Result()
-	if err != nil {
-		return err
-	}
-
-	cache.Expire(context.TODO(), taskid, 60*time.Second)
-	taskret[taskid] = taskid
-	notifyMsg, err := json.Marshal(taskret)
-
-	cache.LPush(context.TODO(), "task_complete_msg_list", notifyMsg)
-	// 通知任务完成
-	return nil
 }

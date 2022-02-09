@@ -5,23 +5,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/open-cmi/cmmns/controller/ctl"
+	"github.com/open-cmi/cmmns/controller"
 	model "github.com/open-cmi/cmmns/model/template"
-	"github.com/open-cmi/cmmns/msg/request"
 	msg "github.com/open-cmi/cmmns/msg/template"
-	"github.com/open-cmi/cmmns/utils"
 )
 
 func List(c *gin.Context) {
-	var param request.RequestQuery
-	utils.ParseParams(c, &param)
+	var option model.Option
+	controller.ParseParams(c, &option.Option)
 
-	user := ctl.GetUser(c)
-	userID, _ := user["id"].(string)
-
-	count, results, err := model.List(&model.ModelOption{
-		UserID: userID,
-	}, &param)
+	count, results, err := model.List(&option)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -45,6 +38,19 @@ func MultiDelete(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+	user := controller.GetUser(c)
+	userID, _ := user["id"].(string)
+
+	var option model.Option
+	option.UserID = userID
+	err := model.MultiDelete(&option, reqMsg.Name)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"ret": 1,
+			"msg": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
@@ -60,12 +66,13 @@ func Create(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	_, err := model.Create(&model.ModelOption{
-		UserID: userID,
-	}, &reqMsg)
+	var option model.Option
+	option.UserID = userID
+
+	_, err := model.Create(&option, &reqMsg)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -81,12 +88,12 @@ func Create(c *gin.Context) {
 func Get(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
+	var option model.Option
+	option.UserID = userID
 
-	m := model.Get(&model.ModelOption{
-		UserID: userID,
-	}, identify)
+	m := model.Get(&option, "id", identify)
 
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,
@@ -99,11 +106,12 @@ func Get(c *gin.Context) {
 func Delete(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
-	err := model.Delete(&model.ModelOption{
-		UserID: userID,
-	}, identify)
+	var option model.Option
+	option.UserID = userID
+
+	err := model.Delete(&option, identify)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -126,11 +134,12 @@ func Edit(c *gin.Context) {
 		return
 	}
 
-	user := ctl.GetUser(c)
+	user := controller.GetUser(c)
 	userID, _ := user["id"].(string)
-	err := model.Edit(&model.ModelOption{
-		UserID: userID,
-	}, identify, &reqMsg)
+	var option model.Option
+	option.UserID = userID
+
+	err := model.Edit(&option, identify, &reqMsg)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return

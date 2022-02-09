@@ -9,7 +9,7 @@ import (
 	"github.com/open-cmi/cmmns/storage/db"
 	"github.com/open-cmi/cmmns/utils"
 
-	commonmsg "github.com/open-cmi/cmmns/msg/request"
+	"github.com/open-cmi/cmmns/msg/request"
 )
 
 type Model struct {
@@ -22,7 +22,7 @@ type Model struct {
 }
 
 // List list
-func List(p *commonmsg.RequestQuery) (int, []Model, error) {
+func List(p *request.RequestQuery) (int, []Model, error) {
 	dbsql := db.GetDB()
 
 	var logs []Model = []Model{}

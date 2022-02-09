@@ -1,4 +1,5 @@
 {
+  "log_level": "debug",
   "storetype": "redis",
   "model": {
     "type": "postgresql",
@@ -20,18 +21,16 @@
     "password": "123456",
     "smtp_host": "smtp.example.com"
   },
-  "masterinfo": {
-    "internal_address": "127.0.0.1",
-    "internal_port": 30000,
-    "internal_proto": "http",
-    "external_address": "",
-    "external_port": 443,
-    "external_proto": "https"
+  "master": {
+    "local_address": "127.0.0.1",
+    "local_port": 30000,
+    "local_proto": "http",
+    "address": "",
+    "port": 443,
+    "proto": "https"
   },
-  "distributed": {
-    "cfgseq": 0,
-    "agent_package_location": "/Users/zhaodianle/flyover/nay/nays/data/nayagent-1.0.1.tar.gz",
-    "agent_config_location": "/opt/eyas/etc/config.json"
+  "agent": {
+    "linux_package": "./data/package/agent-0.1.0.tar.gz"
   },
   "remote_assist": {
     "server_addr": "",
