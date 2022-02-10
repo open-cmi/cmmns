@@ -128,7 +128,7 @@ func BuildFinalClause(o *Option) string {
 	}
 
 	offset := o.PageOption.Page * o.PageOption.PageSize
-	clause += fmt.Sprintf(" OFFSET %d LIMIT %d", offset, o.PageOption.PageSize)
+	clause += fmt.Sprintf(" LIMIT %d OFFSET %d", o.PageOption.PageSize, offset)
 
 	return clause
 }
