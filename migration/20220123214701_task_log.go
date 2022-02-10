@@ -1,8 +1,6 @@
 package migration
 
 import (
-	"fmt"
-
 	"github.com/open-cmi/migrate"
 	"github.com/open-cmi/migrate/cmdopt"
 	"github.com/open-cmi/migrate/global"
@@ -16,15 +14,15 @@ type TaskLogInstance struct {
 func (mi TaskLogInstance) Up() error {
 	db := global.DB
 
-	sqlClause := fmt.Sprintf(`
+	sqlClause := `
 		CREATE TABLE IF NOT EXISTS task_log (
 			id CHAR(64) NOT NULL PRIMARY KEY,
 			type VARCHAR(32) NOT NULL DEFAULT '',
 			content VARCHAR(512) NOT NULL DEFAULT '',
 			file VARCHAR(512) NOT NULL DEFAULT '',
-			ctime INTEGER NOT NULL DEFAULT 0
+			created_time BIGINT NOT NULL DEFAULT 0
 		)
-	`)
+	`
 	_, err := db.Exec(sqlClause)
 	return err
 }
@@ -33,7 +31,7 @@ func (mi TaskLogInstance) Up() error {
 func (mi TaskLogInstance) Down() error {
 	db := global.DB
 
-	sqlClause := fmt.Sprintf("DROP TABLE IF EXISTS task_log")
+	sqlClause := `DROP TABLE IF EXISTS task_log`
 	_, err := db.Exec(sqlClause)
 	return err
 }
