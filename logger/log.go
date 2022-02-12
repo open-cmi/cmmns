@@ -34,7 +34,6 @@ func Init() {
 	return
 }
 
-/*
 func Error(v ...interface{}) {
 	Logger.Error(v...)
 }
@@ -66,4 +65,3 @@ func Debug(v ...interface{}) {
 func Debugf(format string, v ...interface{}) {
 	Logger.Debugf(format, v...)
 }
-*/

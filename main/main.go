@@ -34,6 +34,7 @@ func main() {
 		logger.Logger.Error("service init failed\n")
 		return
 	}
+
 	// init router
 	r := gin.New()
 

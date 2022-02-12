@@ -12,12 +12,12 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/sessions v1.2.1
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
-	github.com/jmoiron/sqlx v1.3.4 // indirect
+	github.com/jmoiron/sqlx v1.3.4
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/lib/pq v1.10.2
-	github.com/open-cmi/goutils v0.4.1
+	github.com/open-cmi/goutils v0.4.2
 	github.com/open-cmi/memstore v0.1.0
-	github.com/open-cmi/migrate v0.4.0 // indirect
+	github.com/open-cmi/migrate v0.4.0
 	github.com/pkg/sftp v1.13.4 // indirect
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil v3.21.7+incompatible
@@ -26,5 +26,5 @@ require (
 	golang.org/x/crypto v0.0.0-20211209193657-4570a0811e8b // indirect
 	golang.org/x/sys v0.0.0-20211210111614-af8b64212486 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/ini.v1 v1.62.0 // indirect
+	gopkg.in/ini.v1 v1.62.0
 )
