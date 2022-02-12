@@ -33,12 +33,6 @@ type Option struct {
 	Filters     []FilterOption
 }
 
-type Model struct {
-	ID          string `json:"id" db:"id"`
-	CreatedTime int64  `json:"created_time" db:"created_time"`
-	UpdatedTime int64  `json:"updated_time" db:"updated_time"`
-}
-
 func GetColumn(v interface{}, skipColumn []string) []string {
 	var columns []string = []string{}
 	dataValue := reflect.ValueOf(v)
@@ -56,7 +50,7 @@ func GetColumn(v interface{}, skipColumn []string) []string {
 		field := dataValue.Type().Field(i)
 		tagColumn, ok := field.Tag.Lookup("db")
 		if ok {
-			sk, _ := skipmap[tagColumn]
+			sk := skipmap[tagColumn]
 			if !sk {
 				columns = append(columns, tagColumn)
 			}
@@ -127,6 +121,7 @@ func BuildFinalClause(o *Option) string {
 		clause += fmt.Sprintf(` ORDER BY %s %s`, o.OrderOption.OrderBy, o.OrderOption.Order)
 	}
 
+	// limit must before offset
 	offset := o.PageOption.Page * o.PageOption.PageSize
 	clause += fmt.Sprintf(" LIMIT %d OFFSET %d", o.PageOption.PageSize, offset)
 
