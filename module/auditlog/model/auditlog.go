@@ -3,9 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/essential/storage/sqldb"
 )
@@ -54,15 +52,4 @@ func List(p *api.Option) (int, []Model, error) {
 		logs = append(logs, item)
 	}
 	return count, logs, err
-}
-
-func InsertLog(ip string, username string, logtype int, action string) error {
-	timestamp := time.Now().Unix()
-	id := uuid.New().String()
-	insertClause := fmt.Sprintf(`insert into audit_log(id, type, ip, username, action, timestamp) 
-		values('%s', %d, '%s', '%s', '%s', %d)`, id, logtype, ip, username, action, timestamp)
-
-	db := sqldb.GetDB()
-	_, err := db.Exec(insertClause)
-	return err
 }
