@@ -1,40 +1,64 @@
 package cmmns
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/config"
-	"github.com/open-cmi/cmmns/logger"
-	_ "github.com/open-cmi/cmmns/migration"
-	"github.com/open-cmi/cmmns/router"
-	"github.com/open-cmi/cmmns/scheduler"
-	"github.com/open-cmi/cmmns/storage"
-	"github.com/open-cmi/cmmns/ticker"
+	_ "github.com/open-cmi/cmmns/component"
+	"github.com/open-cmi/cmmns/essential/api"
+	"github.com/open-cmi/cmmns/essential/api/middleware"
+	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/essential/storage"
+	"github.com/open-cmi/cmmns/essential/ticker"
 )
 
-// Init service Init
-func Init(configfile string) error {
-	// 配置文件的配置先确定在这里
-	err := config.Init(configfile)
+type APIGroup func(e *gin.Engine)
+
+type Service struct {
+	Engine *gin.Engine
+}
+
+func New(configFile string) *Service {
+	err := config.Init(configFile)
 	if err != nil {
-		fmt.Printf("%s\n", err.Error())
+		logger.Errorf("new config failed: %s\n", err.Error())
+		return nil
+	}
+
+	return &Service{
+		Engine: gin.New(),
+	}
+}
+
+func (s *Service) Init() error {
+	logger.Init()
+
+	// 在这里会调用各个模块的配置函数
+
+	// init router
+	err := api.Init(s.Engine)
+	if err != nil {
+		logger.Error("middleware init failed")
 		return err
 	}
 
-	logger.Init()
-	storage.Init()
+	api.UnauthInit(s.Engine)
+	middleware.AuthMiddleware(s.Engine)
+	middleware.UserPermMiddleware(s.Engine)
+	api.AuthInit(s.Engine)
 	ticker.Init()
-	scheduler.Init()
+	storage.Init()
 	return nil
 }
 
-// AuthInit auth init
-func AuthInit(e *gin.Engine) {
-	router.AuthInit(e)
+func (s *Service) Run() error {
+	// unix sock api
+	api.Run(s.Engine)
+	ticker.Run()
+	return nil
 }
 
-// NauthInit no auth init
-func NauthInit(e *gin.Engine) {
-	router.NauthInit(e)
+func (s *Service) Close() {
+	ticker.Close()
+	api.Close()
+	config.Save()
 }

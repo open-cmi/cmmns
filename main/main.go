@@ -2,16 +2,12 @@ package main
 
 import (
 	"flag"
-	"net"
-	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/open-cmi/cmmns"
-	"github.com/open-cmi/cmmns/logger"
-	"github.com/open-cmi/cmmns/middleware"
 	"github.com/open-cmi/migrate"
-
-	"github.com/gin-gonic/gin"
 )
 
 var configfile string = ""
@@ -28,42 +24,28 @@ func main() {
 		flag.Usage()
 		return
 	}
+	// 读取配置文件
+	/*
+		conf, err := config.Init(configfile)
+		if err != nil {
+			fmt.Printf("config init failed: %s\n", err.Error())
+			return
+		}*/
 
-	err := cmmns.Init(configfile)
-	if err != nil {
-		logger.Logger.Error("service init failed\n")
-		return
-	}
+	s := cmmns.New(configfile)
+	// 在init之前，注册业务router
 
-	// init router
-	r := gin.New()
+	// Init
+	s.Init()
+	// Run
+	s.Run()
 
-	err = middleware.Init()
-	if err != nil {
-		logger.Logger.Error("middleware init failed")
-		return
-	}
-	middleware.DefaultMiddleware(r)
-	cmmns.NauthInit(r)
-	middleware.AuthMiddleware(r)
-	middleware.UserPermMiddleware(r)
-	cmmns.AuthInit(r)
+	defer s.Close()
+	// 初始化后，等待信号
+	sigs := make(chan os.Signal, 1)
 
-	// unix sock api
-	const sockAddr = "/tmp/cmmns.sock"
-	os.Remove(sockAddr)
-	unixAddr, err := net.ResolveUnixAddr("unix", sockAddr)
-	if err != nil {
-		logger.Logger.Error(err.Error() + "\n")
-		return
-	}
+	//注册要接收的信号，syscall.SIGINT:接收ctrl+c ,syscall.SIGTERM:程序退出
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
-	listener, err := net.ListenUnix("unix", unixAddr)
-	if err != nil {
-		logger.Logger.Error("listening error: %s\n", err.Error())
-	}
-	logger.Logger.Debug("listening unix socket: %s\n", sockAddr)
-	go http.Serve(listener, r)
-
-	r.Run(":30000")
+	<-sigs
 }

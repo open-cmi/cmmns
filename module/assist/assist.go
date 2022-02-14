@@ -1,87 +1,62 @@
 package assist
 
 import (
-	"context"
-	"errors"
-	"math/rand"
-	"net"
-	"strings"
-	"time"
+	"os"
+	"path/filepath"
+	"strconv"
 
-	"github.com/fatedier/frp/client"
-	"github.com/fatedier/frp/pkg/config"
-	"github.com/fatedier/golib/crypto"
+	"github.com/open-cmi/cmmns/essential/api"
+	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/module/assist/infra"
+	"github.com/open-cmi/cmmns/module/assist/router"
+	"gopkg.in/ini.v1"
 )
 
-type Client struct {
-	IsRunning bool
-	Service   *client.Service
+type RemoteService struct {
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	LocalIP    string `json:"local_ip"`
+	LocalPort  uint16 `json:"local_port"`
+	RemotePort uint16 `json:"remote_port"`
 }
 
-var defaultClient Client
-
-func IsRunning() bool {
-	return defaultClient.IsRunning
+type Config struct {
+	ServerAddr string          `json:"server_addr"`
+	ServerPort uint16          `json:"server_port"`
+	Token      string          `json:"token,omitempty"`
+	Service    []RemoteService `json:"services"`
 }
 
-func RunClient(cfgFilePath string) error {
+var moduleConfig Config
 
-	if defaultClient.IsRunning {
-		return errors.New("assist client is running")
+func Init() error {
+	// 根据配置文件，生成临时ini文件，然后传入参数
+	tmpdir := os.TempDir()
+	cfgFilePath := filepath.Join(tmpdir, "./frpc.ini")
+
+	file := ini.Empty()
+	comsec, _ := file.NewSection("common")
+	comsec.NewKey("server_addr", moduleConfig.ServerAddr)
+	comsec.NewKey("server_port", strconv.Itoa(int(moduleConfig.ServerPort)))
+	if moduleConfig.Token != "" {
+		comsec.NewKey("token", moduleConfig.Token)
+	}
+	for _, rs := range moduleConfig.Service {
+		section, _ := file.NewSection(rs.Name)
+		section.NewKey("type", rs.Type)
+		section.NewKey("local_ip", rs.LocalIP)
+		section.NewKey("local_port", strconv.Itoa(int(rs.LocalPort)))
+		section.NewKey("remote_port", strconv.Itoa(int(rs.RemotePort)))
 	}
 
-	crypto.DefaultSalt = "frp"
-	rand.Seed(time.Now().UnixNano())
+	file.SaveTo(cfgFilePath)
 
-	cfg, pxyCfgs, visitorCfgs, err := config.ParseClientConfig(cfgFilePath)
-	if err != nil {
-		return err
-	}
+	infra.Init(cfgFilePath)
 
-	service, err := startService(cfg, pxyCfgs, visitorCfgs, cfgFilePath)
-	if err != nil {
-		return err
-	}
-
-	defaultClient.IsRunning = true
-	defaultClient.Service = service
 	return nil
 }
 
-func Close() {
-	if defaultClient.IsRunning {
-		defaultClient.Service.Close()
-		defaultClient.Service = nil
-		defaultClient.IsRunning = false
-	}
-	return
-}
-
-func startService(
-	cfg config.ClientCommonConf,
-	pxyCfgs map[string]config.ProxyConf,
-	visitorCfgs map[string]config.VisitorConf,
-	cfgFile string,
-) (svr *client.Service, err error) {
-
-	if cfg.DNSServer != "" {
-		s := cfg.DNSServer
-		if !strings.Contains(s, ":") {
-			s += ":53"
-		}
-		// Change default dns server for frpc
-		net.DefaultResolver = &net.Resolver{
-			PreferGo: true,
-			Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
-				return net.Dial("udp", s)
-			},
-		}
-	}
-	svr, err = client.NewService(cfg, pxyCfgs, visitorCfgs, cfgFile)
-	if err != nil {
-		return nil, err
-	}
-
-	go svr.Run()
-	return svr, nil
+func init() {
+	config.RegisterConfig("assist", &moduleConfig)
+	api.RegisterAuthAPI("assist", router.AuthGroup)
 }

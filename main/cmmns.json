@@ -1,41 +1,21 @@
 {
-  "log_level": "debug",
-  "storetype": "redis",
-  "model": {
-    "type": "postgresql",
-    "host": "127.0.0.1",
-    "port": 25432,
-    "user": "postgres",
-    "password": "",
-    "database": "test_cmmns"
+  "api": {
+    "middleware": {
+      "session_store": "redis",
+      "redis_store": {
+        "host": "127.0.0.1",
+        "port": 25431,
+        "db": 2,
+        "passwd": "8ik,\u003cKI*"
+      }
+    },
+    "listen": "0.0.0.0",
+    "port": 30000,
+    "unix_path": "/tmp/cmmns.sock"
   },
-  "rdb": {
-    "host": "127.0.0.1",
-    "port": 25431,
-    "password": "8ik,<KI*"
-  },
-  "email": {
-    "sender": "test@example.com",
-    "smtp_server": "smtp.example.com:587",
-    "user": "test@example.com",
-    "password": "123456",
-    "smtp_host": "smtp.example.com"
-  },
-  "master": {
-    "local_address": "127.0.0.1",
-    "local_port": 30000,
-    "local_proto": "http",
-    "address": "",
-    "port": 443,
-    "proto": "https"
-  },
-  "agent": {
-    "linux_package": "./data/package/agent-0.1.0.tar.gz"
-  },
-  "remote_assist": {
+  "assist": {
     "server_addr": "",
     "server_port": 7001,
-    "token": "",
     "services": [
       {
         "name": "ssh",
@@ -45,5 +25,38 @@
         "remote_port": 9000
       }
     ]
+  },
+  "cluster": {
+    "linux_package": "",
+    "local_address": "",
+    "local_port": 0,
+    "local_proto": "",
+    "address": "",
+    "port": 0,
+    "proto": ""
+  },
+  "log": {
+    "level": "info",
+    "path": "/tmp/"
+  },
+  "model": {
+    "type": "postgresql",
+    "host": "127.0.0.1",
+    "port": 25432,
+    "database": "test_cmmns",
+    "user": "postgres"
+  },
+  "rdb": {
+    "host": "127.0.0.1",
+    "port": 25431,
+    "password": "8ik,\u003cKI*"
+  },
+  "smtp": {
+    "from": "",
+    "smtp_server": "",
+    "user": "",
+    "password": "",
+    "smtp_host": "",
+    "domain": ""
   }
 }
