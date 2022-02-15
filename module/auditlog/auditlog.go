@@ -6,5 +6,5 @@ import (
 )
 
 func init() {
-	api.RegisterAuthAPI("agent", router.AuthGroup)
+	api.RegisterAuthAPI("auditlog", router.AuthGroup)
 }

@@ -16,14 +16,14 @@ var memoryStore *memstore.MemStore
 
 func GetSession(c *gin.Context) (*sessions.Session, error) {
 	if storeType == "memory" {
-		return memoryStore.Get(c.Request, "cmmnsmemory")
+		return memoryStore.Get(c.Request, "cmmns")
 	} else {
 		return redisStore.Get(c.Request, "koa")
 	}
 }
 
-// AuthMiddleware func
-func AuthMiddleware(r *gin.Engine) {
+// SessionMiddleware func
+func SessionMiddleware(r *gin.Engine) {
 
 	r.Use(func(c *gin.Context) {
 
@@ -43,8 +43,8 @@ func AuthMiddleware(r *gin.Engine) {
 	})
 }
 
-// UserPermMiddleware func
-func UserPermMiddleware(r *gin.Engine) {
+// AuthMiddleware func
+func AuthMiddleware(r *gin.Engine) {
 	r.Use(func(c *gin.Context) {
 		s, _ := c.Get("session")
 		session, ok := s.(*sessions.Session)

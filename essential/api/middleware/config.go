@@ -20,8 +20,6 @@ type MiddlewareConfig struct {
 	RedisStore   RedisStoreConfig `json:"redis_store,omitempty"`
 }
 
-var middlewareConfig MiddlewareConfig
-
 // Init init func
 func Init(config *MiddlewareConfig) (err error) {
 	if config.SessionStore == "memory" {

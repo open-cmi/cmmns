@@ -7,12 +7,14 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/fatedier/frp/client"
 	"github.com/fatedier/frp/pkg/config"
 	"github.com/fatedier/golib/crypto"
+	"gopkg.in/ini.v1"
 )
 
 type Client struct {
@@ -24,12 +26,15 @@ type Client struct {
 var defaultClient *Client
 
 func IsRunning() bool {
+	if defaultClient == nil {
+		return false
+	}
 	return defaultClient.IsRunning
 }
 
 func Run() error {
 	if defaultClient == nil {
-		return errors.New("feature is not enabled")
+		Init()
 	}
 
 	if defaultClient.IsRunning {
@@ -94,7 +99,28 @@ func Close() {
 	}
 }
 
-func Init(frpcFile string) {
+func Init() {
+	// 根据配置文件，生成临时ini文件，然后传入参数
+	tmpdir := os.TempDir()
+	cfgFilePath := filepath.Join(tmpdir, "./frpc.ini")
+
+	file := ini.Empty()
+	comsec, _ := file.NewSection("common")
+	comsec.NewKey("server_addr", moduleConfig.ServerAddr)
+	comsec.NewKey("server_port", strconv.Itoa(int(moduleConfig.ServerPort)))
+	if moduleConfig.Token != "" {
+		comsec.NewKey("token", moduleConfig.Token)
+	}
+	for _, rs := range moduleConfig.Service {
+		section, _ := file.NewSection(rs.Name)
+		section.NewKey("type", rs.Type)
+		section.NewKey("local_ip", rs.LocalIP)
+		section.NewKey("local_port", strconv.Itoa(int(rs.LocalPort)))
+		section.NewKey("remote_port", strconv.Itoa(int(rs.RemotePort)))
+	}
+
+	file.SaveTo(cfgFilePath)
+
 	defaultClient = new(Client)
-	defaultClient.ConfigFile = frpcFile
+	defaultClient.ConfigFile = cfgFilePath
 }

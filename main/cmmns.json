@@ -31,12 +31,12 @@
     "local_address": "",
     "local_port": 0,
     "local_proto": "",
-    "address": "",
+    "address": "localhost",
     "port": 0,
     "proto": ""
   },
   "log": {
-    "level": "info",
+    "level": "debug",
     "path": "/tmp/"
   },
   "model": {

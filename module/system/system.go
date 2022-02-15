@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	ticker.RegisterTicker("system_status", "*/5 * * * * *", func() {
+	ticker.RegisterTicker("system_status", "0 */5 * * * *", func() {
 		model.StartMonitor()
 	})
 	api.RegisterAuthAPI("system", router.AuthGroup)

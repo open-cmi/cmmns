@@ -9,10 +9,12 @@ import (
 // AuthGroup system auth group
 func AuthGroup(e *gin.Engine) {
 
-	g := e.Group("/api/common/v3/system")
+	g := e.Group("/api/common/v3/system/")
 	{
-		g.GET("/", controller.List)
-		g.GET("/:id", controller.Get)
+		g.GET("/status/", controller.List)
+		g.GET("/status/:id", controller.Get)
+
+		g.GET("/device/", controller.GetDevID)
 
 		g.POST("/reboot", controller.Reboot)
 	}

@@ -9,12 +9,15 @@ import (
 )
 
 func GetUser(c *gin.Context) map[string]interface{} {
-	sess, _ := c.Get("session")
-	session := sess.(*sessions.Session)
-	user, ok := session.Values["user"].(map[string]interface{})
-	if ok {
-		return user
+	sess, exist := c.Get("session")
+	if exist {
+		session := sess.(*sessions.Session)
+		user, ok := session.Values["user"].(map[string]interface{})
+		if ok {
+			return user
+		}
 	}
+
 	return nil
 }
 

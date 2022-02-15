@@ -34,7 +34,7 @@ func List(option *api.Option) (int, []Model, error) {
 
 	var results []Model = []Model{}
 
-	countClause := fmt.Sprintf("select count(*) from template")
+	countClause := "select count(*) from template"
 	whereClause, args := api.BuildWhereClause(option)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)

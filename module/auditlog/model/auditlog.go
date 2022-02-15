@@ -1,20 +1,21 @@
 package model
 
 import (
-	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/open-cmi/cmmns/essential/api"
+	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/storage/sqldb"
 )
 
 type Model struct {
-	ID        string `json:"id"`
-	IP        string `json:"ip"`
-	Type      int    `json:"type"`
-	Username  string `json:"username"`
-	Action    string `json:"action"`
-	Timestamp int    `json:"timestamp"`
+	ID        string `json:"id" db:"id"`
+	IP        string `json:"ip" db:"ip"`
+	Type      int    `json:"type" db:"type"`
+	Username  string `json:"username" db:"username"`
+	Action    string `json:"action" db:"action"`
+	Timestamp int    `json:"timestamp" db:"timestamp"`
 }
 
 // List list
@@ -23,7 +24,7 @@ func List(p *api.Option) (int, []Model, error) {
 
 	var logs []Model = []Model{}
 
-	countClause := fmt.Sprintf("select count(*) from audit_log")
+	countClause := "select count(*) from audit_log"
 	whereClause, args := api.BuildWhereClause(p)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
@@ -31,21 +32,29 @@ func List(p *api.Option) (int, []Model, error) {
 	var count int
 	err := row.Scan(&count)
 	if err != nil {
-		return 0, logs, errors.New("get count failed")
+		// 这里只打印错误，不暴露错误，防止存在sql注入时给用于错误提示
+		logger.Errorf("get count failed: %s\n", err.Error())
+		return 0, logs, nil
 	}
 
-	queryClause := fmt.Sprintf(`select id,ip,type,username,action,timestamp from audit_log`)
+	columns := api.GetColumn(Model{}, []string{})
+
+	queryClause := fmt.Sprintf(`select %s from audit_log`, strings.Join(columns, ","))
 	queryClause += whereClause
-	rows, err := db.Query(queryClause, args...)
+	finalClause := api.BuildFinalClause(p)
+	queryClause += finalClause
+	rows, err := db.Queryx(queryClause, args...)
 	if err != nil {
+		logger.Errorf("audit log queryx failed: %s\n", err.Error())
 		// 没有的话，也不需要报错
 		return count, logs, nil
 	}
 
 	for rows.Next() {
 		var item Model
-		err := rows.Scan(&item.ID, &item.IP, &item.Type, &item.Username, &item.Action, &item.Timestamp)
+		err := rows.StructScan(&item)
 		if err != nil {
+			logger.Errorf("audit log struct scan failed: %s\n", err.Error())
 			break
 		}
 

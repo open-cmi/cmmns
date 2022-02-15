@@ -45,9 +45,9 @@ func (s *Service) Init() error {
 		return err
 	}
 
+	middleware.SessionMiddleware(s.Engine)
 	api.UnauthInit(s.Engine)
 	middleware.AuthMiddleware(s.Engine)
-	middleware.UserPermMiddleware(s.Engine)
 	api.AuthInit(s.Engine)
 	ticker.Init()
 	storage.Init()

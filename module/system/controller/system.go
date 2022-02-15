@@ -6,6 +6,7 @@ import (
 
 	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/module/system/model"
+	"github.com/open-cmi/goutils/devutil"
 
 	"github.com/gin-gonic/gin"
 )
@@ -52,5 +53,19 @@ func Reboot(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"ret": 0,
 		"msg": "",
+	})
+}
+
+func GetDevID(c *gin.Context) {
+
+	deviceID := devutil.GetDeviceID()
+
+	// 返回LAN参数
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
+		"data": map[string]interface{}{
+			"id": deviceID,
+		},
 	})
 }
