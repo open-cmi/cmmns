@@ -18,7 +18,7 @@ func Init(e *gin.Engine) error {
 }
 
 func Run(r *gin.Engine) error {
-	sockAddr := moduleConfig.UnixPath //"/tmp/cmmns.sock"
+	sockAddr := moduleConfig.UnixPath
 	os.Remove(sockAddr)
 	unixAddr, err := net.ResolveUnixAddr("unix", sockAddr)
 	if err != nil {

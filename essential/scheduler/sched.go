@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/storage/rdb"
 )
 
@@ -93,17 +94,19 @@ func (s *Scheduler) GetJob(option *ConsumerOption) *Job {
 		return nil
 	}
 	var job Job
-	job.ID, _ = jobMap["id"]
-	job.Type, _ = jobMap["type"]
+	job.ID = jobMap["id"]
+	job.Type = jobMap["type"]
 	job.Priority, _ = strconv.Atoi(jobMap["priority"])
 	job.State = "Running"
 	job.Count, _ = strconv.Atoi(jobMap["count"])
-	job.Content, _ = jobMap["content"]
+	job.Content = jobMap["content"]
 
 	// 改变job 状态
 	key = fmt.Sprintf("scheduler.hash.%s.%s.%s", s.Namespace, option.Group, jobID)
 	_, err = cache.HSet(context.TODO(), key, "state", job.State).Result()
-
+	if err != nil {
+		logger.Error("set job state failed\n")
+	}
 	return &job
 }
 
@@ -151,12 +154,12 @@ func (sched *Scheduler) NewConsumer(option *ConsumerOption) *Consumer {
 	sched.Mutex.Lock()
 	defer sched.Mutex.Unlock()
 
-	consumer, found := sched.Consumers[option.Identity]
+	_, found := sched.Consumers[option.Identity]
 	if found {
 		return nil
 	}
 
-	consumer = &Consumer{
+	consumer := &Consumer{
 		Sched:  sched,
 		Option: option,
 	}
@@ -176,5 +179,12 @@ func (sched *Scheduler) GetConsumer(identity string) *Consumer {
 }
 
 func GetScheduler() *Scheduler {
+	if Sched == nil {
+		Sched = NewScheduler("default")
+	}
 	return Sched
+}
+
+func init() {
+	rdb.Register("scheduler", 4)
 }

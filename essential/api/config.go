@@ -18,7 +18,7 @@ func init() {
 	// default config
 	moduleConfig.Listen = "127.0.0.1"
 	moduleConfig.Port = 30000
-	moduleConfig.UnixPath = "/tmp"
+	moduleConfig.UnixPath = "/tmp/cmmns.sock"
 	moduleConfig.Middleware.SessionStore = "memory"
 
 	config.RegisterConfig("api", &moduleConfig)
