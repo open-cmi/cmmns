@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/common/errcode"
 	"github.com/open-cmi/cmmns/essential/api"
+	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/scheduler"
 	"github.com/open-cmi/cmmns/module/agent/model"
 	"github.com/open-cmi/cmmns/module/agent/msg"
@@ -23,8 +24,11 @@ func KeepAlive(c *gin.Context) {
 	// 先检查executor是否存在，如果不存在，则查询model
 	sched := scheduler.GetScheduler()
 	if sched == nil {
+		logger.Errorf("sched is nil\n")
+		c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": "scheduler is nil"})
 		return
 	}
+
 	consumer := sched.GetConsumer(devID)
 	if consumer == nil {
 		var option api.Option

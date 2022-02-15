@@ -14,7 +14,7 @@ type Config struct {
 	ServerAddr string          `json:"server_addr"`
 	ServerPort uint16          `json:"server_port"`
 	Token      string          `json:"token,omitempty"`
-	Service    []RemoteService `json:"services"`
+	Service    []RemoteService `json:"services,omitempty"`
 }
 
 var moduleConfig Config
