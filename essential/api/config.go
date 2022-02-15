@@ -15,5 +15,11 @@ type Config struct {
 var moduleConfig Config
 
 func init() {
+	// default config
+	moduleConfig.Listen = "127.0.0.1"
+	moduleConfig.Port = 30000
+	moduleConfig.UnixPath = "/tmp"
+	moduleConfig.Middleware.SessionStore = "memory"
+
 	config.RegisterConfig("api", &moduleConfig)
 }
