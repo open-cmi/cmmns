@@ -10,8 +10,9 @@ import (
 func UnauthGroup(e *gin.Engine) {
 	g := e.Group("/api/common/v3/agent")
 	{
-		g.GET("/self", controller.GetJob)
-		g.GET("/keepalive", controller.KeepAlive)
+		g.GET("/get-job", controller.GetJob)
+		g.POST("/report-result", controller.ReportResult)
+		g.GET("/keep-alive", controller.KeepAlive)
 		g.POST("/register", controller.Register)
 	}
 }

@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/common/errcode"
+	"github.com/open-cmi/cmmns/common/job"
 	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/scheduler"
@@ -112,6 +114,41 @@ func GetJob(c *gin.Context) {
 		"ret":  0,
 		"msg":  "",
 		"data": *job,
+	})
+}
+
+func ReportResult(c *gin.Context) {
+	// 获取device id
+	devID := c.Query("dev_id")
+	if devID == "" {
+		c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": "dev id is required"})
+		return
+	}
+	// 解析结果数据
+	var resp job.Response
+	if err := c.ShouldBindJSON(&resp); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	sched := scheduler.GetScheduler()
+	if sched == nil {
+		return
+	}
+
+	consumer := sched.GetConsumer(devID)
+	if consumer == nil {
+		c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": "agent not exist"})
+		return
+	}
+
+	// 根据job内容，修改结果，入库，删除缓存
+	consumer.JobDone(&resp)
+	fmt.Println(resp)
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
 	})
 }
 

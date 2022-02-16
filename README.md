@@ -12,8 +12,8 @@
 │   └── storage
 │   └── ticker
 │   └── notification
-├── main
-│   └── _your_app_
+├── app
+│   └── server
 ├── migration
 ├── module
 │   ├── agent

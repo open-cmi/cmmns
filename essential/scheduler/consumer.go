@@ -1,5 +1,7 @@
 package scheduler
 
+import "github.com/open-cmi/cmmns/common/job"
+
 type ConsumerOption struct {
 	Identity string
 	Group    string
@@ -18,4 +20,8 @@ func (c *Consumer) GetJob() *Job {
 
 func (c *Consumer) HasJob() bool {
 	return c.Sched.HasJob(c.Option)
+}
+
+func (c *Consumer) JobDone(job *job.Response) {
+	c.Sched.JobDone(c.Option, job)
 }

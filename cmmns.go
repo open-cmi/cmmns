@@ -6,7 +6,7 @@ import (
 	"syscall"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/open-cmi/cmmns/component"
+	_ "github.com/open-cmi/cmmns/component/server"
 	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/essential/api/middleware"
 	"github.com/open-cmi/cmmns/essential/config"
