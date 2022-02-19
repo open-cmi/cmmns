@@ -11,7 +11,7 @@
 │   └── scheduler
 │   └── storage
 │   └── ticker
-│   └── notification
+│   └── scmd
 ├── app
 │   └── server
 ├── migration

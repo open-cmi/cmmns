@@ -4,12 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/open-cmi/cmmns/common/job"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/storage/rdb"
 )
@@ -49,42 +47,75 @@ func NewScheduler(namespace string) *Scheduler {
 	return &sched
 }
 
-func (s *Scheduler) AddJob(job *Job, option *ProviderOption) error {
+func (s *Scheduler) enqueue(job *Job) error {
+	cache := rdb.GetCache("scheduler")
+
+	var err error
+	if job.SchedObject == "anyone" {
+		zkey := fmt.Sprintf("scheduler.zset.%s.%s", s.Namespace, job.SchedGroup)
+
+		_, err = cache.ZAddNX(context.TODO(), zkey, &redis.Z{
+			Score:  float64(time.Now().Unix())/1000000 + float64(job.Priority)*10000,
+			Member: job.ID,
+		}).Result()
+	} else if job.SchedObject == "everyone" {
+		for key, cons := range s.Consumers {
+			if cons.Option.Group == job.SchedGroup {
+				zkey := fmt.Sprintf("scheduler.zset.%s.%s.%s", s.Namespace, job.SchedGroup, key)
+
+				_, err = cache.ZAddNX(context.TODO(), zkey, &redis.Z{
+					Score:  float64(time.Now().Unix())/1000000 + float64(job.Priority)*10000,
+					Member: job.ID,
+				}).Result()
+
+				if err != nil {
+					logger.Errorf("zaddnx failed: %s\n", err.Error())
+					break
+				}
+			}
+		}
+	}
+
+	job.State = "Pending"
+	return err
+}
+
+func (s *Scheduler) dequeue(option *ConsumerOption) (id string) {
+	// 获取cache
+	cache := rdb.GetCache("scheduler")
+	if cache == nil {
+		return ""
+	}
+
+	// 从优先级集合中获取jobid
+	key := fmt.Sprintf("scheduler.zset.%s.%s.%s", s.Namespace, option.Group, option.Identity)
+	z, _ := cache.ZPopMax(context.TODO(), key, 1).Result()
+	if len(z) == 0 {
+		key = fmt.Sprintf("scheduler.zset.%s.%s", s.Namespace, option.Group)
+		z, _ = cache.ZPopMax(context.TODO(), key, 1).Result()
+		if len(z) == 0 {
+			return ""
+		}
+	}
+
+	jobID := z[0].Member.(string)
+	return jobID
+}
+
+func (s *Scheduler) addJob(job *Job) error {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
-	// 添加任务
-	cache := rdb.GetCache("scheduler")
-	var count int = 1
-	if option.Type == "anyone" {
-		zkey := fmt.Sprintf("scheduler.zset.%s.%s", s.Namespace, option.Group)
-
-		cache.ZAddNX(context.TODO(), zkey, &redis.Z{
-			Score:  float64(time.Now().Unix())/1000000 + float64(job.Priority)*10000,
-			Member: job.ID,
-		})
-	} else if option.Type == "everyone" {
-		for key, _ := range s.Consumers {
-			zkey := fmt.Sprintf("scheduler.zset.%s.%s.%s", s.Namespace, option.Group, key)
-
-			cache.ZAddNX(context.TODO(), zkey, &redis.Z{
-				Score:  float64(time.Now().Unix())/1000000 + float64(job.Priority)*10000,
-				Member: job.ID,
-			})
-		}
-		count = len(s.Consumers)
+	err := job.Save()
+	if err == nil {
+		// 如果保存失败，需要回退?
+		err = s.enqueue(job)
 	}
-	job.State = "Pending"
-	job.Count = count
 
-	key := fmt.Sprintf("scheduler.hash.%s.%s.%s", s.Namespace, option.Group, job.ID)
-	cache.HSet(context.TODO(), key, "id", job.ID, "type", job.Type, "priority", job.Priority,
-		"state", job.State, "count", job.Count, "content", job.Content)
-
-	return nil
+	return err
 }
 
-func (s *Scheduler) GetJob(option *ConsumerOption) *Job {
+func (s *Scheduler) getJob(option *ConsumerOption) *JobRequest {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
@@ -93,38 +124,25 @@ func (s *Scheduler) GetJob(option *ConsumerOption) *Job {
 	if cache == nil {
 		return nil
 	}
-	//
-	key := fmt.Sprintf("scheduler.zset.%s.%s.%s", s.Namespace, option.Group, option.Identity)
-	z, _ := cache.ZPopMax(context.TODO(), key, 1).Result()
-	if len(z) == 0 {
-		key = fmt.Sprintf("scheduler.zset.%s.%s", s.Namespace, option.Group)
-		z, _ = cache.ZPopMax(context.TODO(), key, 1).Result()
-		if len(z) == 0 {
+	jobID := s.dequeue(option)
+
+	if jobID != "" {
+		var jobRequest JobRequest
+		job := Get("id", jobID)
+		if job == nil {
 			return nil
 		}
-	}
+		jobRequest.ID = job.ID
+		jobRequest.Type = job.Type
+		jobRequest.Content = job.Content
 
-	jobID := z[0].Member.(string)
-	key = fmt.Sprintf("scheduler.hash.%s.%s.%s", s.Namespace, option.Group, jobID)
-	jobMap, err := cache.HGetAll(context.TODO(), key).Result()
-	if err != nil {
-		return nil
-	}
-	var job Job
-	job.ID = jobMap["id"]
-	job.Type = jobMap["type"]
-	job.Priority, _ = strconv.Atoi(jobMap["priority"])
-	job.State = "Running"
-	job.Count, _ = strconv.Atoi(jobMap["count"])
-	job.Content = jobMap["content"]
+		job.State = Running
 
-	// 改变job 状态
-	key = fmt.Sprintf("scheduler.hash.%s.%s.%s", s.Namespace, option.Group, jobID)
-	_, err = cache.HSet(context.TODO(), key, "state", job.State).Result()
-	if err != nil {
-		logger.Error("set job state failed\n")
+		go job.Save()
+
+		return &jobRequest
 	}
-	return &job
+	return nil
 }
 
 func (s *Scheduler) RegisterJobCallback(jobType string, callback JobCallback) error {
@@ -139,7 +157,7 @@ func (s *Scheduler) RegisterJobCallback(jobType string, callback JobCallback) er
 	return nil
 }
 
-func (s *Scheduler) JobDone(option *ConsumerOption, jobResp *job.Response) {
+func (s *Scheduler) jobDone(option *ConsumerOption, jobResp *JobResponse) {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
@@ -149,46 +167,32 @@ func (s *Scheduler) JobDone(option *ConsumerOption, jobResp *job.Response) {
 		return
 	}
 
-	key := fmt.Sprintf("scheduler.hash.%s.%s.%s", s.Namespace, option.Group, jobResp.ID)
-	jobMap, err := cache.HGetAll(context.TODO(), key).Result()
-	if err != nil {
+	job := Get("id", jobResp.ID)
+	if job == nil {
 		return
 	}
-	var job Job
-	job.ID = jobResp.ID
-	job.Type = jobResp.Type
+
 	job.Result = jobResp.Result
-	job.Count, _ = strconv.Atoi(jobMap["count"])
-	job.Done, _ = strconv.Atoi(jobMap["done"])
 	job.Done += 1
 	if job.Count == job.Done {
 		job.State = "Done"
-		// job done，hash里面数据删除
-		key = fmt.Sprintf("scheduler.hash.%s.%s.%s", s.Namespace, option.Group, jobResp.ID)
-		_, err = cache.Del(context.TODO(), key).Result()
-		if err != nil {
-			logger.Error("job completed, del failed\n")
-		}
+		job.StoppedTime = time.Now().Unix()
+		job.Save()
 		callback, found := s.Callback[jobResp.Type]
 		if found {
-			callback.Done(&job, option)
+			callback.Done(job, option)
 		}
 	} else {
 		// 只增加done的数量，不删除数据
-		// 改变job 状态
-		key = fmt.Sprintf("scheduler.hash.%s.%s.%s", s.Namespace, option.Group, jobResp.ID)
-		_, err = cache.HSet(context.TODO(), key, "done", job.Done).Result()
-		if err != nil {
-			logger.Error("set job done failed\n")
-		}
+		job.Save()
 		callback, found := s.Callback[jobResp.Type]
 		if found {
-			callback.Progress(&job, option)
+			callback.Progress(job, option)
 		}
 	}
 }
 
-func (s *Scheduler) HasJob(option *ConsumerOption) bool {
+func (s *Scheduler) hasJob(option *ConsumerOption) bool {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
@@ -208,10 +212,15 @@ func (s *Scheduler) HasJob(option *ConsumerOption) bool {
 }
 
 func (sched *Scheduler) NewProvider(option *ProviderOption) *Provider {
+	_, found := sched.Providers[option.Identity]
+	if found {
+		return nil
+	}
 	provider := &Provider{
 		Sched:  sched,
 		Option: option,
 	}
+
 	sched.Providers[option.Identity] = provider
 	return provider
 }

@@ -1,7 +1,10 @@
 package scheduler
 
-import "github.com/open-cmi/cmmns/essential/storage/rdb"
+import (
+	"github.com/open-cmi/cmmns/common/def"
+	"github.com/open-cmi/cmmns/essential/storage/rdb"
+)
 
 func init() {
-	rdb.Register("scheduler", 4)
+	rdb.Register("scheduler", def.RDBScheduler)
 }

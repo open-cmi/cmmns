@@ -1,12 +1,10 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/common/errcode"
-	"github.com/open-cmi/cmmns/common/job"
 	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/scheduler"
@@ -125,7 +123,7 @@ func ReportResult(c *gin.Context) {
 		return
 	}
 	// 解析结果数据
-	var resp job.Response
+	var resp scheduler.JobResponse
 	if err := c.ShouldBindJSON(&resp); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -144,7 +142,6 @@ func ReportResult(c *gin.Context) {
 
 	// 根据job内容，修改结果，入库，删除缓存
 	consumer.JobDone(&resp)
-	fmt.Println(resp)
 
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,

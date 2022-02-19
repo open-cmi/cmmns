@@ -1,4 +1,4 @@
-package startup
+package def
 
 const (
 	ModuleLog = iota

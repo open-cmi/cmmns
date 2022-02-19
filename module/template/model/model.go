@@ -39,6 +39,7 @@ func (m *Model) Save() error {
 			logger.Errorf("create model failed: %s", err.Error())
 			return errors.New("create model failed")
 		}
+		m.isNew = false
 	} else {
 		columns := api.GetColumn(*m, []string{"id", "created_time"})
 
@@ -72,10 +73,10 @@ func (m *Model) Remove() error {
 
 func New() (m *Model) {
 	now := time.Now().Unix()
-	return &Model{
-		ID:          uuid.NewString(),
-		CreatedTime: now,
-		UpdatedTime: now,
-		isNew:       true,
-	}
+	m = new(Model)
+	m.ID = uuid.NewString()
+	m.CreatedTime = now
+	m.UpdatedTime = now
+	m.isNew = true
+	return m
 }
