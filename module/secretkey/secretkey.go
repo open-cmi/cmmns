@@ -1,10 +1,10 @@
 package secretkey
 
 import (
-	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/module/secretkey/router"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func init() {
-	api.RegisterAuthAPI("secretkey", router.AuthGroup)
+	webserver.RegisterAuthAPI("secretkey", router.AuthGroup)
 }

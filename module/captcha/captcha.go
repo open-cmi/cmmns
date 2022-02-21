@@ -1,10 +1,10 @@
 package captcha
 
 import (
-	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/module/captcha/router"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func init() {
-	api.RegisterUnauthAPI("captcha", router.UnauthGroup)
+	webserver.RegisterUnauthAPI("captcha", router.UnauthGroup)
 }

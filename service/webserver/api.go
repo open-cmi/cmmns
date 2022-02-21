@@ -1,4 +1,4 @@
-package api
+package webserver
 
 import (
 	"net"
@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/essential/api/middleware"
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/service/webserver/middleware"
 )
 
 func Init(e *gin.Engine) error {

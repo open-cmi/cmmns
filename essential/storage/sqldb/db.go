@@ -25,15 +25,15 @@ type Config struct {
 var moduleConfig Config
 
 // Init db init
-func Init() error {
+func (c *Config) Init() error {
 	var dbconf database.Config
-	dbconf.Type = moduleConfig.Type
-	dbconf.File = moduleConfig.File
-	dbconf.Host = moduleConfig.Host
-	dbconf.Port = moduleConfig.Port
-	dbconf.User = moduleConfig.User
-	dbconf.Password = moduleConfig.Password
-	dbconf.Database = moduleConfig.Database
+	dbconf.Type = c.Type
+	dbconf.File = c.File
+	dbconf.Host = c.Host
+	dbconf.Port = c.Port
+	dbconf.User = c.User
+	dbconf.Password = c.Password
+	dbconf.Database = c.Database
 
 	dbi, err := dbsql.SQLInit(&dbconf)
 	if err != nil {

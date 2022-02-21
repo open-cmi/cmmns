@@ -31,7 +31,7 @@ func AuthGroup(e *gin.Engine) {
 	g2 := e.Group("/api/common/v3/master/")
 	{
 		g2.GET("/setting", controller.GetSetting)
-		g2.GET("/auto-get-master", controller.AutoGetMaster)
+		g2.GET("/auto-master-setting", controller.AutoGetMaster)
 		g2.POST("/setting", controller.EditSetting)
 	}
 }

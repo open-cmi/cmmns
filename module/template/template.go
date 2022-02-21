@@ -1,10 +1,10 @@
 package template
 
 import (
-	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/module/template/router"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func init() {
-	api.RegisterAuthAPI("template", router.AuthGroup)
+	webserver.RegisterAuthAPI("template", router.AuthGroup)
 }

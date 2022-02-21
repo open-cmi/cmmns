@@ -12,6 +12,10 @@ type Config struct {
 	Proto        string `json:"proto"`
 }
 
+func (c *Config) Init() error {
+	return nil
+}
+
 var moduleConfig Config
 
 func init() {

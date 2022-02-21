@@ -1,10 +1,10 @@
 package auditlog
 
 import (
-	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/module/auditlog/router"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func init() {
-	api.RegisterAuthAPI("auditlog", router.AuthGroup)
+	webserver.RegisterAuthAPI("auditlog", router.AuthGroup)
 }

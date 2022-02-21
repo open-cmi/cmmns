@@ -16,7 +16,7 @@ type Ticker struct {
 
 var tickers map[string]Ticker = make(map[string]Ticker)
 
-func RegisterTicker(name string, spec string, f TickerFunc) error {
+func Register(name string, spec string, f TickerFunc) error {
 	_, found := tickers[name]
 	if found {
 		errMsg := fmt.Sprintf("ticker %s registered failed", name)

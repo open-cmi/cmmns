@@ -1,21 +1,13 @@
 package controller
 
 import (
-	"encoding/json"
-	"errors"
 	"net/http"
-	"os"
-	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/goutils/fileutil"
-	"github.com/open-cmi/goutils/pathutil"
 )
 
 type Setting struct {
@@ -74,47 +66,47 @@ func EditSetting(c *gin.Context) {
 
 	config.Save()
 
-	// 找到agent的位置
-	agentPackage := moduleConfig.LinuxPackage
-	if !strings.HasPrefix(agentPackage, "/") {
-		rp := pathutil.GetRootPath()
-		agentPackage = filepath.Join(rp, agentPackage)
-	}
+	/*
+		// 找到agent的位置
+		agentPackage := moduleConfig.LinuxPackage
+		if !strings.HasPrefix(agentPackage, "/") {
+			rp := pathutil.GetRootPath()
+			agentPackage = filepath.Join(rp, agentPackage)
+		}
 
-	if !fileutil.FileExist(agentPackage) {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": errors.New("agent package is not exist")})
-		return
-	}
+		if !fileutil.FileExist(agentPackage) {
+			c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": errors.New("agent package is not exist")})
+			return
+		}
 
-	// 解压包
-	cmdArgs := []string{"xzvf", agentPackage, "-C", os.TempDir()}
-	err := exec.Command("tar", cmdArgs...).Run()
-	if err != nil {
-		logger.Errorf("tar xzvf failed: %s\n", err.Error())
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": errors.New("run tar command failed")})
-		return
-	}
-	// 写入master.json文件
-	content, _ := json.MarshalIndent(moduleConfig, "", "  ")
-	masterFile := filepath.Join(os.TempDir(), "agent", "etc", "master.json")
-	os.WriteFile(masterFile, content, 0644)
+		// 解压包
+		cmdArgs := []string{"xzvf", agentPackage, "-C", os.TempDir()}
+		err := exec.Command("tar", cmdArgs...).Run()
+		if err != nil {
+			logger.Errorf("tar xzvf failed: %s\n", err.Error())
+			c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": errors.New("run tar command failed")})
+			return
+		}
+		// 写入master.json文件
+		content, _ := json.MarshalIndent(moduleConfig, "", "  ")
+		masterFile := filepath.Join(os.TempDir(), "agent", "etc", "master.json")
+		os.WriteFile(masterFile, content, 0644)
 
-	// 打包
-	cmdArgs = []string{"czvf", agentPackage, "-C", os.TempDir(), "agent"}
-	err = exec.Command("tar", cmdArgs...).Run()
-	if err != nil {
-		logger.Errorf("tar czvf failed: %s\n", err.Error())
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": errors.New("run tar command failed")})
-		return
-	}
+		// 打包
+		cmdArgs = []string{"czvf", agentPackage, "-C", os.TempDir(), "agent"}
+		err = exec.Command("tar", cmdArgs...).Run()
+		if err != nil {
+			logger.Errorf("tar czvf failed: %s\n", err.Error())
+			c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": errors.New("run tar command failed")})
+			return
+		}
 
-	os.RemoveAll(filepath.Join(os.TempDir(), "agent"))
-
+		os.RemoveAll(filepath.Join(os.TempDir(), "agent"))
+	*/
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
 	})
-	return
 }
 
 func AutoGetMaster(c *gin.Context) {

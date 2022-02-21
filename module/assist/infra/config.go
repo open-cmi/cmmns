@@ -17,6 +17,10 @@ type Config struct {
 	Service    []RemoteService `json:"services,omitempty"`
 }
 
+func (c *Config) Init() error {
+	return nil
+}
+
 var moduleConfig Config
 
 func init() {

@@ -4,8 +4,12 @@ import (
 	"flag"
 
 	"github.com/open-cmi/cmmns"
-	"github.com/open-cmi/cmmns/essential/scmd"
+	"github.com/open-cmi/cmmns/scmd"
+	"github.com/open-cmi/cmmns/service/ticker"
+	"github.com/open-cmi/cmmns/service/webserver"
 	"github.com/open-cmi/migrate"
+
+	_ "github.com/open-cmi/cmmns/component"
 )
 
 var configfile string = ""
@@ -27,7 +31,13 @@ func main() {
 		return
 	}
 
-	s := cmmns.New(configfile)
+	err := cmmns.Init(configfile)
+	if err != nil {
+		return
+	}
+	defer cmmns.Fini()
+
+	s := webserver.New()
 	// 在init之前，注册业务router
 
 	// Init
@@ -35,6 +45,10 @@ func main() {
 	// Run
 	s.Run()
 
-	defer s.Close()
-	s.Wait()
+	// run ticker service
+	t := ticker.New()
+	t.Init()
+	t.Run()
+
+	cmmns.Wait()
 }

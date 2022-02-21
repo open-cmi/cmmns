@@ -23,10 +23,10 @@ type Config struct {
 var moduleConfig Config
 
 // Init db init
-func Init() error {
-	cachehost := moduleConfig.Host
-	cacheport := moduleConfig.Port
-	cachepassword := moduleConfig.Password
+func (c *Config) Init() error {
+	cachehost := c.Host
+	cacheport := c.Port
+	cachepassword := c.Password
 
 	Cache = make(map[string]*redis.Client)
 

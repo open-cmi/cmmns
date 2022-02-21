@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/open-cmi/cmmns/common/def"
 	"github.com/open-cmi/cmmns/essential/api"
+	"github.com/open-cmi/cmmns/essential/pubsub"
 	"github.com/open-cmi/cmmns/essential/storage/sqldb"
 	"github.com/open-cmi/cmmns/module/agentgroup/msg"
 )
@@ -122,4 +124,10 @@ func Delete(mo *api.Option, name string) error {
 		return errors.New("item not exist")
 	}
 	return m.Remove()
+}
+
+func init() {
+	pubsub.Subscribe(def.EventUserCreate, func(username string) {
+		fmt.Println("user create:", username)
+	})
 }

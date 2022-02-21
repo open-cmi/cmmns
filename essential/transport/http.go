@@ -10,6 +10,9 @@ import (
 	"net/url"
 )
 
+// Cookies resp cookies
+var Cookies []*http.Cookie
+
 // ReqAPI func
 func ReqAPI(api string, params map[string]string, payload interface{}) (respmsg Response, err error) {
 
@@ -33,6 +36,10 @@ func ReqAPI(api string, params map[string]string, payload interface{}) (respmsg 
 	}
 	// 通过 http 请求
 	req, _ := http.NewRequest("GET", connurl, bytes.NewReader(reqbody))
+	for _, cookie := range Cookies {
+		req.AddCookie(cookie)
+	}
+
 	resp, err := DefaultClient.Do(req)
 	if resp != nil {
 		defer resp.Body.Close()
@@ -46,6 +53,8 @@ func ReqAPI(api string, params map[string]string, payload interface{}) (respmsg 
 		errmsg := fmt.Sprintf("api not available, status code: %d", resp.StatusCode)
 		return respmsg, errors.New(errmsg)
 	}
+
+	Cookies = resp.Cookies()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -85,6 +94,9 @@ func PostAPI(api string, params map[string]string, payload interface{}) (respmsg
 	if err != nil {
 		return respmsg, err
 	}
+	for _, cookie := range Cookies {
+		request.AddCookie(cookie)
+	}
 
 	request.Header.Set("Content-Type", "application/json;charset=UTF-8")
 	resp, err := DefaultClient.Do(request)
@@ -101,6 +113,7 @@ func PostAPI(api string, params map[string]string, payload interface{}) (respmsg
 		errmsg := fmt.Sprintf("api not available, status code: %d", resp.StatusCode)
 		return respmsg, errors.New(errmsg)
 	}
+	Cookies = resp.Cookies()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -139,6 +152,10 @@ func DelAPI(api string, params map[string]string) (respmsg Response, err error) 
 		return respmsg, err
 	}
 
+	for _, cookie := range Cookies {
+		request.AddCookie(cookie)
+	}
+
 	resp, err := DefaultClient.Do(request)
 	// 这里需要处理出错机制，比如上传失败，需要重新上传等，这里后续完善
 	if resp != nil {
@@ -153,6 +170,7 @@ func DelAPI(api string, params map[string]string) (respmsg Response, err error) 
 		errmsg := fmt.Sprintf("api not available, status code: %d", resp.StatusCode)
 		return respmsg, errors.New(errmsg)
 	}
+	Cookies = resp.Cookies()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

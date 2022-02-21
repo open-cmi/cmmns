@@ -1,8 +1,8 @@
-package api
+package webserver
 
 import (
-	"github.com/open-cmi/cmmns/essential/api/middleware"
 	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/service/webserver/middleware"
 )
 
 type Config struct {
@@ -14,6 +14,10 @@ type Config struct {
 
 var moduleConfig Config
 
+func (c *Config) Init() error {
+	return nil
+}
+
 func init() {
 	// default config
 	moduleConfig.Listen = "127.0.0.1"
@@ -21,5 +25,5 @@ func init() {
 	moduleConfig.UnixPath = "/tmp/cmmns.sock"
 	moduleConfig.Middleware.SessionStore = "memory"
 
-	config.RegisterConfig("api", &moduleConfig)
+	config.RegisterConfig("webserver", &moduleConfig)
 }

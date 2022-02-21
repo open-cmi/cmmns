@@ -1,10 +1,10 @@
 package agentgroup
 
 import (
-	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/module/agentgroup/router"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func init() {
-	api.RegisterAuthAPI("agentgroup", router.AuthGroup)
+	webserver.RegisterAuthAPI("agentgroup", router.AuthGroup)
 }

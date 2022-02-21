@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/StackExchange/wmi v1.2.1 // indirect
+	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef // indirect
 	github.com/dchest/captcha v0.0.0-20200903113550-03f5f0333e1f
 	github.com/fatedier/frp v0.38.0
 	github.com/fatedier/golib v0.1.1-0.20200901083111-1f870741e185

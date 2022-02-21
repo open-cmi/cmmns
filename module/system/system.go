@@ -1,15 +1,15 @@
 package system
 
 import (
-	"github.com/open-cmi/cmmns/essential/api"
-	"github.com/open-cmi/cmmns/essential/ticker"
 	"github.com/open-cmi/cmmns/module/system/model"
 	"github.com/open-cmi/cmmns/module/system/router"
+	"github.com/open-cmi/cmmns/service/ticker"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func init() {
-	ticker.RegisterTicker("system_status", "0 */5 * * * *", func() {
+	ticker.Register("system_status", "0 */5 * * * *", func() {
 		model.StartMonitor()
 	})
-	api.RegisterAuthAPI("system", router.AuthGroup)
+	webserver.RegisterAuthAPI("system", router.AuthGroup)
 }

@@ -7,8 +7,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jameskeane/bcrypt"
+	"github.com/open-cmi/cmmns/common/def"
 	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/essential/pubsub"
 	"github.com/open-cmi/cmmns/essential/storage/sqldb"
 	"github.com/open-cmi/cmmns/module/user/msg"
 )
@@ -239,5 +241,7 @@ func Create(m *msg.CreateMsg) (err error) {
 	if err != nil {
 		return errors.New("create user failed")
 	}
+
+	pubsub.Publish(def.EventUserCreate, m.UserName)
 	return nil
 }

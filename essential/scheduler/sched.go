@@ -138,7 +138,7 @@ func (s *Scheduler) getJob(option *ConsumerOption) *JobRequest {
 
 		job.State = Running
 
-		go job.Save()
+		job.Save()
 
 		return &jobRequest
 	}

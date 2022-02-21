@@ -7,14 +7,18 @@ import (
 	"github.com/open-cmi/goutils/confparser"
 )
 
+type Feature interface {
+	Init() error
+}
+
 // Config config
 type Config struct {
 	parser   *confparser.Parser
-	Features map[string]interface{}
+	Features map[string]Feature
 }
 
 var config *Config
-var defaultConfig map[string]interface{} = make(map[string]interface{})
+var defaultConfig map[string]Feature = make(map[string]Feature)
 
 // Init config init
 func Init(configfile string) error {
@@ -42,6 +46,7 @@ func Init(configfile string) error {
 		if err != nil {
 			return err
 		}
+		moduleConfig.Init()
 	}
 	return nil
 }
@@ -51,7 +56,7 @@ func Save() {
 	config.parser.Save(config.Features)
 }
 
-func RegisterConfig(name string, conf interface{}) error {
+func RegisterConfig(name string, conf Feature) error {
 	_, found := defaultConfig[name]
 	if found {
 		return errors.New("config " + name + " has been registered")

@@ -1,10 +1,10 @@
 package assist
 
 import (
-	"github.com/open-cmi/cmmns/essential/api"
 	"github.com/open-cmi/cmmns/module/assist/router"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func init() {
-	api.RegisterAuthAPI("assist", router.AuthGroup)
+	webserver.RegisterAuthAPI("assist", router.AuthGroup)
 }

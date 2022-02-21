@@ -26,7 +26,7 @@ var moduleConfig Config
 var DefaultClient *http.Client
 
 // Init transport init
-func Init() error {
+func (c *Config) Init() error {
 
 	var tp = &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -45,8 +45,8 @@ func Init() error {
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 	}
-	if moduleConfig.TLSKeyPair.CertFile != "" && moduleConfig.TLSKeyPair.KeyFile != "" {
-		cliCrt, err := tls.LoadX509KeyPair(moduleConfig.TLSKeyPair.CertFile, moduleConfig.TLSKeyPair.KeyFile)
+	if c.TLSKeyPair.CertFile != "" && c.TLSKeyPair.KeyFile != "" {
+		cliCrt, err := tls.LoadX509KeyPair(c.TLSKeyPair.CertFile, c.TLSKeyPair.KeyFile)
 		if err != nil {
 			logger.Errorf("load x509 key pair failed, err: %s\n", err.Error())
 			return err
