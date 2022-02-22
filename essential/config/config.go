@@ -17,8 +17,8 @@ type Config struct {
 	Features map[string]Feature
 }
 
-var config *Config
-var defaultConfig map[string]Feature = make(map[string]Feature)
+var gConf *Config
+var configMapping map[string]Feature = make(map[string]Feature)
 
 // Init config init
 func Init(configfile string) error {
@@ -27,18 +27,18 @@ func Init(configfile string) error {
 		return errors.New("open file failed")
 	}
 
-	config = new(Config)
-	config.parser = parser
-	config.Features = defaultConfig
+	gConf = new(Config)
+	gConf.parser = parser
+	gConf.Features = configMapping
 
 	var tmpConf map[string]json.RawMessage = make(map[string]json.RawMessage)
-	err := config.parser.Load(&tmpConf)
+	err := gConf.parser.Load(&tmpConf)
 	if err != nil {
 		return err
 	}
 
 	for name, value := range tmpConf {
-		moduleConfig, found := config.Features[name]
+		moduleConfig, found := gConf.Features[name]
 		if !found {
 			continue
 		}
@@ -53,14 +53,15 @@ func Init(configfile string) error {
 
 // Save save config
 func Save() {
-	config.parser.Save(config.Features)
+	gConf.parser.Save(gConf.Features)
 }
 
+// RegisterConfig register config
 func RegisterConfig(name string, conf Feature) error {
-	_, found := defaultConfig[name]
+	_, found := configMapping[name]
 	if found {
 		return errors.New("config " + name + " has been registered")
 	}
-	defaultConfig[name] = conf
+	configMapping[name] = conf
 	return nil
 }

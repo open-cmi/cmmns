@@ -7,6 +7,8 @@ import (
 
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
+
+	_ "github.com/open-cmi/cmmns/migration"
 )
 
 func Init(configFile string) error {

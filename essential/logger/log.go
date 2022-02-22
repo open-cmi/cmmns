@@ -126,10 +126,6 @@ func Debugf(format string, v ...interface{}) {
 
 var moduleConfig Config
 
-func RegisterLogger(l interface{}) {
-	Logger = l.(Feature)
-}
-
 func init() {
 	moduleConfig.Level = "debug"
 	moduleConfig.Path = "/tmp/"

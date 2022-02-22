@@ -2,11 +2,8 @@ package def
 
 const (
 	ModuleLog = iota
-	ModuleStorage
-	ModuleScheduler
-	ModuleUser
-	ModuleAgent
-	ModuleMaster
-	ModuleTicker
-	ModuleAPI
+	ModuleRDB
+	ModuleSqlDB
+	ModulePubSub
+	ModuleTransport
 )

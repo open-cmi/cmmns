@@ -5,11 +5,17 @@ import (
 	"github.com/open-cmi/cmmns/service/webserver/middleware"
 )
 
+type Server struct {
+	Address  string `json:"address"`
+	Port     int    `json:"port,omitempty"`
+	Proto    string `json:"proto"`
+	CertFile string `json:"cert,omitempty"`
+	KeyFile  string `json:"key,omitempty"`
+}
+
 type Config struct {
 	Middleware middleware.MiddlewareConfig `json:"middleware"`
-	Listen     string                      `json:"listen"`
-	Port       int                         `json:"port"`
-	UnixPath   string                      `json:"unix_path"`
+	Server     []Server                    `json:"server"`
 }
 
 var moduleConfig Config
@@ -20,10 +26,16 @@ func (c *Config) Init() error {
 
 func init() {
 	// default config
-	moduleConfig.Listen = "127.0.0.1"
-	moduleConfig.Port = 30000
-	moduleConfig.UnixPath = "/tmp/cmmns.sock"
 	moduleConfig.Middleware.SessionStore = "memory"
+
+	moduleConfig.Server = append(moduleConfig.Server, Server{
+		Address: "127.0.0.1",
+		Port:    30000,
+		Proto:   "http",
+	}, Server{
+		Address: "/tmp/cmmns.sock",
+		Proto:   "unix",
+	})
 
 	config.RegisterConfig("webserver", &moduleConfig)
 }

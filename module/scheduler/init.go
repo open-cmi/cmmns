@@ -1,4 +1,4 @@
-package user
+package scheduler
 
 import (
 	"github.com/open-cmi/cmmns/common/def"
@@ -6,6 +6,5 @@ import (
 )
 
 func init() {
-
-	rdb.Register("user", def.RDBUser)
+	rdb.Register("scheduler", def.RDBScheduler)
 }

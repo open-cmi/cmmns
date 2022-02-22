@@ -1,10 +1,15 @@
 package agentgroup
 
-import (
-	"github.com/open-cmi/cmmns/module/agentgroup/router"
-	"github.com/open-cmi/cmmns/service/webserver"
-)
+type CreateMsg struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
 
-func init() {
-	webserver.RegisterAuthAPI("agentgroup", router.AuthGroup)
+type MultiDeleteMsg struct {
+	ID []string `json:"id"`
+}
+
+type EditMsg struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
