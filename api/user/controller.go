@@ -20,7 +20,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jordan-wright/email"
-	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/essential/i18n"
 	"github.com/open-cmi/cmmns/essential/rdb"
 )
 
@@ -50,21 +50,26 @@ func ChangePassword(c *gin.Context) {
 
 	usermap := api.GetUser(c)
 	if usermap == nil {
+		c.JSON(200, gin.H{
+			"ret": 1,
+			"msg": i18n.Sprintf("user not exist"),
+		})
 		return
 	}
 
 	if apimsg.NewPassword != apimsg.ConfirmPassword {
 		c.JSON(200, gin.H{
 			"ret": 1,
-			"msg": "password confirmation doesn't match the password",
+			"msg": i18n.Sprintf("password confirmation doesn't match the password"),
 		})
 		return
 	}
+
 	userID, _ := usermap["id"].(string)
 	if !user.VerifyPasswordByID(userID, apimsg.OldPassword) {
 		c.JSON(200, gin.H{
 			"ret": 1,
-			"msg": "user password verify failed",
+			"msg": i18n.Sprintf("user password verify failed"),
 		})
 		return
 	}
@@ -73,10 +78,15 @@ func ChangePassword(c *gin.Context) {
 	if err != nil {
 		c.JSON(200, gin.H{
 			"ret": 1,
-			"msg": "change password failed",
+			"msg": i18n.Sprintf("change password failed"),
 		})
 		return
 	}
+
+	auditlog.InsertLog(c,
+		auditlog.OperationType,
+		i18n.Sprintf("change password sussessfully"),
+	)
 
 	c.JSON(200, gin.H{
 		"ret": 0,
@@ -94,7 +104,7 @@ func List(c *gin.Context) {
 	if err != nil {
 		c.JSON(200, gin.H{
 			"ret": 1,
-			"msg": "list users failed",
+			"msg": i18n.Sprintf("list users failed"),
 		})
 		return
 	}
@@ -126,7 +136,7 @@ func Get(c *gin.Context) {
 	if user == nil {
 		c.JSON(200, gin.H{
 			"ret": errcode.ErrFailed,
-			"msg": "user not exist",
+			"msg": i18n.Sprintf("user not exist"),
 		})
 		return
 	}
@@ -193,7 +203,7 @@ func Login(c *gin.Context) {
 	}
 
 	// 写日志操作
-	auditlog.InsertLog(c, auditlog.LoginType, "Login Success")
+	auditlog.InsertLog(c, auditlog.LoginType, i18n.Sprintf("login successfully"))
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": *user})
 }
@@ -203,7 +213,7 @@ func Logout(c *gin.Context) {
 	session := sess.(*sessions.Session)
 
 	// 写日志操作
-	auditlog.InsertLog(c, auditlog.LoginType, "Logout Success")
+	auditlog.InsertLog(c, auditlog.LoginType, i18n.Sprintf("logout successfully"))
 
 	delete(session.Values, "user")
 
@@ -289,6 +299,11 @@ func Create(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 	}
 
+	auditlog.InsertLog(c,
+		auditlog.OperationType,
+		i18n.Sprintf("create user sussessfully"),
+	)
+
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
@@ -304,25 +319,10 @@ func Delete(c *gin.Context) {
 		return
 	}
 
+	auditlog.InsertLog(c,
+		auditlog.OperationType,
+		i18n.Sprintf("delete user sussessfully"),
+	)
+
 	c.JSON(200, gin.H{"ret": 0, "msg": ""})
-}
-
-// Config smtp
-type Config struct {
-	From       string `json:"from"`
-	SMTPServer string `json:"smtp_server"`
-	User       string `json:"user"`
-	Password   string `json:"password"`
-	SMTPHost   string `json:"smtp_host"`
-	Domain     string `json:"domain"`
-}
-
-func (c *Config) Init() error {
-	return nil
-}
-
-var moduleConfig Config
-
-func init() {
-	config.RegisterConfig("smtp", &moduleConfig)
 }

@@ -34,7 +34,6 @@ func (s *Service) Init() error {
 	UnauthInit(s.Engine)
 	middleware.AuthMiddleware(s.Engine)
 	AuthInit(s.Engine)
-
 	return nil
 }
 

@@ -1,4 +1,7 @@
 {
+  "locale": {
+    "lang": "zh-CN"
+  },
   "assist": {
     "server_addr": "",
     "server_port": 0

@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/common/api"
+	"github.com/open-cmi/cmmns/essential/i18n"
 	"github.com/open-cmi/cmmns/module/agent"
 	"github.com/open-cmi/cmmns/module/auditlog"
 )
@@ -27,7 +28,6 @@ func List(c *gin.Context) {
 			"count":   count,
 			"results": list,
 		}})
-	return
 }
 
 // Create create agent
@@ -50,12 +50,12 @@ func Create(c *gin.Context) {
 	option.UserID = userID
 	_, err := agent.Create(&option, &createmsg)
 	if err != nil {
-		auditlog.InsertLog(c, auditlog.LoginType, "create agent failed")
+		auditlog.InsertLog(c, auditlog.OperationType, i18n.Sprintf("create agent failed"))
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 	// 写日志操作
-	auditlog.InsertLog(c, auditlog.LoginType, "create agent successfully")
+	auditlog.InsertLog(c, auditlog.OperationType, i18n.Sprintf("create agent successfully"))
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
@@ -70,9 +70,16 @@ func Delete(c *gin.Context) {
 	option.UserID = userID
 	err := agent.Delete(&option, id)
 	if err != nil {
+		// 写日志操作
+		auditlog.InsertLog(c, auditlog.OperationType, i18n.Sprintf("delete agent failed"))
+
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+
+	// 写日志操作
+	auditlog.InsertLog(c, auditlog.OperationType, i18n.Sprintf("delete agent successfully"))
+
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 

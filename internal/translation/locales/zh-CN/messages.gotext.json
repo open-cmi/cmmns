@@ -1,0 +1,75 @@
+{
+    "language": "zh-CN",
+    "messages": [
+        {
+            "id": "create agent failed",
+            "message": "create agent failed",
+            "translation": "创建agent失败"
+        },
+        {
+            "id": "create agent successfully",
+            "message": "create agent successfully",
+            "translation": "创建agent成功"
+        },
+        {
+            "id": "delete agent failed",
+            "message": "delete agent failed",
+            "translation": "删除agent失败"
+        },
+        {
+            "id": "delete agent successfully",
+            "message": "delete agent successfully",
+            "translation": "删除agent成功"
+        },
+        {
+            "id": "user not exist",
+            "message": "user not exist",
+            "translation": "用户不存在"
+        },
+        {
+            "id": "password confirmation doesn't match the password",
+            "message": "password confirmation doesn't match the password",
+            "translation": "新密码不匹配"
+        },
+        {
+            "id": "user password verify failed",
+            "message": "user password verify failed",
+            "translation": "用户密码校验失败"
+        },
+        {
+            "id": "change password failed",
+            "message": "change password failed",
+            "translation": "修改密码失败"
+        },
+        {
+            "id": "change password sussessfully",
+            "message": "change password sussessfully",
+            "translation": "修改密码成功"
+        },
+        {
+            "id": "list users failed",
+            "message": "list users failed",
+            "translation": "获取用户列表失败"
+        },
+        {
+            "id": "login successfully",
+            "message": "login successfully",
+            "translation": "登陆成功"
+        },
+        {
+            "id": "logout successfully",
+            "message": "logout successfully",
+            "translation": "登出成功"
+        },
+        {
+            "id": "create user sussessfully",
+            "message": "create user sussessfully",
+            "translation": "创建用户成功"
+        },
+        {
+            "id": "delete user sussessfully",
+            "message": "delete user sussessfully",
+            "translation": "删除用户成功"
+        }
+    ]
+}

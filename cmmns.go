@@ -8,6 +8,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 
+	_ "github.com/open-cmi/cmmns/internal/translation"
 	_ "github.com/open-cmi/cmmns/migration"
 )
 
@@ -32,5 +33,4 @@ func Wait() {
 }
 
 func Fini() {
-	config.Save()
 }

@@ -5,6 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/open-cmi/cmmns/common/api"
+	"github.com/open-cmi/cmmns/essential/i18n"
 	"github.com/open-cmi/cmmns/module/system"
 	"github.com/open-cmi/goutils/devutil"
 
@@ -67,5 +68,27 @@ func GetDevID(c *gin.Context) {
 		"data": map[string]interface{}{
 			"id": deviceID,
 		},
+	})
+}
+
+func ChangeLang(c *gin.Context) {
+	type LangMsg struct {
+		Lang string `json:"lang"`
+	}
+	var msg LangMsg
+	if err := c.ShouldBindJSON(&msg); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	i18n.ChangeLang(msg.Lang)
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+}
+
+func GetLang(c *gin.Context) {
+	lang := i18n.GetLang()
+	c.JSON(http.StatusOK, gin.H{
+		"ret":  0,
+		"msg":  "",
+		"data": lang,
 	})
 }
