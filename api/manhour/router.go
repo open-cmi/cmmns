@@ -1,13 +1,13 @@
-package template
+package manhour
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
 
-// AuthGroup template auth group router
+// AuthGroup manhour auth group router
 func AuthGroup(e *gin.Engine) {
-	g := e.Group("/api/common/v3/template")
+	g := e.Group("/api/common/v3/manhour")
 	{
 		g.GET("/", List)
 		g.POST("/", Create)
@@ -19,5 +19,5 @@ func AuthGroup(e *gin.Engine) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("template", AuthGroup)
+	webserver.RegisterAuthAPI("manhour", AuthGroup)
 }
