@@ -29,6 +29,8 @@ func ParseParams(c *gin.Context, option *Option) (err error) {
 		userID = user["id"].(string)
 	}
 	option.UserID = userID
+	devID := c.DefaultQuery("dev_id", "")
+	option.DevID = devID
 
 	pagestr := c.DefaultQuery("page", "0")
 	page, err := strconv.Atoi(pagestr)

@@ -98,12 +98,11 @@ func Deploy(c *gin.Context) {
 	option.UserID = userID
 
 	for _, id := range dmsg.ID {
-		mdl := agent.Get(&option, "id", id)
+		mdl := agent.Get(&option, []string{"id"}, []interface{}{id})
 		if mdl == nil {
 			continue
 		}
-		var err error
-		err = DeployRemote(mdl)
+		err := DeployRemote(mdl)
 		if err != nil {
 			mdl.State = agent.StateDeployFailed
 		} else {

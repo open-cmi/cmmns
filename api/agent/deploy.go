@@ -88,16 +88,14 @@ func DeployRemote(agent *agent.Model) error {
 		logger.Errorf("install failed: %s\n", err.Error())
 		return err
 	}
-	// 获取设备ID
-	output, err := ss.SSHOutput("/opt/agent/bin/agent get -dev")
+	// 获取设备内网地址
+	output, err := ss.SSHOutput("/opt/agent/bin/agent local-address")
 	if err != nil {
 		logger.Errorf("show dev failed: %s\n", err.Error())
 		return err
 	}
-	arr := strings.Split(string(output), "\n")
-	devStr := strings.Split(arr[0], ":")
-	devID := strings.Trim(devStr[1], " \n\t")
-	agent.DevID = devID
+	localAddr := strings.Trim(string(output), " \n\t")
+	agent.LocalAddress = localAddr
 
 	return nil
 }

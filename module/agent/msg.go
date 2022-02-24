@@ -2,7 +2,6 @@ package agent
 
 // RegisterMsg register agent msg
 type RegisterMsg struct {
-	Token        string `json:"token"`
 	DevID        string `json:"dev_id"`
 	LocalAddress string `json:"local_address"`
 	HostName     string `json:"hostname"`

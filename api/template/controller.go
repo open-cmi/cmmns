@@ -27,7 +27,6 @@ func List(c *gin.Context) {
 			"results": results,
 		},
 	})
-	return
 }
 
 func MultiDelete(c *gin.Context) {
@@ -90,7 +89,7 @@ func Get(c *gin.Context) {
 	var option api.Option
 	option.UserID = userID
 
-	m := template.Get(&option, "id", identify)
+	m := template.Get(&option, []string{"id"}, []interface{}{identify})
 
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,

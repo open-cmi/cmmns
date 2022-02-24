@@ -29,6 +29,7 @@ func (mi AgentInstance) Up() error {
 			hostname varchar(128) NOT NULL,
 			group_name varchar(128) NOT NULL default '',
 			local_address varchar(134) NOT NULL DEFAULT '',
+			os varchar(256) NOT NULL DEFAULT '',
 			port int NOT NULL default 22,
 			conn_type varchar(64) NOT NULL default 'password',
 			username varchar(256) NOT NULL default '',

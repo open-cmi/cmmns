@@ -8,6 +8,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 
+	_ "github.com/open-cmi/cmmns/api"
 	_ "github.com/open-cmi/cmmns/internal/translation"
 	_ "github.com/open-cmi/cmmns/migration"
 )

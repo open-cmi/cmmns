@@ -8,8 +8,6 @@ import (
 	"github.com/open-cmi/cmmns/service/ticker"
 	"github.com/open-cmi/cmmns/service/webserver"
 	"github.com/open-cmi/migrate"
-
-	_ "github.com/open-cmi/cmmns/api"
 )
 
 var configfile string = ""
@@ -38,8 +36,6 @@ func main() {
 	defer cmmns.Fini()
 
 	s := webserver.New()
-	// 在init之前，注册业务router
-
 	// Init
 	s.Init()
 	// Run

@@ -34,7 +34,7 @@ func KeepAlive(c *gin.Context) {
 		var option api.Option
 		option.UserID = ""
 
-		mdl := agent.Get(&option, "dev_id", devID)
+		mdl := agent.Get(&option, []string{"dev_id"}, []interface{}{devID})
 		if mdl == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"ret": errcode.ErrNotRegistered,
@@ -149,6 +149,11 @@ func ReportResult(c *gin.Context) {
 	})
 }
 
+// Register 只有当数据库中不存在dev_id时，才需要注册
+// 1. 数据库中，不存在任何该设备的信息，此时可以新建一个
+// 2. 数据库中，有用户添加的设备信息，但是信息不全，此时，需要根据用户的地址信息去判断
+// 2.1 当用户添加设备时，如果是程序部署的，则部署时会获取ip地址，根据内网外地址确定唯一设备
+// 2.2 当用户添加设备时，不允许选择手动部署，即使手动部署，也按照不存在该设备处理
 func Register(c *gin.Context) {
 	clientIP := c.ClientIP()
 
@@ -159,12 +164,15 @@ func Register(c *gin.Context) {
 	}
 	// 这里需要验证token
 
-	// dd
-	mdl := agent.Get(&api.Option{}, "dev_id", msgobj.DevID)
+	// 根据外网地址与内网地址唯一确定一个agent
+	mdl := agent.Get(&api.Option{},
+		[]string{"address", "local_address"},
+		[]interface{}{clientIP, msgobj.LocalAddress},
+	)
 	if mdl != nil {
-		mdl.Address = clientIP
 		mdl.HostName = msgobj.HostName
-		mdl.LocalAddress = msgobj.LocalAddress
+		mdl.DevID = msgobj.DevID
+		mdl.State = agent.StateOnline
 		mdl.Save()
 		c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 		return
@@ -174,7 +182,6 @@ func Register(c *gin.Context) {
 	mdl.DevID = msgobj.DevID
 	mdl.LocalAddress = msgobj.LocalAddress
 	mdl.HostName = msgobj.HostName
-
 	mdl.ConnType = "manual"
 	mdl.Address = clientIP
 	mdl.State = agent.StateOnline

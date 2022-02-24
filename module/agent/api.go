@@ -10,12 +10,23 @@ import (
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
 
-func Get(mo *api.Option, field string, value string) *Model {
+func Get(mo *api.Option, fields []string, values []interface{}) *Model {
 	columns := api.GetColumn(Model{}, []string{})
 
-	queryClause := fmt.Sprintf(`select %s from agent where %s=$1`, strings.Join(columns, ","), field)
+	var whereClause string
+	for index, field := range fields {
+		if index != 0 {
+			whereClause += " and "
+		} else {
+			whereClause += " where "
+		}
+		whereClause += fmt.Sprintf(`%s=$%d`, field, index+1)
+	}
+
+	queryClause := fmt.Sprintf(`select %s from agent %s`, strings.Join(columns, ","), whereClause)
+	logger.Debugf(queryClause + "\n")
 	db := sqldb.GetDB()
-	row := db.QueryRowx(queryClause, value)
+	row := db.QueryRowx(queryClause, values...)
 
 	var mdl Model
 	err := row.StructScan(&mdl)
@@ -100,7 +111,7 @@ func MultiDelete(mo *api.Option, ids []string) error {
 
 func Create(mo *api.Option, reqMsg *CreateMsg) (m *Model, err error) {
 	// 先检查用户名是否存在
-	api := Get(mo, "address", reqMsg.Address)
+	api := Get(mo, []string{"address"}, []interface{}{reqMsg.Address})
 	if api != nil {
 		// 用户名已经被占用
 		return nil, errors.New("address has been used")
@@ -120,7 +131,7 @@ func Create(mo *api.Option, reqMsg *CreateMsg) (m *Model, err error) {
 }
 
 func Edit(mo *api.Option, id string, reqMsg *EditMsg) error {
-	m := Get(mo, "id", id)
+	m := Get(mo, []string{"id"}, []interface{}{id})
 	if m == nil {
 		return errors.New("item not exist")
 	}
@@ -138,7 +149,7 @@ func Edit(mo *api.Option, id string, reqMsg *EditMsg) error {
 }
 
 func Delete(mo *api.Option, id string) error {
-	m := Get(mo, "id", id)
+	m := Get(mo, []string{"id"}, []interface{}{id})
 	if m == nil {
 		return errors.New("item not exist")
 	}

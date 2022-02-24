@@ -28,6 +28,7 @@ type OrderOption struct {
 // Option model option
 type Option struct {
 	UserID      string
+	DevID       string
 	PageOption  PageOption
 	OrderOption OrderOption
 	Filters     []FilterOption

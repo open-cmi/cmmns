@@ -27,6 +27,7 @@ type Model struct {
 	CreatedTime  int64  `json:"created_time" db:"created_time"`
 	UpdatedTime  int64  `json:"updated_time" db:"updated_time"`
 	HostName     string `json:"hostname" db:"hostname"`
+	OS           string `json:"os" db:"os"`
 	DevID        string `json:"dev_id" db:"dev_id"`
 	Group        string `json:"group" db:"group_name"`
 	Address      string `json:"address" db:"address"`
