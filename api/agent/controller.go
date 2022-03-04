@@ -98,7 +98,7 @@ func Deploy(c *gin.Context) {
 	option.UserID = userID
 
 	for _, id := range dmsg.ID {
-		mdl := agent.Get(&option, []string{"id"}, []interface{}{id})
+		mdl := agent.FilterGet(&option, []string{"id"}, []interface{}{id})
 		if mdl == nil {
 			continue
 		}

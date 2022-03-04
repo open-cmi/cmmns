@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/open-cmi/cmmns/common/def"
 	"github.com/open-cmi/cmmns/essential/config"
 )
 
@@ -57,4 +58,5 @@ func Register(module string, db int) error {
 
 func init() {
 	config.RegisterConfig("redis", &moduleConfig)
+	Register("public", def.RDBPublic)
 }

@@ -56,6 +56,7 @@ func (m *Model) Save() error {
 			return errors.New("update model failed")
 		}
 	}
+	go SetCache(m)
 
 	return nil
 }

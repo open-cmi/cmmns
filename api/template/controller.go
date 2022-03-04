@@ -89,7 +89,7 @@ func Get(c *gin.Context) {
 	var option api.Option
 	option.UserID = userID
 
-	m := template.Get(&option, []string{"id"}, []interface{}{identify})
+	m := template.FilterGet(&option, []string{"id"}, []interface{}{identify})
 
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,

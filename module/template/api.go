@@ -10,7 +10,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
 
-func Get(mo *api.Option, fields []string, values []interface{}) *Model {
+func FilterGet(mo *api.Option, fields []string, values []interface{}) *Model {
 	columns := api.GetColumn(Model{}, []string{})
 
 	var whereClause string
@@ -36,6 +36,16 @@ func Get(mo *api.Option, fields []string, values []interface{}) *Model {
 	}
 
 	return &mdl
+}
+
+func Get(mo *api.Option, field string, value interface{}) *Model {
+	if field == "id" {
+		mdl := GetCache(value.(string))
+		if mdl != nil {
+			return mdl
+		}
+	}
+	return FilterGet(mo, []string{field}, []interface{}{value})
 }
 
 // List list
@@ -113,7 +123,7 @@ func MultiDelete(mo *api.Option, ids []string) error {
 
 func Create(mo *api.Option, reqMsg *CreateMsg) (m *Model, err error) {
 	// 先检查用户名是否存在
-	model := Get(mo, []string{"name"}, []interface{}{reqMsg.Name})
+	model := FilterGet(mo, []string{"name"}, []interface{}{reqMsg.Name})
 	if model != nil {
 		// 用户名已经被占用
 		return nil, errors.New("name has been used")
@@ -126,7 +136,7 @@ func Create(mo *api.Option, reqMsg *CreateMsg) (m *Model, err error) {
 }
 
 func Edit(mo *api.Option, id string, reqMsg *EditMsg) error {
-	m := Get(mo, []string{"id"}, []interface{}{id})
+	m := FilterGet(mo, []string{"id"}, []interface{}{id})
 	if m == nil {
 		return errors.New("item not exist")
 	}
@@ -137,7 +147,7 @@ func Edit(mo *api.Option, id string, reqMsg *EditMsg) error {
 }
 
 func Delete(mo *api.Option, id string) error {
-	m := Get(mo, []string{"id"}, []interface{}{id})
+	m := FilterGet(mo, []string{"id"}, []interface{}{id})
 	if m == nil {
 		return errors.New("item not exist")
 	}

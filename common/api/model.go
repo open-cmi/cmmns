@@ -71,13 +71,16 @@ func GetColumnNamed(columns []string) []string {
 }
 
 // BuildWhereClause build where clause
-func BuildWhereClause(o *Option) (format string, args []interface{}) {
+func BuildWhereClause(opt *Option) (format string, args []interface{}) {
+	if opt == nil {
+		return "", []interface{}{}
+	}
 	var clause string = ""
 
 	var whereUsed bool = false
 
 	args = []interface{}{}
-	for index, filter := range o.Filters {
+	for index, filter := range opt.Filters {
 		if whereUsed {
 			clause += " and"
 		} else {
@@ -112,19 +115,23 @@ func BuildWhereClause(o *Option) (format string, args []interface{}) {
 }
 
 // BuildFinalClause build final clause
-func BuildFinalClause(o *Option) string {
+func BuildFinalClause(opt *Option) string {
+	if opt == nil {
+		return ""
+	}
+
 	var clause string = ""
 
-	if o.OrderOption.OrderBy != "" {
-		if o.OrderOption.Order == "" {
-			o.OrderOption.Order = "asc"
+	if opt.OrderOption.OrderBy != "" {
+		if opt.OrderOption.Order == "" {
+			opt.OrderOption.Order = "asc"
 		}
-		clause += fmt.Sprintf(` ORDER BY %s %s`, o.OrderOption.OrderBy, o.OrderOption.Order)
+		clause += fmt.Sprintf(` ORDER BY %s %s`, opt.OrderOption.OrderBy, opt.OrderOption.Order)
 	}
 
 	// limit must before offset
-	offset := o.PageOption.Page * o.PageOption.PageSize
-	clause += fmt.Sprintf(" LIMIT %d OFFSET %d", o.PageOption.PageSize, offset)
+	offset := opt.PageOption.Page * opt.PageOption.PageSize
+	clause += fmt.Sprintf(" LIMIT %d OFFSET %d", opt.PageOption.PageSize, offset)
 
 	return clause
 }

@@ -2,6 +2,7 @@ package agent
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/common/api"
@@ -20,6 +21,29 @@ func KeepAlive(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": "dev id is required"})
 		return
 	}
+	var option api.Option
+	option.UserID = ""
+
+	mdl := agent.Get("dev_id", devID)
+	if mdl == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"ret": errcode.ErrNotRegistered,
+			"msg": "agent not registered",
+		})
+		return
+	}
+
+	// if status is not online, udpate
+	// update every 4 minute
+	now := time.Now().Unix()
+	if mdl.State != agent.StateOnline || now-mdl.UpdatedTime > int64(4*time.Minute) {
+		mdl.State = agent.StateOnline
+		err := mdl.Save()
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": err.Error()})
+			return
+		}
+	}
 
 	// 先检查executor是否存在，如果不存在，则查询model
 	sched := scheduler.GetScheduler()
@@ -31,28 +55,6 @@ func KeepAlive(c *gin.Context) {
 
 	consumer := sched.GetConsumer(devID)
 	if consumer == nil {
-		var option api.Option
-		option.UserID = ""
-
-		mdl := agent.Get(&option, []string{"dev_id"}, []interface{}{devID})
-		if mdl == nil {
-			c.JSON(http.StatusOK, gin.H{
-				"ret": errcode.ErrNotRegistered,
-				"msg": "agent not registered",
-			})
-			return
-		}
-
-		// 节点存在，需要更新信息
-		if mdl.State != agent.StateOnline {
-			mdl.State = agent.StateOnline
-			err := mdl.Save()
-			if err != nil {
-				c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": err.Error()})
-				return
-			}
-		}
-
 		consumer = sched.NewConsumer(&scheduler.ConsumerOption{
 			Identity: devID,
 			Group:    "default",
@@ -64,7 +66,6 @@ func KeepAlive(c *gin.Context) {
 	}
 
 	// 查看是否有配置变更
-
 	// 查看是否有自己agent的任务
 	if consumer.HasJob() {
 		c.JSON(http.StatusOK, gin.H{
@@ -165,7 +166,7 @@ func Register(c *gin.Context) {
 	// 这里需要验证token
 
 	// 根据外网地址与内网地址唯一确定一个agent
-	mdl := agent.Get(&api.Option{},
+	mdl := agent.FilterGet(&api.Option{},
 		[]string{"address", "local_address"},
 		[]interface{}{clientIP, msgobj.LocalAddress},
 	)
