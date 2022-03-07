@@ -3,57 +3,85 @@ package agentgroup
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/open-cmi/cmmns/common/api"
-	"github.com/open-cmi/cmmns/common/def"
+	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/module/pubsub"
 )
 
-func Get(mo *api.Option, id string) *Model {
-	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select * from agent_group where id=$1")
+func FilterGet(mo *api.Option, fields []string, values []interface{}) *Model {
+	columns := api.GetColumn(Model{}, []string{})
 
-	var model Model
-	db := sqldb.GetDB()
-	row := db.QueryRow(queryclause, id)
-	err := row.Scan(&model.ID, &model.Name)
-	if err == nil {
-		// 用户名已经被占用
-		return &model
+	var whereClause string
+	for index, field := range fields {
+		if index != 0 {
+			whereClause += " and "
+		} else {
+			whereClause += " where "
+		}
+		whereClause += fmt.Sprintf(`%s=$%d`, field, index+1)
 	}
-	return nil
+
+	queryClause := fmt.Sprintf(`select %s from agent_group %s`, strings.Join(columns, ","), whereClause)
+	logger.Debugf(queryClause + "\n")
+	db := sqldb.GetDB()
+	row := db.QueryRowx(queryClause, values...)
+
+	var mdl Model
+	err := row.StructScan(&mdl)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil
+	}
+
+	return &mdl
+}
+
+func Get(mo *api.Option, field string, value interface{}) *Model {
+	if field == "id" {
+		mdl := GetCache(value.(string))
+		if mdl != nil {
+			return mdl
+		}
+	}
+	return FilterGet(mo, []string{field}, []interface{}{value})
 }
 
 // List list
-func List(mo *api.Option) (int, []Model, error) {
+func List(option *api.Option) (int, []Model, error) {
 	db := sqldb.GetDB()
 
 	var results []Model = []Model{}
 
-	countClause := fmt.Sprintf("select count(*) from agent_group")
-	whereClause, args := api.BuildWhereClause(mo)
+	countClause := "select count(*) from agent_group"
+	whereClause, args := api.BuildWhereClause(option)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
 
 	var count int
 	err := row.Scan(&count)
 	if err != nil {
+		logger.Errorf("count failed: %s\n", err.Error())
 		return 0, results, errors.New("get count failed")
 	}
 
-	queryClause := fmt.Sprintf(`select id,name,description from agent_group`)
-	queryClause += whereClause
-	rows, err := db.Query(queryClause, args...)
+	columns := api.GetColumn(Model{}, []string{})
+	queryClause := fmt.Sprintf(`select %s from agent_group`, strings.Join(columns, ","))
+	finalClause := api.BuildFinalClause(option)
+	queryClause += (whereClause + finalClause)
+	rows, err := db.Queryx(queryClause, args...)
 	if err != nil {
 		// 没有的话，也不需要报错
+		logger.Error(err.Error())
 		return count, results, nil
 	}
 
 	for rows.Next() {
 		var item Model
-		err := rows.Scan(&item.ID, &item.Name, &item.Description)
+		err := rows.StructScan(&item)
 		if err != nil {
+			logger.Error(err.Error())
 			break
 		}
 
@@ -87,46 +115,42 @@ func MultiDelete(mo *api.Option, ids []string) error {
 	deleteClause := fmt.Sprintf("delete from agent_group where id in %s", list)
 	_, err := db.Exec(deleteClause, args...)
 	if err != nil {
-		return errors.New("delete item failed")
+		logger.Errorf("delete failed: %s\n", err.Error())
+		return errors.New("delete failed")
 	}
 	return nil
 }
 
 func Create(mo *api.Option, reqMsg *CreateMsg) (m *Model, err error) {
 	// 先检查用户名是否存在
-	model := Get(mo, reqMsg.Name)
+	model := FilterGet(mo, []string{"name"}, []interface{}{reqMsg.Name})
 	if model != nil {
 		// 用户名已经被占用
 		return nil, errors.New("name has been used")
 	}
-
-	m = New(reqMsg)
+	m = New()
+	m.Name = reqMsg.Name
 	err = m.Save()
 
 	return m, err
 }
 
-func Edit(mo *api.Option, name string, reqMsg *EditMsg) error {
-	m := Get(mo, name)
+func Edit(mo *api.Option, id string, reqMsg *EditMsg) error {
+	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")
 	}
-
 	m.Name = reqMsg.Name
+	m.Description = reqMsg.Description
+
 	err := m.Save()
 	return err
 }
 
-func Delete(mo *api.Option, name string) error {
-	m := Get(mo, name)
+func Delete(mo *api.Option, id string) error {
+	m := FilterGet(mo, []string{"id"}, []interface{}{id})
 	if m == nil {
 		return errors.New("item not exist")
 	}
 	return m.Remove()
-}
-
-func init() {
-	pubsub.RegisterSubscribe(def.EventUserCreate, func(username string) {
-		fmt.Println("user create:", username)
-	})
 }

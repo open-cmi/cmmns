@@ -25,8 +25,8 @@ func (mi AgentInstance) Up() error {
 		CREATE TABLE IF NOT EXISTS agent (
 			id CHAR(64) NOT NULL primary key,
 			dev_id varchar(64) NOT NULL default '',
-			address varchar(134) NOT NULL,
-			hostname varchar(128) NOT NULL,
+			address varchar(134) NOT NULL default '',
+			hostname varchar(128) NOT NULL default '',
 			group_name varchar(128) NOT NULL default '',
 			local_address varchar(134) NOT NULL DEFAULT '',
 			os varchar(256) NOT NULL DEFAULT '',

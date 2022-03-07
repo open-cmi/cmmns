@@ -163,5 +163,7 @@ func Delete(mo *api.Option, id string) error {
 	if m == nil {
 		return errors.New("item not exist")
 	}
+
+	DeleteCache(m.DevID)
 	return m.Remove()
 }

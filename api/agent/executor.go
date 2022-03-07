@@ -186,6 +186,7 @@ func Register(c *gin.Context) {
 	mdl.ConnType = "manual"
 	mdl.Address = clientIP
 	mdl.State = agent.StateOnline
+	mdl.Group = "root"
 	mdl.Save()
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})

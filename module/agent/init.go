@@ -9,5 +9,7 @@ func init() {
 	err := ticker.Register("agent-status-check", "0 */1 * * * *", func() {
 		CheckStatus()
 	})
-	logger.Debug("agent register ticker, ", err)
+	if err != nil {
+		logger.Errorf("register ticker failed: %s\n", err.Error())
+	}
 }

@@ -52,7 +52,7 @@ func (mi UserInstance) Up() error {
       );
 	`)
 	if err == nil {
-		err = mi.SyncData()
+		mi.SyncData()
 	}
 	return err
 }
