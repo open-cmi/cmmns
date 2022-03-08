@@ -57,6 +57,14 @@ func Reboot(c *gin.Context) {
 	})
 }
 
+func ShutDown(c *gin.Context) {
+	exec.Command("/bin/sh", "-c", "shutdown -h now").Output()
+	c.JSON(200, gin.H{
+		"ret": 0,
+		"msg": "",
+	})
+}
+
 func GetDevID(c *gin.Context) {
 
 	deviceID := devutil.GetDeviceID()

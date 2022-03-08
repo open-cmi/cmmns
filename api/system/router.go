@@ -16,6 +16,7 @@ func AuthGroup(e *gin.Engine) {
 		g.GET("/device/", GetDevID)
 
 		g.POST("/reboot", Reboot)
+		g.POST("/shutdown", ShutDown)
 		g.PUT("/locale", ChangeLang)
 		g.GET("/locale", GetLang)
 	}
