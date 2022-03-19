@@ -1,4 +1,4 @@
-package template
+package setting
 
 import (
 	"errors"
@@ -19,9 +19,9 @@ func FilterGet(mo *api.Option, fields []string, values []interface{}) *Model {
 		key += fmt.Sprintf("%s.%v", field, values[index])
 	}
 
-	m := GetCache(key)
-	if m != nil {
-		return m
+	mdl := GetCache(key)
+	if mdl != nil {
+		return mdl
 	}
 
 	columns := api.GetColumn(Model{}, []string{})
@@ -36,28 +36,22 @@ func FilterGet(mo *api.Option, fields []string, values []interface{}) *Model {
 		whereClause += fmt.Sprintf(`%s=$%d`, field, index+1)
 	}
 
-	queryClause := fmt.Sprintf(`select %s from template %s`, strings.Join(columns, ","), whereClause)
+	queryClause := fmt.Sprintf(`select %s from setting %s`, strings.Join(columns, ","), whereClause)
 	logger.Debugf(queryClause + "\n")
 	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, values...)
 
-	var mdl Model
-	err := row.StructScan(&mdl)
+	var model Model
+	err := row.StructScan(&model)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil
 	}
-
-	return &mdl
+	go SetCache(key, &model)
+	return &model
 }
 
 func Get(mo *api.Option, field string, value interface{}) *Model {
-	if field == "id" {
-		mdl := GetCache(value.(string))
-		if mdl != nil {
-			return mdl
-		}
-	}
 	return FilterGet(mo, []string{field}, []interface{}{value})
 }
 
@@ -67,7 +61,7 @@ func List(option *api.Option) (int, []Model, error) {
 
 	var results []Model = []Model{}
 
-	countClause := "select count(*) from template"
+	countClause := "select count(*) from setting"
 	whereClause, args := api.BuildWhereClause(option)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
@@ -80,7 +74,7 @@ func List(option *api.Option) (int, []Model, error) {
 	}
 
 	columns := api.GetColumn(Model{}, []string{})
-	queryClause := fmt.Sprintf(`select %s from template`, strings.Join(columns, ","))
+	queryClause := fmt.Sprintf(`select %s from setting`, strings.Join(columns, ","))
 	finalClause := api.BuildFinalClause(option)
 	queryClause += (whereClause + finalClause)
 	rows, err := db.Queryx(queryClause, args...)
@@ -103,66 +97,18 @@ func List(option *api.Option) (int, []Model, error) {
 	return count, results, err
 }
 
-// List list
-func MultiDelete(mo *api.Option, ids []string) error {
-	db := sqldb.GetDB()
-
-	if len(ids) == 0 {
-		return errors.New("no items deleted")
-	}
-
-	var list = " ("
-	for index, _ := range ids {
-		if index != 0 {
-			list += ","
-		}
-		list += fmt.Sprintf("$%d", index+1)
-	}
-	list += ")"
-
-	var args []interface{} = []interface{}{}
-	for _, item := range ids {
-		args = append(args, item)
-	}
-
-	deleteClause := fmt.Sprintf("delete from template where id in %s", list)
-	_, err := db.Exec(deleteClause, args...)
-	if err != nil {
-		logger.Errorf("delete failed: %s\n", err.Error())
-		return errors.New("delete failed")
-	}
-	return nil
-}
-
-func Create(mo *api.Option, reqMsg *CreateMsg) (m *Model, err error) {
-	// 先检查用户名是否存在
-	model := FilterGet(mo, []string{"name"}, []interface{}{reqMsg.Name})
-	if model != nil {
-		// 用户名已经被占用
-		return nil, errors.New("name has been used")
-	}
-	m = New()
-	m.Name = reqMsg.Name
-	err = m.Save()
-
-	return m, err
-}
-
 func Edit(mo *api.Option, id string, reqMsg *EditMsg) error {
 	m := FilterGet(mo, []string{"id"}, []interface{}{id})
 	if m == nil {
 		return errors.New("item not exist")
 	}
-	m.Name = reqMsg.Name
+
+	m.Scope = reqMsg.Scope
+	m.Belong = reqMsg.Belong
+	m.Key = reqMsg.Key
+	m.Value = reqMsg.Value
+	m.CfgSeq++
 
 	err := m.Save()
 	return err
-}
-
-func Delete(mo *api.Option, id string) error {
-	m := FilterGet(mo, []string{"id"}, []interface{}{id})
-	if m == nil {
-		return errors.New("item not exist")
-	}
-	return m.Remove()
 }

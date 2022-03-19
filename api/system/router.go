@@ -10,8 +10,7 @@ func AuthGroup(e *gin.Engine) {
 
 	g := e.Group("/api/common/v3/system/")
 	{
-		g.GET("/status/", List)
-		g.GET("/status/:id", Get)
+		g.GET("/status/", GetStatus)
 
 		g.GET("/device/", GetDevID)
 

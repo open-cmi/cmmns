@@ -34,6 +34,46 @@ func InitDevID() {
 	return
 }
 
+type SystemStatus struct {
+	CPUUsage        float64 `json:"cpu_usage"`
+	DiskUsed        uint64  `json:"disk_used"`
+	DiskTotal       uint64  `json:"disk_total"`
+	DiskUsedPercent float64 `json:"disk_used_percent"`
+	MemUsed         uint64  `json:"mem_used"`
+	MemTotal        uint64  `json:"mem_total"`
+	MemUsedPercent  float64 `json:"mem_used_percent"`
+	NetSent         uint64  `json:"net_sent"`
+	NetRecv         uint64  `json:"net_recv"`
+	LoadAvg1        float64 `json:"load_avg_1"`
+	LoadAvg5        float64 `json:"load_avg_5"`
+	LoadAvg15       float64 `json:"load_avg_15"`
+}
+
+func GetStatus() SystemStatus {
+	var status SystemStatus
+	status.CPUUsage = CPUSummary()
+
+	diskUsed, diskTotal, diskUsedPercent := DiskSummary()
+	status.DiskTotal = diskTotal
+	status.DiskUsed = diskUsed
+	status.DiskUsedPercent = diskUsedPercent
+
+	memUsed, memTotal, memUsedPercent := MemSummary()
+	status.MemTotal = memTotal
+	status.MemUsed = memUsed
+	status.MemUsedPercent = memUsedPercent
+
+	netSent, netRecv := NetRateSummary()
+	status.NetRecv = netRecv
+	status.NetSent = netSent
+
+	load1, load5, load15 := LoadSummary()
+	status.LoadAvg1 = load1
+	status.LoadAvg5 = load5
+	status.LoadAvg15 = load15
+	return status
+}
+
 func Get(mo *api.Option, field string, value string) *Model {
 	columns := api.GetColumn(Model{}, []string{})
 
@@ -115,6 +155,7 @@ func StartMonitor() {
 	}
 
 	LocalModel.UpdatedTime = time.Now().Unix()
+
 	LocalModel.CPUUsage = CPUSummary()
 
 	diskUsed, diskTotal, diskUsedPercent := DiskSummary()

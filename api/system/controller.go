@@ -48,6 +48,12 @@ func Get(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": mdl})
 }
 
+func GetStatus(c *gin.Context) {
+	status := system.GetStatus()
+
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": status})
+}
+
 func Reboot(c *gin.Context) {
 
 	exec.Command("/bin/sh", "-c", "reboot -f").Output()
