@@ -115,7 +115,17 @@ func Set(msg *ConfigMsg) error {
 	var args []string = []string{"apply"}
 	exec.Command("netplan", args...).Run()
 
-	gConf.Change(msg)
+	gConf.Address = msg.Address
+	gConf.Netmask = msg.Netmask
+	gConf.Gateway = msg.Gateway
+	gConf.MainDNS = msg.MainDNS
+	gConf.SecondaryDNS = msg.SecondaryDNS
+	if msg.Mode == "dhcp" {
+		gConf.DHCP = true
+	} else {
+		gConf.DHCP = false
+	}
+	gConf.Save()
 
 	return nil
 }

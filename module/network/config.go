@@ -13,6 +13,10 @@ type Config struct {
 }
 
 func (c *Config) Init() error {
+	if c.Dev == "" {
+		return nil
+	}
+
 	var msg ConfigMsg
 	if c.DHCP {
 		msg.Mode = "dhcp"
@@ -24,27 +28,19 @@ func (c *Config) Init() error {
 	msg.Gateway = c.Gateway
 	msg.MainDNS = c.MainDNS
 	msg.SecondaryDNS = c.SecondaryDNS
+
 	Set(&msg)
 	return nil
 }
 
-func (c *Config) Change(msg *ConfigMsg) {
-	c.Address = msg.Address
-	c.Netmask = msg.Netmask
-	c.Gateway = msg.Gateway
-	c.MainDNS = msg.MainDNS
-	c.SecondaryDNS = msg.SecondaryDNS
-	if msg.Mode == "dhcp" {
-		c.DHCP = true
-	} else {
-		c.DHCP = false
-	}
+func (c *Config) Save() {
+	config.Save()
 }
 
 var gConf Config
 
 func init() {
-	gConf.Dev = "eth0"
+	gConf.Dev = ""
 	gConf.DHCP = true
 	config.RegisterConfig("network", &gConf)
 }
