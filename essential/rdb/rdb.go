@@ -21,7 +21,7 @@ type Config struct {
 	Password string `json:"password,omitempty"`
 }
 
-var moduleConfig Config
+var gConf Config
 
 // Init db init
 func (c *Config) Init() error {
@@ -57,6 +57,8 @@ func Register(module string, db int) error {
 }
 
 func init() {
-	config.RegisterConfig("redis", &moduleConfig)
+	gConf.Host = "127.0.0.1"
+	gConf.Port = 25431
+	config.RegisterConfig("redis", &gConf)
 	Register("public", def.RDBPublic)
 }

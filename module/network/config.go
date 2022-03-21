@@ -29,7 +29,7 @@ func (c *Config) Init() error {
 	msg.MainDNS = c.MainDNS
 	msg.SecondaryDNS = c.SecondaryDNS
 
-	Set(&msg)
+	setConfig(&msg)
 	return nil
 }
 
