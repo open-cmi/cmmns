@@ -12,6 +12,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/sessions v1.2.1
+	github.com/jackpal/gateway v1.0.7 // indirect
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible

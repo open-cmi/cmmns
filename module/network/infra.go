@@ -1,15 +1,9 @@
 package network
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
-	"net"
-	"os"
 	"strconv"
-	"strings"
-
-	"golang.org/x/net/route"
 )
 
 var Location string
@@ -49,66 +43,4 @@ func NetmaskString(subnet int) string {
 	d, _ := strconv.ParseUint(masker[24:32], 2, 64)
 	resultMask := fmt.Sprintf("%v.%v.%v.%v", a, b, c, d)
 	return resultMask
-}
-
-var defaultRoute = [4]byte{0, 0, 0, 0}
-
-func GetDefaultGateway() (gw net.IP) {
-	rib, _ := route.FetchRIB(0, route.RIBTypeRoute, 0)
-	messages, err := route.ParseRIB(route.RIBTypeRoute, rib)
-
-	if err != nil {
-		return gw
-	}
-
-	var destination, gateway *route.Inet4Addr
-
-	for _, message := range messages {
-		route_message := message.(*route.RouteMessage)
-		addresses := route_message.Addrs
-
-		ok := false
-
-		if destination, ok = addresses[0].(*route.Inet4Addr); !ok {
-			continue
-		}
-
-		if gateway, ok = addresses[1].(*route.Inet4Addr); !ok {
-			continue
-		}
-
-		if destination == nil || gateway == nil {
-			continue
-		}
-
-		if destination.IP == defaultRoute {
-			break
-		}
-	}
-	if gateway != nil {
-		return net.IPv4(gateway.IP[0], gateway.IP[1], gateway.IP[2], gateway.IP[3])
-	}
-	return net.IPv4(0, 0, 0, 0)
-}
-
-func GetDNS() []string {
-	var dns []string
-	rf, err := os.Open("/etc/resolv.conf")
-	if err != nil {
-		return dns
-	}
-	rd := bufio.NewReader(rf)
-	for linebyte, _, err := rd.ReadLine(); err == nil; linebyte, _, err = rd.ReadLine() {
-		line := string(linebyte)
-		fmt.Println(line)
-		if strings.HasPrefix(line, "#") {
-			continue
-		}
-		if strings.HasPrefix(line, "nameserver") {
-			tmp := strings.TrimPrefix(line, "nameserver")
-			tmp = strings.Trim(tmp, "\r\n\t ")
-			dns = append(dns, tmp)
-		}
-	}
-	return dns
 }
