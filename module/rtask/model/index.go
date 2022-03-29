@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/essential/storage/sqldb"
+	"github.com/open-cmi/cmmns/essential/sqldb"
 )
 
 // realtime task

@@ -7,13 +7,18 @@ import (
 	"github.com/open-cmi/goutils/confparser"
 )
 
+type Feature interface {
+	Init() error
+}
+
 // Config config
 type Config struct {
 	parser   *confparser.Parser
-	Features map[string]interface{}
+	Features map[string]Feature
 }
 
-var config *Config
+var gConf *Config
+var configMapping map[string]Feature = make(map[string]Feature)
 
 // Init config init
 func Init(configfile string) error {
@@ -22,42 +27,41 @@ func Init(configfile string) error {
 		return errors.New("open file failed")
 	}
 
-	conf := new(Config)
-	conf.parser = parser
-	conf.Features = defaultConfig
+	gConf = new(Config)
+	gConf.parser = parser
+	gConf.Features = configMapping
 
 	var tmpConf map[string]json.RawMessage = make(map[string]json.RawMessage)
-	err := conf.parser.Load(&tmpConf)
+	err := gConf.parser.Load(&tmpConf)
 	if err != nil {
 		return err
 	}
 
-	for name, value := range tmpConf {
-		moduleConfig, found := conf.Features[name]
-		if !found {
-			continue
+	for name, moduleConfig := range gConf.Features {
+		value, ok := tmpConf[name]
+		if ok {
+			err := json.Unmarshal(value, moduleConfig)
+			if err != nil {
+				return err
+			}
 		}
-		err := json.Unmarshal(value, moduleConfig)
-		if err != nil {
-			return err
-		}
+		moduleConfig.Init()
 	}
-	config = conf
+
 	return nil
 }
 
 // Save save config
 func Save() {
-	config.parser.Save(config.Features)
+	gConf.parser.Save(gConf.Features)
 }
 
-var defaultConfig map[string]interface{} = make(map[string]interface{})
-
-func RegisterConfig(name string, conf interface{}) error {
-	_, found := defaultConfig[name]
+// RegisterConfig register config
+func RegisterConfig(name string, conf Feature) error {
+	_, found := configMapping[name]
 	if found {
 		return errors.New("config " + name + " has been registered")
 	}
-	defaultConfig[name] = conf
+	configMapping[name] = conf
 	return nil
 }

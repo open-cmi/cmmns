@@ -28,15 +28,13 @@ type Config struct {
 	Path  string `json:"path,omitempty"`
 }
 
-var moduleConfig Config
+func (c *Config) Init() error {
+	if Logger != nil {
+		return nil
+	}
 
-func RegisterLogger(l interface{}) {
-	Logger = l.(Feature)
-}
-
-func Init() error {
 	level := logutil.Info
-	switch moduleConfig.Level {
+	switch c.Level {
 	case "debug":
 		level = logutil.Debug
 	case "info":
@@ -46,7 +44,7 @@ func Init() error {
 	case "error":
 		level = logutil.Error
 	}
-	logPath := moduleConfig.Path
+	logPath := c.Path
 	if logPath == "" {
 		rp := pathutil.GetRootPath()
 		logPath = filepath.Join(rp, "data")
@@ -125,6 +123,8 @@ func Debugf(format string, v ...interface{}) {
 		fmt.Printf(format, v...)
 	}
 }
+
+var moduleConfig Config
 
 func init() {
 	moduleConfig.Level = "debug"

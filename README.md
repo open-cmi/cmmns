@@ -11,9 +11,9 @@
 │   └── scheduler
 │   └── storage
 │   └── ticker
-│   └── notification
-├── main
-│   └── _your_app_
+│   └── scmd
+├── app
+│   └── server
 ├── migration
 ├── module
 │   ├── agent

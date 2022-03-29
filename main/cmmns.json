@@ -1,37 +1,17 @@
 {
-  "api": {
-    "middleware": {
-      "session_store": "redis",
-      "redis_store": {
-        "host": "127.0.0.1",
-        "port": 25431,
-        "db": 2,
-        "passwd": "8ik,\u003cKI*"
-      }
-    },
-    "listen": "0.0.0.0",
-    "port": 30000,
-    "unix_path": "/tmp/cmmns.sock"
+  "locale": {
+    "lang": "zh-CN"
   },
   "assist": {
     "server_addr": "",
-    "server_port": 7001,
-    "services": [
-      {
-        "name": "ssh",
-        "type": "tcp",
-        "local_ip": "127.0.0.1",
-        "local_port": 22,
-        "remote_port": 9000
-      }
-    ]
+    "server_port": 0
   },
   "cluster": {
     "linux_package": "",
     "local_address": "",
     "local_port": 0,
     "local_proto": "",
-    "address": "localhost",
+    "address": "",
     "port": 0,
     "proto": ""
   },
@@ -46,7 +26,7 @@
     "database": "test_cmmns",
     "user": "postgres"
   },
-  "rdb": {
+  "redis": {
     "host": "127.0.0.1",
     "port": 25431,
     "password": "8ik,\u003cKI*"
@@ -58,5 +38,27 @@
     "password": "",
     "smtp_host": "",
     "domain": ""
+  },
+  "webserver": {
+    "middleware": {
+      "session_store": "redis",
+      "redis_store": {
+        "host": "127.0.0.1",
+        "port": 25431,
+        "db": 2,
+        "passwd": "8ik,\u003cKI*"
+      }
+    },
+    "server": [
+      {
+        "address": "0.0.0.0",
+        "port": 30000,
+        "proto": "http"
+      },
+      {
+        "address": "/tmp/cmmns.sock",
+        "proto": "unix"
+      }
+    ]
   }
 }
