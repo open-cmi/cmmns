@@ -10,11 +10,11 @@ type Header struct {
 	Len  uint16
 }
 
-var XSNOSServer string = "192.168.1.104:30017" //"192.168.56.103:30017"
+var TCPServer string = "localhost:30017"
 
 // TCPRequest request msg
 func TCPRequest(msg []byte) (conn *net.TCPConn, err error) {
-	rsvr, err := net.ResolveTCPAddr("tcp", XSNOSServer)
+	rsvr, err := net.ResolveTCPAddr("tcp", TCPServer)
 	if err != nil {
 		return nil, err
 	}

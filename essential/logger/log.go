@@ -124,10 +124,10 @@ func Debugf(format string, v ...interface{}) {
 	}
 }
 
-var moduleConfig Config
+var gConf Config
 
 func init() {
-	moduleConfig.Level = "debug"
-	moduleConfig.Path = "/tmp/"
-	config.RegisterConfig("log", &moduleConfig)
+	gConf.Level = "debug"
+	gConf.Path = "/tmp/"
+	config.RegisterConfig("log", &gConf)
 }

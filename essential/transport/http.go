@@ -16,7 +16,7 @@ var Cookies []*http.Cookie
 // ReqAPI func
 func ReqAPI(api string, params map[string]string, payload interface{}) (respmsg Response, err error) {
 
-	requrl := moduleConfig.Server + api
+	requrl := gConf.Server + api
 	urlObj, err := url.Parse(requrl)
 	if err != nil {
 		return respmsg, err
@@ -74,7 +74,7 @@ func PostAPI(api string, params map[string]string, payload interface{}) (respmsg
 	if err != nil {
 		return respmsg, err
 	}
-	requrl := moduleConfig.Server + api
+	requrl := gConf.Server + api
 	// post api
 	querys := url.Values{}
 
@@ -131,7 +131,7 @@ func PostAPI(api string, params map[string]string, payload interface{}) (respmsg
 // DelAPI func
 func DelAPI(api string, params map[string]string) (respmsg Response, err error) {
 
-	requrl := moduleConfig.Server + api
+	requrl := gConf.Server + api
 	// post api
 	querys := url.Values{}
 

@@ -18,7 +18,7 @@ type Config struct {
 	Server     []Server                    `json:"server"`
 }
 
-var moduleConfig Config
+var gConf Config
 
 func (c *Config) Init() error {
 	return nil
@@ -26,9 +26,9 @@ func (c *Config) Init() error {
 
 func init() {
 	// default config
-	moduleConfig.Middleware.SessionStore = "memory"
+	gConf.Middleware.SessionStore = "memory"
 
-	moduleConfig.Server = append(moduleConfig.Server, Server{
+	gConf.Server = append(gConf.Server, Server{
 		Address: "127.0.0.1",
 		Port:    30000,
 		Proto:   "http",
@@ -37,5 +37,5 @@ func init() {
 		Proto:   "unix",
 	})
 
-	config.RegisterConfig("webserver", &moduleConfig)
+	config.RegisterConfig("webserver", &gConf)
 }

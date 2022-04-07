@@ -5,10 +5,10 @@ import (
 	"github.com/open-cmi/cmmns/service/webserver"
 )
 
-var moduleConfig Config
+var gConf Config
 
 func init() {
-	config.RegisterConfig("cluster", &moduleConfig)
+	config.RegisterConfig("cluster", &gConf)
 	webserver.RegisterAuthAPI("agent", AuthGroup)
 	webserver.RegisterUnauthAPI("agent", UnauthGroup)
 }

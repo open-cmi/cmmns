@@ -16,12 +16,12 @@ type TLSKeyPair struct {
 }
 
 type Config struct {
-	Server      string     `json:"server,omitempty"`
-	TLSKeyPair  TLSKeyPair `json:"tls_key_pair"`
-	XSNOSServer string     `json:"xsnos_server,omitempty"`
+	Server     string     `json:"server,omitempty"`
+	TLSKeyPair TLSKeyPair `json:"tls_key_pair"`
+	TCPServer  string     `json:"tcp_server,omitempty"`
 }
 
-var moduleConfig Config
+var gConf Config
 
 // DefaultClient direct client
 var DefaultClient *http.Client
@@ -59,12 +59,12 @@ func (c *Config) Init() error {
 		Transport: tp,
 	}
 
-	XSNOSServer = moduleConfig.XSNOSServer
+	TCPServer = gConf.TCPServer
 	return nil
 }
 
 func init() {
-	moduleConfig.Server = "localhost"
-	moduleConfig.XSNOSServer = XSNOSServer
-	config.RegisterConfig("transport", &moduleConfig)
+	gConf.Server = "localhost"
+	gConf.TCPServer = TCPServer
+	config.RegisterConfig("transport", &gConf)
 }

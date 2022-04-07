@@ -16,7 +16,7 @@ import (
 )
 
 func GetAgentPackage() string {
-	AgentPackage := moduleConfig.LinuxPackage
+	AgentPackage := gConf.LinuxPackage
 	if !strings.HasPrefix(AgentPackage, "/") {
 		rp := pathutil.GetRootPath()
 		return filepath.Join(rp, AgentPackage)
@@ -25,7 +25,7 @@ func GetAgentPackage() string {
 }
 
 func DeployRemote(agent *agent.Model) error {
-	agentPackage := moduleConfig.LinuxPackage
+	agentPackage := gConf.LinuxPackage
 	if !strings.HasPrefix(agentPackage, "/") {
 		rp := pathutil.GetRootPath()
 		agentPackage = filepath.Join(rp, agentPackage)

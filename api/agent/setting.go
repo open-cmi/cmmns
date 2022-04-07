@@ -18,7 +18,7 @@ type Setting struct {
 
 // 获取配置
 func GetSetting(c *gin.Context) {
-	if moduleConfig.Address == "" {
+	if gConf.Address == "" {
 		var address string = ""
 		host := c.Request.Host
 		// 目前只支持ipv4地址，不支持ipv6地址
@@ -28,13 +28,13 @@ func GetSetting(c *gin.Context) {
 		} else {
 			address = host
 		}
-		moduleConfig.Address = address
+		gConf.Address = address
 		config.Save()
 	}
 	var setting Setting
-	setting.Address = moduleConfig.Address
-	setting.Port = moduleConfig.Port
-	setting.Proto = moduleConfig.Proto
+	setting.Address = gConf.Address
+	setting.Port = gConf.Port
+	setting.Proto = gConf.Proto
 
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,
@@ -60,15 +60,15 @@ func EditSetting(c *gin.Context) {
 		return
 	}
 
-	moduleConfig.Address = reqMsg.Address
-	moduleConfig.Port = reqMsg.Port
-	moduleConfig.Proto = reqMsg.Proto
+	gConf.Address = reqMsg.Address
+	gConf.Port = reqMsg.Port
+	gConf.Proto = reqMsg.Proto
 
 	config.Save()
 
 	/*
 		// 找到agent的位置
-		agentPackage := moduleConfig.LinuxPackage
+		agentPackage := gConf.LinuxPackage
 		if !strings.HasPrefix(agentPackage, "/") {
 			rp := pathutil.GetRootPath()
 			agentPackage = filepath.Join(rp, agentPackage)
@@ -88,7 +88,7 @@ func EditSetting(c *gin.Context) {
 			return
 		}
 		// 写入master.json文件
-		content, _ := json.MarshalIndent(moduleConfig, "", "  ")
+		content, _ := json.MarshalIndent(gConf, "", "  ")
 		masterFile := filepath.Join(os.TempDir(), "agent", "etc", "master.json")
 		os.WriteFile(masterFile, content, 0644)
 

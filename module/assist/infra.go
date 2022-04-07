@@ -106,12 +106,12 @@ func Init() {
 
 	file := ini.Empty()
 	comsec, _ := file.NewSection("common")
-	comsec.NewKey("server_addr", moduleConfig.ServerAddr)
-	comsec.NewKey("server_port", strconv.Itoa(int(moduleConfig.ServerPort)))
-	if moduleConfig.Token != "" {
-		comsec.NewKey("token", moduleConfig.Token)
+	comsec.NewKey("server_addr", gConf.ServerAddr)
+	comsec.NewKey("server_port", strconv.Itoa(int(gConf.ServerPort)))
+	if gConf.Token != "" {
+		comsec.NewKey("token", gConf.Token)
 	}
-	for _, rs := range moduleConfig.Service {
+	for _, rs := range gConf.Service {
 		section, _ := file.NewSection(rs.Name)
 		section.NewKey("type", rs.Type)
 		section.NewKey("local_ip", rs.LocalIP)

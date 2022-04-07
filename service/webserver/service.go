@@ -26,7 +26,7 @@ func New() *Service {
 
 func (s *Service) Init() error {
 	// init webserver
-	err := middleware.Init(&moduleConfig.Middleware)
+	err := middleware.Init(&gConf.Middleware)
 	if err != nil {
 		logger.Error("middleware init failed")
 		return err
@@ -42,7 +42,7 @@ func (s *Service) Init() error {
 
 func (s *Service) Run() error {
 	// unix sock api
-	for _, srv := range moduleConfig.Server {
+	for _, srv := range gConf.Server {
 		if srv.Proto == "unix" {
 			sockAddr := srv.Address
 			os.Remove(sockAddr)
