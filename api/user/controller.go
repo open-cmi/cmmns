@@ -256,8 +256,8 @@ func Register(c *gin.Context) {
 	}
 
 	e := email.NewEmail()
-	domain := moduleConfig.Domain
-	e.From = moduleConfig.From
+	domain := gConf.Domain
+	e.From = gConf.From
 	e.To = []string{apimsg.Email}
 	e.Subject = "Welcome to Nay"
 	htmlcontent := strings.Replace(EmailTemplate, "token", code.String(), 1)
@@ -265,12 +265,12 @@ func Register(c *gin.Context) {
 	htmlcontent = strings.Replace(htmlcontent, "username", apimsg.UserName, 1)
 
 	e.HTML = []byte(htmlcontent)
-	err = e.Send(moduleConfig.SMTPServer,
+	err = e.Send(gConf.SMTPServer,
 		smtp.PlainAuth(
 			"",
-			moduleConfig.User,
-			moduleConfig.Password,
-			moduleConfig.SMTPHost),
+			gConf.User,
+			gConf.Password,
+			gConf.SMTPHost),
 	)
 	if err != nil {
 		user.DeleteByName(apimsg.UserName)

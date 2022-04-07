@@ -4,11 +4,14 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/service/webserver/middleware"
+	"github.com/open-cmi/goutils/pathutil"
 )
 
 type Service struct {
@@ -23,7 +26,7 @@ func New() *Service {
 
 func (s *Service) Init() error {
 	// init webserver
-	err := middleware.Init(&moduleConfig.Middleware)
+	err := middleware.Init(&gConf.Middleware)
 	if err != nil {
 		logger.Error("middleware init failed")
 		return err
@@ -39,7 +42,7 @@ func (s *Service) Init() error {
 
 func (s *Service) Run() error {
 	// unix sock api
-	for _, srv := range moduleConfig.Server {
+	for _, srv := range gConf.Server {
 		if srv.Proto == "unix" {
 			sockAddr := srv.Address
 			os.Remove(sockAddr)
@@ -58,6 +61,22 @@ func (s *Service) Run() error {
 			go http.Serve(listener, s.Engine)
 		} else if srv.Proto == "http" {
 			go s.Engine.Run(srv.Address + ":" + strconv.Itoa(srv.Port))
+		} else if srv.Proto == "https" {
+			rp := pathutil.GetRootPath()
+			var certFile string
+			if strings.HasPrefix(srv.CertFile, ".") {
+				certFile = filepath.Join(rp, srv.CertFile)
+			} else {
+				certFile = srv.CertFile
+			}
+			var keyFile string
+			if strings.HasPrefix(srv.KeyFile, ".") {
+				keyFile = filepath.Join(rp, srv.KeyFile)
+			} else {
+				keyFile = srv.KeyFile
+			}
+			go s.Engine.RunTLS(srv.Address+":"+strconv.Itoa(srv.Port),
+				certFile, keyFile)
 		}
 	}
 

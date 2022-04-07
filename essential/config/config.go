@@ -37,15 +37,15 @@ func Init(configfile string) error {
 		return err
 	}
 
-	for name, moduleConfig := range gConf.Features {
+	for name, gConf := range gConf.Features {
 		value, ok := tmpConf[name]
 		if ok {
-			err := json.Unmarshal(value, moduleConfig)
+			err := json.Unmarshal(value, gConf)
 			if err != nil {
 				return err
 			}
 		}
-		moduleConfig.Init()
+		gConf.Init()
 	}
 
 	return nil

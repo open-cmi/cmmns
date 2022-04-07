@@ -11,16 +11,17 @@ import (
 )
 
 type TLSKeyPair struct {
-	CertFile string
-	KeyFile  string
+	CertFile string `json:"cert_file,omitempty"`
+	KeyFile  string `json:"key_file,omitempty"`
 }
 
 type Config struct {
-	Server     string
-	TLSKeyPair TLSKeyPair
+	Server     string     `json:"server,omitempty"`
+	TLSKeyPair TLSKeyPair `json:"tls_key_pair"`
+	TCPServer  string     `json:"tcp_server,omitempty"`
 }
 
-var moduleConfig Config
+var gConf Config
 
 // DefaultClient direct client
 var DefaultClient *http.Client
@@ -57,10 +58,13 @@ func (c *Config) Init() error {
 	DefaultClient = &http.Client{
 		Transport: tp,
 	}
+
+	TCPServer = gConf.TCPServer
 	return nil
 }
 
 func init() {
-	moduleConfig.Server = "localhost"
-	config.RegisterConfig("transport", &moduleConfig)
+	gConf.Server = "localhost"
+	gConf.TCPServer = TCPServer
+	config.RegisterConfig("transport", &gConf)
 }

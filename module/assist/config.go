@@ -21,8 +21,8 @@ func (c *Config) Init() error {
 	return nil
 }
 
-var moduleConfig Config
+var gConf Config
 
 func init() {
-	config.RegisterConfig("assist", &moduleConfig)
+	config.RegisterConfig("assist", &gConf)
 }

@@ -22,7 +22,7 @@ type Config struct {
 	Password string `json:"password,omitempty"`
 }
 
-var moduleConfig Config
+var gConf Config
 
 // Init db init
 func (c *Config) Init() error {
@@ -50,5 +50,5 @@ func GetDB() *sqlx.DB {
 }
 
 func init() {
-	config.RegisterConfig("model", &moduleConfig)
+	config.RegisterConfig("model", &gConf)
 }

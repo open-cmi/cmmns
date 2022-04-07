@@ -16,8 +16,8 @@ func (c *Config) Init() error {
 	return nil
 }
 
-var moduleConfig Config
+var gConf Config
 
 func init() {
-	config.RegisterConfig("smtp", &moduleConfig)
+	config.RegisterConfig("smtp", &gConf)
 }
