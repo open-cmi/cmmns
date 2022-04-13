@@ -60,5 +60,13 @@
         "proto": "unix"
       }
     ]
+  },
+  "process": {
+    "services": [
+      {
+        "name": "dnsmasq",
+        "exec_start": "/usr/sbin/dnsmasq"
+      }
+    ]
   }
 }
