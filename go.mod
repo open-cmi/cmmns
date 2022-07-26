@@ -17,7 +17,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/lib/pq v1.10.2 // indirect
-	github.com/open-cmi/goutils v0.4.2
+	github.com/open-cmi/goutils v0.4.3
 	github.com/open-cmi/memstore v0.1.0
 	github.com/open-cmi/migrate v0.4.0
 	github.com/pkg/sftp v1.13.4 // indirect
@@ -32,5 +32,3 @@ require (
 	gopkg.in/ini.v1 v1.62.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
-
-replace github.com/open-cmi/goutils => /Users/zhaodianle/flyover/libraries/goutils

@@ -3,6 +3,7 @@ package network
 import (
 	"bufio"
 	"bytes"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -20,7 +21,6 @@ func GetDNS() []string {
 		rd := bufio.NewReader(rf)
 		for linebyte, _, err := rd.ReadLine(); err == nil; linebyte, _, err = rd.ReadLine() {
 			line := string(linebyte)
-			fmt.Println(line)
 			if strings.HasPrefix(line, "#") {
 				continue
 			}
