@@ -68,5 +68,8 @@
         "exec_start": "/usr/sbin/dnsmasq"
       }
     ]
+  },
+  "transport": {
+    "tcp_server": "localhost:30017"
   }
 }

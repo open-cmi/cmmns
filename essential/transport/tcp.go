@@ -2,6 +2,7 @@ package transport
 
 import (
 	"net"
+	"time"
 )
 
 // Header tlv header
@@ -10,11 +11,12 @@ type Header struct {
 	Len  uint16
 }
 
-var TCPServer string = "localhost:30017"
+var TCPServer string = "192.168.1.104:30017"
 
 // TCPRequest request msg
 func TCPRequest(msg []byte) (conn *net.TCPConn, err error) {
-	rsvr, err := net.ResolveTCPAddr("tcp", TCPServer)
+
+	rsvr, err := net.ResolveTCPAddr("tcp", gConf.TCPServer)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +25,11 @@ func TCPRequest(msg []byte) (conn *net.TCPConn, err error) {
 	if err != nil {
 		return conn, err
 	}
+	now := time.Now()
 
+	conn.SetDeadline(now.Add(10 * time.Second))
+	conn.SetReadDeadline(now.Add(10 * time.Second))
+	conn.SetWriteDeadline(now.Add(10 * time.Second))
 	_, err = conn.Write(msg)
 	if err != nil {
 		return conn, err
