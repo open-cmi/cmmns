@@ -58,9 +58,6 @@ type Manager struct {
 	Procs map[string]*Process
 }
 
-// ProcessContainer container
-var ProcessContainer map[string]*Process
-
 // Start start process
 func (p *Process) Start() error {
 	cmdstring := p.Config.ExecStart

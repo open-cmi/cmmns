@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"gopkg.in/yaml.v2"
 )
@@ -83,7 +84,7 @@ func Set(msg *ConfigMsg) error {
 		gConf.DHCP = false
 	}
 
-	gConf.Save()
+	config.Save()
 	return nil
 }
 

@@ -1,6 +1,8 @@
 package webserver
 
 import (
+	"encoding/json"
+
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/service/webserver/middleware"
 )
@@ -20,8 +22,14 @@ type Config struct {
 
 var gConf Config
 
-func (c *Config) Init() error {
-	return nil
+func Init(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gConf)
+	return err
+}
+
+func Save() json.RawMessage {
+	raw, _ := json.Marshal(&gConf)
+	return raw
 }
 
 func init() {
@@ -37,5 +45,5 @@ func init() {
 		Proto:   "unix",
 	})
 
-	config.RegisterConfig("webserver", &gConf)
+	config.RegisterConfig("webserver", Init, Save)
 }

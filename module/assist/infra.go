@@ -34,7 +34,7 @@ func IsRunning() bool {
 
 func Run() error {
 	if defaultClient == nil {
-		Init()
+		InitClient()
 	}
 
 	if defaultClient.IsRunning {
@@ -99,7 +99,7 @@ func Close() {
 	}
 }
 
-func Init() {
+func InitClient() {
 	// 根据配置文件，生成临时ini文件，然后传入参数
 	tmpdir := os.TempDir()
 	cfgFilePath := filepath.Join(tmpdir, "./frpc.ini")

@@ -1,6 +1,7 @@
 package rdb
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -23,25 +24,6 @@ type Config struct {
 
 var gConf Config
 
-// Init db init
-func (c *Config) Init() error {
-	cachehost := c.Host
-	cacheport := c.Port
-	cachepassword := c.Password
-
-	Cache = make(map[string]*redis.Client)
-
-	for module, db := range modules {
-		Cache[module] = redis.NewClient(&redis.Options{
-			Addr:     fmt.Sprintf("%s:%d", cachehost, cacheport),
-			Password: cachepassword,
-			DB:       db,
-		})
-	}
-
-	return nil
-}
-
 // GetCache get cache
 func GetCache(module string) *redis.Client {
 	return Cache[module]
@@ -56,9 +38,39 @@ func Register(module string, db int) error {
 	return nil
 }
 
+// Init db init
+func Init(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gConf)
+	if err != nil {
+		return err
+	}
+
+	cachehost := gConf.Host
+	cacheport := gConf.Port
+	cachepassword := gConf.Password
+
+	Cache = make(map[string]*redis.Client)
+
+	for module, db := range modules {
+		Cache[module] = redis.NewClient(&redis.Options{
+			Addr:     fmt.Sprintf("%s:%d", cachehost, cacheport),
+			Password: cachepassword,
+			DB:       db,
+		})
+	}
+
+	return nil
+}
+
+func Save() json.RawMessage {
+	raw, _ := json.Marshal(&gConf)
+	return raw
+}
+
 func init() {
 	gConf.Host = "127.0.0.1"
 	gConf.Port = 25431
-	config.RegisterConfig("redis", &gConf)
+	config.RegisterConfig("redis", Init, Save)
+
 	Register("public", def.RDBPublic)
 }

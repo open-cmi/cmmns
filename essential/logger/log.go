@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"path/filepath"
@@ -26,38 +27,6 @@ var Logger Feature
 type Config struct {
 	Level string `json:"level"`
 	Path  string `json:"path,omitempty"`
-}
-
-func (c *Config) Init() error {
-	if Logger != nil {
-		return nil
-	}
-
-	level := logutil.Info
-	switch c.Level {
-	case "debug":
-		level = logutil.Debug
-	case "info":
-		level = logutil.Info
-	case "warn":
-		level = logutil.Warn
-	case "error":
-		level = logutil.Error
-	}
-	logPath := c.Path
-	if logPath == "" {
-		rp := pathutil.GetRootPath()
-		logPath = filepath.Join(rp, "data")
-	}
-
-	Logger = logutil.NewLogger(&logutil.Option{
-		Dir:        logPath,
-		Compress:   true,
-		Level:      level,
-		ReserveDay: 30,
-	})
-
-	return nil
 }
 
 func Error(v ...interface{}) {
@@ -126,8 +95,49 @@ func Debugf(format string, v ...interface{}) {
 
 var gConf Config
 
+func Init(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gConf)
+	if err != nil {
+		return err
+	}
+
+	if Logger != nil {
+		return nil
+	}
+
+	level := logutil.Info
+	switch gConf.Level {
+	case "debug":
+		level = logutil.Debug
+	case "info":
+		level = logutil.Info
+	case "warn":
+		level = logutil.Warn
+	case "error":
+		level = logutil.Error
+	}
+	logPath := gConf.Path
+	if logPath == "" {
+		rp := pathutil.GetRootPath()
+		logPath = filepath.Join(rp, "data")
+	}
+
+	Logger = logutil.NewLogger(&logutil.Option{
+		Dir:        logPath,
+		Compress:   true,
+		Level:      level,
+		ReserveDay: 30,
+	})
+
+	return nil
+}
+func Save() json.RawMessage {
+	raw, _ := json.Marshal(&gConf)
+	return raw
+}
+
 func init() {
 	gConf.Level = "debug"
 	gConf.Path = "/tmp/"
-	config.RegisterConfig("log", &gConf)
+	config.RegisterConfig("log", Init, Save)
 }

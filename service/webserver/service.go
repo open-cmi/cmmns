@@ -75,7 +75,7 @@ func (s *Service) Run() error {
 			} else {
 				keyFile = srv.KeyFile
 			}
-			logger.Debugf("run tls %s:%d, cert %d, key %s",
+			logger.Debugf("run tls %s:%d, cert %s, key %s",
 				srv.Address, srv.Port, certFile, keyFile)
 			s.Engine.RunTLS(srv.Address+":"+strconv.Itoa(srv.Port),
 				certFile, keyFile)

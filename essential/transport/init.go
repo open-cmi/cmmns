@@ -2,6 +2,7 @@ package transport
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"net"
 	"net/http"
 	"time"
@@ -27,7 +28,11 @@ var gConf Config
 var DefaultClient *http.Client
 
 // Init transport init
-func (c *Config) Init() error {
+func Init(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gConf)
+	if err != nil {
+		return err
+	}
 
 	var tp = &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -46,8 +51,8 @@ func (c *Config) Init() error {
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 	}
-	if c.TLSKeyPair.CertFile != "" && c.TLSKeyPair.KeyFile != "" {
-		cliCrt, err := tls.LoadX509KeyPair(c.TLSKeyPair.CertFile, c.TLSKeyPair.KeyFile)
+	if gConf.TLSKeyPair.CertFile != "" && gConf.TLSKeyPair.KeyFile != "" {
+		cliCrt, err := tls.LoadX509KeyPair(gConf.TLSKeyPair.CertFile, gConf.TLSKeyPair.KeyFile)
 		if err != nil {
 			logger.Errorf("load x509 key pair failed, err: %s\n", err.Error())
 			return err
@@ -63,8 +68,14 @@ func (c *Config) Init() error {
 	return nil
 }
 
+func Save() json.RawMessage {
+	raw, _ := json.Marshal(&gConf)
+	return raw
+}
+
 func init() {
 	gConf.Server = "localhost"
 	gConf.TCPServer = TCPServer
-	config.RegisterConfig("transport", &gConf)
+
+	config.RegisterConfig("transport", Init, Save)
 }

@@ -1,6 +1,10 @@
 package assist
 
-import "github.com/open-cmi/cmmns/essential/config"
+import (
+	"encoding/json"
+
+	"github.com/open-cmi/cmmns/essential/config"
+)
 
 type RemoteService struct {
 	Name       string `json:"name"`
@@ -17,12 +21,18 @@ type Config struct {
 	Service    []RemoteService `json:"services,omitempty"`
 }
 
-func (c *Config) Init() error {
-	return nil
-}
-
 var gConf Config
 
+func Init(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gConf)
+	return err
+}
+
+func Save() json.RawMessage {
+	raw, _ := json.Marshal(&gConf)
+	return raw
+}
+
 func init() {
-	config.RegisterConfig("assist", &gConf)
+	config.RegisterConfig("assist", Init, Save)
 }

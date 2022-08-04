@@ -1,6 +1,8 @@
 package sqldb
 
 import (
+	"encoding/json"
+
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/goutils/database"
 	"github.com/open-cmi/goutils/database/dbsql"
@@ -24,16 +26,25 @@ type Config struct {
 
 var gConf Config
 
+// GetDB get db
+func GetDB() *sqlx.DB {
+	return DB
+}
+
 // Init db init
-func (c *Config) Init() error {
+func Init(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gConf)
+	if err != nil {
+		return err
+	}
 	var dbconf database.Config
-	dbconf.Type = c.Type
-	dbconf.File = c.File
-	dbconf.Host = c.Host
-	dbconf.Port = c.Port
-	dbconf.User = c.User
-	dbconf.Password = c.Password
-	dbconf.Database = c.Database
+	dbconf.Type = gConf.Type
+	dbconf.File = gConf.File
+	dbconf.Host = gConf.Host
+	dbconf.Port = gConf.Port
+	dbconf.User = gConf.User
+	dbconf.Password = gConf.Password
+	dbconf.Database = gConf.Database
 
 	dbi, err := dbsql.SQLInit(&dbconf)
 	if err != nil {
@@ -44,11 +55,11 @@ func (c *Config) Init() error {
 	return nil
 }
 
-// GetDB get db
-func GetDB() *sqlx.DB {
-	return DB
+func Save() json.RawMessage {
+	raw, _ := json.Marshal(&gConf)
+	return raw
 }
 
 func init() {
-	config.RegisterConfig("model", &gConf)
+	config.RegisterConfig("model", Init, Save)
 }

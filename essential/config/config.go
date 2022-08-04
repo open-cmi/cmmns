@@ -2,66 +2,35 @@ package config
 
 import (
 	"encoding/json"
-	"errors"
 
 	"github.com/open-cmi/goutils/confparser"
 )
 
-type Feature interface {
-	Init() error
-}
-
-// Config config
-type Config struct {
-	parser   *confparser.Parser
-	Features map[string]Feature
-}
-
-var gConf *Config
-var configMapping map[string]Feature = make(map[string]Feature)
+var gConfCtx *confparser.Context
 
 // Init config init
 func Init(configfile string) error {
-	parser := confparser.New(configfile)
-	if parser == nil {
-		return errors.New("open file failed")
-	}
 
-	gConf = new(Config)
-	gConf.parser = parser
-	gConf.Features = configMapping
-
-	var tmpConf map[string]json.RawMessage = make(map[string]json.RawMessage)
-	err := gConf.parser.Load(&tmpConf)
-	if err != nil {
-		return err
-	}
-
-	for name, gConf := range gConf.Features {
-		value, ok := tmpConf[name]
-		if ok {
-			err := json.Unmarshal(value, gConf)
-			if err != nil {
-				return err
-			}
-		}
-		gConf.Init()
-	}
-
-	return nil
+	err := gConfCtx.Load(configfile)
+	return err
 }
 
-// Save save config
 func Save() {
-	gConf.parser.Save(gConf.Features)
+	if gConfCtx != nil {
+		gConfCtx.Save()
+	}
 }
 
 // RegisterConfig register config
-func RegisterConfig(name string, conf Feature) error {
-	_, found := configMapping[name]
-	if found {
-		return errors.New("config " + name + " has been registered")
+func RegisterConfig(name string, initFunc func(json.RawMessage) error, saveFunc func() json.RawMessage) error {
+
+	if gConfCtx == nil {
+		gConfCtx = confparser.NewContext()
 	}
-	configMapping[name] = conf
-	return nil
+
+	var opt confparser.Option
+	opt.Name = name
+	opt.Init = initFunc
+	opt.Save = saveFunc
+	return gConfCtx.Register(&opt)
 }

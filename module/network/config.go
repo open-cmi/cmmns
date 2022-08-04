@@ -1,6 +1,10 @@
 package network
 
-import "github.com/open-cmi/cmmns/essential/config"
+import (
+	"encoding/json"
+
+	"github.com/open-cmi/cmmns/essential/config"
+)
 
 type Config struct {
 	Dev          string `json:"dev"`
@@ -12,22 +16,27 @@ type Config struct {
 	SecondaryDNS string `json:"secondary_dns,omitempty"`
 }
 
-func (c *Config) Init() error {
-	if c.Dev == "" {
+func Init(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gConf)
+	if err != nil {
+		return err
+	}
+
+	if gConf.Dev == "" {
 		return nil
 	}
 
 	var msg ConfigMsg
-	if c.DHCP {
+	if gConf.DHCP {
 		msg.Mode = "dhcp"
 	} else {
 		msg.Mode = "static"
 	}
-	msg.Address = c.Address
-	msg.Netmask = c.Netmask
-	msg.Gateway = c.Gateway
-	msg.MainDNS = c.MainDNS
-	msg.SecondaryDNS = c.SecondaryDNS
+	msg.Address = gConf.Address
+	msg.Netmask = gConf.Netmask
+	msg.Gateway = gConf.Gateway
+	msg.MainDNS = gConf.MainDNS
+	msg.SecondaryDNS = gConf.SecondaryDNS
 
 	setConfig(&msg)
 	return nil
@@ -39,8 +48,13 @@ func (c *Config) Save() {
 
 var gConf Config
 
+func Save() json.RawMessage {
+	raw, _ := json.Marshal(&gConf)
+	return raw
+}
+
 func init() {
 	gConf.Dev = ""
 	gConf.DHCP = true
-	config.RegisterConfig("network", &gConf)
+	config.RegisterConfig("network", Init, Save)
 }

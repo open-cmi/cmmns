@@ -152,7 +152,7 @@ func Login(m *LoginMsg) (authuser *Model, err error) {
 
 // Activate activate user
 func Activate(username string) error {
-	updateClause := fmt.Sprintf("update users set status=1 where username=$1", username)
+	updateClause := "update users set status=1 where username=$1"
 	db := sqldb.GetDB()
 	_, err := db.Exec(updateClause, username)
 	if err != nil {

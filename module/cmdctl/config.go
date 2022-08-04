@@ -1,6 +1,8 @@
 package cmdctl
 
 import (
+	"encoding/json"
+
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 )
@@ -19,8 +21,15 @@ type CommandConfig struct {
 	Services []Config `json:"services"`
 }
 
-func (cc *CommandConfig) Init() error {
-	for _, s := range cc.Services {
+var gConf CommandConfig
+
+func Init(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gConf)
+	if err != nil {
+		return err
+	}
+
+	for _, s := range gConf.Services {
 		manager.AddProcess(&s)
 		err := manager.StartProcess(s.Name)
 		if err != nil {
@@ -31,10 +40,13 @@ func (cc *CommandConfig) Init() error {
 	return nil
 }
 
-var gConf CommandConfig
+func Save() json.RawMessage {
+	raw, _ := json.Marshal(&gConf)
+	return raw
+}
 
 func init() {
 	manager = NewManager()
 
-	config.RegisterConfig("process", &gConf)
+	config.RegisterConfig("process", Init, Save)
 }

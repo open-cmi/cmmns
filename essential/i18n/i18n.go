@@ -1,6 +1,8 @@
 package i18n
 
 import (
+	"encoding/json"
+
 	"github.com/open-cmi/cmmns/essential/config"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
@@ -15,22 +17,6 @@ type Config struct {
 }
 
 var gConf Config
-
-func (c *Config) Init() error {
-	var found bool = false
-	for _, lang := range supportedLang {
-		if lang == c.Lang {
-			found = true
-		}
-		tag := language.MustParse(lang)
-		p := message.NewPrinter(tag)
-		printerMapping[lang] = p
-	}
-	if !found {
-		gConf.Lang = supportedLang[0]
-	}
-	return nil
-}
 
 func GetLang() string {
 	return gConf.Lang
@@ -71,7 +57,33 @@ func Printf(format string, args ...interface{}) (n int, err error) {
 	return printerMapping[gConf.Lang].Printf(format, args)
 }
 
+func Init(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gConf)
+	if err != nil {
+		return err
+	}
+
+	var found bool = false
+	for _, lang := range supportedLang {
+		if lang == gConf.Lang {
+			found = true
+		}
+		tag := language.MustParse(lang)
+		p := message.NewPrinter(tag)
+		printerMapping[lang] = p
+	}
+	if !found {
+		gConf.Lang = supportedLang[0]
+	}
+	return nil
+}
+
+func Save() json.RawMessage {
+	raw, _ := json.Marshal(gConf)
+	return raw
+}
+
 func init() {
 	gConf.Lang = "en-US"
-	config.RegisterConfig("locale", &gConf)
+	config.RegisterConfig("locale", Init, Save)
 }
