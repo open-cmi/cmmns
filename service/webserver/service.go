@@ -26,12 +26,6 @@ func New() *Service {
 
 func (s *Service) Init() error {
 	// init webserver
-	err := middleware.Init(&gConf.Middleware)
-	if err != nil {
-		logger.Error("middleware init failed")
-		return err
-	}
-
 	middleware.DefaultMiddleware(s.Engine)
 	middleware.SessionMiddleware(s.Engine)
 	UnauthInit(s.Engine)

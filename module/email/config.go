@@ -7,10 +7,11 @@ import (
 )
 
 type Config struct {
-	Server   string
-	Port     int
-	User     string
-	Password string
+	Server   string `json:"server"`
+	Port     int    `json:"port"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+	UseTLS   bool   `json:"use_tls"`
 }
 
 var gConf Config

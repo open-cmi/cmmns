@@ -1,6 +1,7 @@
 package email
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/smtp"
 
@@ -23,13 +24,30 @@ func Send(to []string, subject string, content string, opt *SendOption) error {
 	e.Subject = subject
 
 	e.HTML = []byte(content)
-	s := fmt.Sprintf("%s:%d", gConf.Server, gConf.Port)
-	err := e.Send(s,
-		smtp.PlainAuth(
-			"",
-			gConf.User,
-			gConf.Password,
-			gConf.Server),
-	)
+	addr := fmt.Sprintf("%s:%d", gConf.Server, gConf.Port)
+	var tlsConfig tls.Config
+	tlsConfig.InsecureSkipVerify = false
+	tlsConfig.ServerName = gConf.Server
+
+	var err error
+	if gConf.UseTLS {
+		err = e.SendWithTLS(addr,
+			smtp.PlainAuth(
+				"",
+				gConf.User,
+				gConf.Password,
+				gConf.Server),
+			&tlsConfig,
+		)
+	} else {
+		err = e.Send(addr,
+			smtp.PlainAuth(
+				"",
+				gConf.User,
+				gConf.Password,
+				gConf.Server),
+		)
+	}
+
 	return err
 }

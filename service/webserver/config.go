@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/cmmns/service/webserver/middleware"
 )
 
 type Server struct {
@@ -16,8 +15,7 @@ type Server struct {
 }
 
 type Config struct {
-	Middleware middleware.MiddlewareConfig `json:"middleware"`
-	Server     []Server                    `json:"server"`
+	Server []Server `json:"server"`
 }
 
 var gConf Config
@@ -34,7 +32,6 @@ func Save() json.RawMessage {
 
 func init() {
 	// default config
-	gConf.Middleware.SessionStore = "memory"
 
 	gConf.Server = append(gConf.Server, Server{
 		Address: "127.0.0.1",

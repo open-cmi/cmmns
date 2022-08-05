@@ -32,23 +32,13 @@
     "password": "8ik,\u003cKI*"
   },
   "smtp": {
-    "from": "",
-    "smtp_server": "",
+    "server": "",
+    "port": 465,
     "user": "",
     "password": "",
-    "smtp_host": "",
-    "domain": ""
+    "use_tls": true
   },
   "webserver": {
-    "middleware": {
-      "session_store": "redis",
-      "redis_store": {
-        "host": "127.0.0.1",
-        "port": 25431,
-        "db": 2,
-        "passwd": "8ik,\u003cKI*"
-      }
-    },
     "server": [
       {
         "address": "0.0.0.0",
@@ -60,6 +50,15 @@
         "proto": "unix"
       }
     ]
+  },
+  "web_server_middleware": {
+    "session_store": "redis",
+    "redis_store": {
+      "host": "127.0.0.1",
+      "port": 25431,
+      "db": 2,
+      "passwd": "8ik,\u003cKI*"
+    }
   },
   "process": {
     "services": [

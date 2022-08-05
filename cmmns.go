@@ -42,6 +42,7 @@ func Run(opt *Option) error {
 		s.Run()
 		count++
 	}
+
 	if opt.TickServiceEnable {
 		// run ticker service
 		t := ticker.New()
