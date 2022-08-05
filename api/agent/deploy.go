@@ -11,14 +11,14 @@ import (
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/module/agent"
 	"github.com/open-cmi/goutils/fileutil"
-	"github.com/open-cmi/goutils/pathutil"
 	"github.com/open-cmi/goutils/sshutil"
 )
 
 func GetAgentPackage() string {
 	AgentPackage := gConf.LinuxPackage
 	if !strings.HasPrefix(AgentPackage, "/") {
-		rp := pathutil.GetRootPath()
+		//rp := pathutil.GetRootPath()
+		rp, _ := os.Getwd()
 		return filepath.Join(rp, AgentPackage)
 	}
 	return AgentPackage
@@ -27,7 +27,8 @@ func GetAgentPackage() string {
 func DeployRemote(agent *agent.Model) error {
 	agentPackage := gConf.LinuxPackage
 	if !strings.HasPrefix(agentPackage, "/") {
-		rp := pathutil.GetRootPath()
+		//rp := pathutil.GetRootPath()
+		rp, _ := os.Getwd()
 		agentPackage = filepath.Join(rp, agentPackage)
 	}
 
