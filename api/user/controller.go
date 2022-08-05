@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/smtp"
 	"strings"
 	"time"
 
@@ -15,11 +14,11 @@ import (
 	"github.com/open-cmi/cmmns/common/errcode"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/email"
 	"github.com/open-cmi/cmmns/module/user"
 	"github.com/open-cmi/goutils/typeutil"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jordan-wright/email"
 	"github.com/open-cmi/cmmns/essential/i18n"
 	"github.com/open-cmi/cmmns/essential/rdb"
 )
@@ -29,7 +28,7 @@ var EmailTemplate string = `
 <div>
 	<h1>Hi username, Welcome to Nay!</h1>
 	<h5>Here is a link to activate your account, please copy and paste it to your browser:</h5>
-	<h5>https://domain/api/common/v3/user/activate/token</h5>
+	<h5>user_activate_url/token</h5>
 </div>
 `
 
@@ -255,23 +254,12 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	e := email.NewEmail()
-	domain := gConf.Domain
-	e.From = gConf.From
-	e.To = []string{apimsg.Email}
-	e.Subject = "Welcome to Nay"
+	activateURL := gConf.ActivateURL
 	htmlcontent := strings.Replace(EmailTemplate, "token", code.String(), 1)
-	htmlcontent = strings.Replace(htmlcontent, "domain", domain, 1)
+	htmlcontent = strings.Replace(htmlcontent, "user_activate_url", activateURL, 1)
 	htmlcontent = strings.Replace(htmlcontent, "username", apimsg.UserName, 1)
 
-	e.HTML = []byte(htmlcontent)
-	err = e.Send(gConf.SMTPServer,
-		smtp.PlainAuth(
-			"",
-			gConf.User,
-			gConf.Password,
-			gConf.SMTPHost),
-	)
+	err = email.Send([]string{apimsg.Email}, "Welcome to Nay", htmlcontent, nil)
 	if err != nil {
 		user.DeleteByName(apimsg.UserName)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email can't be verified"})
