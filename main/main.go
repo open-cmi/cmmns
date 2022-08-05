@@ -5,8 +5,6 @@ import (
 
 	"github.com/open-cmi/cmmns"
 	"github.com/open-cmi/cmmns/scmd"
-	"github.com/open-cmi/cmmns/service/ticker"
-	"github.com/open-cmi/cmmns/service/webserver"
 	"github.com/open-cmi/migrate"
 )
 
@@ -35,16 +33,10 @@ func main() {
 	}
 	defer cmmns.Fini()
 
-	s := webserver.New()
-	// Init
-	s.Init()
-	// Run
-	s.Run()
-
-	// run ticker service
-	t := ticker.New()
-	t.Init()
-	t.Run()
+	var opt cmmns.Option
+	opt.WebServiceEnable = true
+	opt.TickServiceEnable = true
+	cmmns.Run(&opt)
 
 	cmmns.Wait()
 }

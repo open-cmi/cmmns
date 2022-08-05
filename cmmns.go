@@ -1,12 +1,15 @@
 package cmmns
 
 import (
+	"errors"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/service/ticker"
+	"github.com/open-cmi/cmmns/service/webserver"
 
 	_ "github.com/open-cmi/cmmns/api"
 	_ "github.com/open-cmi/cmmns/internal/translation"
@@ -14,14 +17,44 @@ import (
 	_ "github.com/open-cmi/cmmns/module"
 )
 
+type Option struct {
+	WebServiceEnable  bool
+	TickServiceEnable bool
+}
+
 func Init(configFile string) error {
 	err := config.Init(configFile)
 	if err != nil {
-		logger.Errorf("new config failed: %s\n", err.Error())
+		logger.Errorf("config init failed: %s\n", err.Error())
 		return err
 	}
 
 	return nil
+}
+
+func Run(opt *Option) error {
+	var count int
+	if opt.WebServiceEnable {
+		s := webserver.New()
+		// Init
+		s.Init()
+		// Run
+		s.Run()
+		count++
+	}
+	if opt.TickServiceEnable {
+		// run ticker service
+		t := ticker.New()
+		t.Init()
+		t.Run()
+		count++
+	}
+
+	if count > 1 {
+		return nil
+	}
+
+	return errors.New("at least one service enabled")
 }
 
 func Wait() {
