@@ -8,8 +8,10 @@ import (
 
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/scmd"
 	"github.com/open-cmi/cmmns/service/ticker"
 	"github.com/open-cmi/cmmns/service/webserver"
+	"github.com/open-cmi/migrate"
 
 	_ "github.com/open-cmi/cmmns/api"
 	_ "github.com/open-cmi/cmmns/internal/translation"
@@ -20,6 +22,17 @@ import (
 type Option struct {
 	WebServiceEnable  bool
 	TickServiceEnable bool
+}
+
+func TryRunScmd(service string) bool {
+	if migrate.TryRun(service) {
+		return true
+	}
+
+	if scmd.TryRun() {
+		return true
+	}
+	return false
 }
 
 func Init(configFile string) error {

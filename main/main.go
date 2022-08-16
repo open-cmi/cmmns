@@ -4,18 +4,12 @@ import (
 	"flag"
 
 	"github.com/open-cmi/cmmns"
-	"github.com/open-cmi/cmmns/scmd"
-	"github.com/open-cmi/migrate"
 )
 
 var configfile string = ""
 
 func main() {
-	if migrate.TryRun("cmmns") {
-		return
-	}
-
-	if scmd.TryRun() {
+	if cmmns.TryRunScmd("cmmns") {
 		return
 	}
 
