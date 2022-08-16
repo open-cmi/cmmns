@@ -18,8 +18,8 @@ type RedisStoreConfig struct {
 }
 
 type Config struct {
-	SessionStore string           `json:"session_store"`
-	RedisStore   RedisStoreConfig `json:"redis_store,omitempty"`
+	StoreType  string           `json:"store_type"`
+	RedisStore RedisStoreConfig `json:"redis_store,omitempty"`
 }
 
 var gConf Config
@@ -30,7 +30,7 @@ func Init(raw json.RawMessage) error {
 		return err
 	}
 
-	if gConf.SessionStore == "memory" {
+	if gConf.StoreType == "memory" {
 		memoryStore = memstore.NewMemStore([]byte("memorystore"),
 			[]byte("enckey12341234567890123456789012"))
 		storeType = "memory"
@@ -56,7 +56,7 @@ func Save() json.RawMessage {
 
 func init() {
 	// default config
-	gConf.SessionStore = "memory"
+	gConf.StoreType = "memory"
 
-	config.RegisterConfig("web_server_middleware", Init, Save)
+	config.RegisterConfig("session_middleware", Init, Save)
 }

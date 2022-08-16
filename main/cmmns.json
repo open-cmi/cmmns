@@ -51,8 +51,8 @@
       }
     ]
   },
-  "web_server_middleware": {
-    "session_store": "redis",
+  "session_middleware": {
+    "store_type": "redis",
     "redis_store": {
       "host": "127.0.0.1",
       "port": 25431,
