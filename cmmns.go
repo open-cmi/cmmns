@@ -24,8 +24,8 @@ type Option struct {
 	TickServiceEnable bool
 }
 
-func TryRunScmd(service string) bool {
-	if migrate.TryRun(service) {
+func TryRunScmd() bool {
+	if migrate.TryRun() {
 		return true
 	}
 

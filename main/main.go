@@ -9,7 +9,7 @@ import (
 var configfile string = ""
 
 func main() {
-	if cmmns.TryRunScmd("cmmns") {
+	if cmmns.TryRunScmd() {
 		return
 	}
 
