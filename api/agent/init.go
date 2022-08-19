@@ -21,6 +21,6 @@ func Save() json.RawMessage {
 
 func init() {
 	config.RegisterConfig("cluster", Init, Save)
-	webserver.RegisterAuthAPI("agent", AuthGroup)
-	webserver.RegisterUnauthAPI("agent", UnauthGroup)
+	webserver.RegisterAuthRouter("agent", AuthGroup)
+	webserver.RegisterUnauthRouter("agent", UnauthGroup)
 }

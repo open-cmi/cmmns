@@ -20,5 +20,5 @@ func AuthGroup(e *gin.Engine) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("agentgroup", AuthGroup)
+	webserver.RegisterAuthRouter("agentgroup", AuthGroup)
 }

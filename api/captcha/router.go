@@ -15,5 +15,5 @@ func UnauthGroup(e *gin.Engine) {
 }
 
 func init() {
-	webserver.RegisterUnauthAPI("captcha", UnauthGroup)
+	webserver.RegisterUnauthRouter("captcha", UnauthGroup)
 }
