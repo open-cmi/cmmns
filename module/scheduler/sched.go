@@ -48,7 +48,7 @@ func NewScheduler(namespace string) *Scheduler {
 }
 
 func (s *Scheduler) enqueue(job *Job) error {
-	cache := rdb.GetCache("scheduler")
+	cache := rdb.GetClient("scheduler")
 
 	var err error
 	if job.SchedObject == "anyone" {
@@ -81,7 +81,7 @@ func (s *Scheduler) enqueue(job *Job) error {
 
 func (s *Scheduler) dequeue(option *ConsumerOption) (id string) {
 	// 获取cache
-	cache := rdb.GetCache("scheduler")
+	cache := rdb.GetClient("scheduler")
 	if cache == nil {
 		return ""
 	}
@@ -176,7 +176,7 @@ func (s *Scheduler) hasJob(option *ConsumerOption) bool {
 	defer s.Mutex.Unlock()
 
 	// 添加任务
-	cache := rdb.GetCache("scheduler")
+	cache := rdb.GetClient("scheduler")
 
 	key := fmt.Sprintf("scheduler.zset.%s.%s", s.Namespace, option.Group)
 	count, _ := cache.ZCard(context.TODO(), key).Result()

@@ -11,7 +11,7 @@ import (
 )
 
 func GetCache(devID string) *Model {
-	cache := rdb.GetCache("public")
+	cache := rdb.GetClient("public")
 	if cache == nil {
 		return nil
 	}
@@ -32,7 +32,7 @@ func GetCache(devID string) *Model {
 }
 
 func SetCache(mdl *Model) error {
-	cache := rdb.GetCache("public")
+	cache := rdb.GetClient("public")
 	if cache == nil {
 		return errors.New("cache not exist")
 	}
@@ -48,7 +48,7 @@ func SetCache(mdl *Model) error {
 }
 
 func RefreshCache(devID string) error {
-	cache := rdb.GetCache("public")
+	cache := rdb.GetClient("public")
 	if cache == nil {
 		return errors.New("cache not exist")
 	}
@@ -59,7 +59,7 @@ func RefreshCache(devID string) error {
 }
 
 func DeleteCache(devID string) error {
-	cache := rdb.GetCache("public")
+	cache := rdb.GetClient("public")
 	if cache == nil {
 		return errors.New("cache not exist")
 	}

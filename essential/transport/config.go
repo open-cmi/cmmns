@@ -64,7 +64,6 @@ func Init(raw json.RawMessage) error {
 		Transport: tp,
 	}
 
-	TCPServer = gConf.TCPServer
 	return nil
 }
 
@@ -75,7 +74,7 @@ func Save() json.RawMessage {
 
 func init() {
 	gConf.Server = "localhost"
-	gConf.TCPServer = TCPServer
+	gConf.TCPServer = "127.0.0.1:30017"
 
 	config.RegisterConfig("transport", Init, Save)
 }

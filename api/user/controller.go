@@ -153,7 +153,7 @@ func Activate(c *gin.Context) {
 		return
 	}
 
-	cache := rdb.GetCache("user")
+	cache := rdb.GetClient("user")
 	activateCode := fmt.Sprintf("activate_code_%s", code)
 	username, err := cache.Get(context.TODO(), activateCode).Result()
 	if err != nil {
@@ -245,7 +245,7 @@ func Register(c *gin.Context) {
 	}
 
 	code := uuid.New()
-	cache := rdb.GetCache("user")
+	cache := rdb.GetClient("user")
 	activateCode := fmt.Sprintf("activate_code_%s", code.String())
 	err = cache.Set(context.TODO(), activateCode, apimsg.UserName, time.Hour*24).Err()
 	if err != nil {

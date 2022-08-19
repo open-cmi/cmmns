@@ -99,7 +99,7 @@ func (m *Job) Remove() error {
 }
 
 func (j *Job) setCache() error {
-	cache := rdb.GetCache("job")
+	cache := rdb.GetClient("job")
 
 	key := fmt.Sprintf("job.%s", j.ID)
 	jobMap := make(map[string]interface{})
@@ -130,7 +130,7 @@ func (j *Job) setCache() error {
 }
 
 func getCache(id string) *Job {
-	cache := rdb.GetCache("job")
+	cache := rdb.GetClient("job")
 
 	key := fmt.Sprintf("job.%s", id)
 	jobMap, err := cache.HGetAll(context.TODO(), key).Result()

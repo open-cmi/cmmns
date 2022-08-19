@@ -10,8 +10,8 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 )
 
-// Cache redis Cache
-var Cache map[string]*redis.Client
+// clients redis clients
+var clients map[string]*redis.Client
 
 var modules map[string]int = make(map[string]int)
 
@@ -24,9 +24,9 @@ type Config struct {
 
 var gConf Config
 
-// GetCache get cache
-func GetCache(module string) *redis.Client {
-	return Cache[module]
+// GetClient get client
+func GetClient(module string) *redis.Client {
+	return clients[module]
 }
 
 func Register(module string, db int) error {
@@ -49,10 +49,10 @@ func Init(raw json.RawMessage) error {
 	cacheport := gConf.Port
 	cachepassword := gConf.Password
 
-	Cache = make(map[string]*redis.Client)
+	clients = make(map[string]*redis.Client)
 
 	for module, db := range modules {
-		Cache[module] = redis.NewClient(&redis.Options{
+		clients[module] = redis.NewClient(&redis.Options{
 			Addr:     fmt.Sprintf("%s:%d", cachehost, cacheport),
 			Password: cachepassword,
 			DB:       db,

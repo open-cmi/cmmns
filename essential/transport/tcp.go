@@ -11,8 +11,6 @@ type Header struct {
 	Len  uint16
 }
 
-var TCPServer string = "192.168.1.104:30017"
-
 // TCPRequest request msg
 func TCPRequest(msg []byte) (conn *net.TCPConn, err error) {
 
