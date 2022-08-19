@@ -82,10 +82,16 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	auditlog.InsertLog(c,
-		auditlog.OperationType,
-		i18n.Sprintf("change password sussessfully"),
-	)
+	ip := c.ClientIP()
+	user := api.GetUser(c)
+	if user != nil {
+		username, _ := user["username"].(string)
+		auditlog.InsertLog(ip,
+			username,
+			auditlog.OperationType,
+			i18n.Sprintf("change password sussessfully"),
+		)
+	}
 
 	c.JSON(200, gin.H{
 		"ret": 0,
@@ -200,9 +206,10 @@ func Login(c *gin.Context) {
 			"role":     user.Role,
 		}
 	}
+	ip := c.ClientIP()
 
 	// 写日志操作
-	auditlog.InsertLog(c, auditlog.LoginType, i18n.Sprintf("login successfully"))
+	auditlog.InsertLog(ip, user.UserName, auditlog.LoginType, i18n.Sprintf("login successfully"))
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": *user})
 }
@@ -211,8 +218,13 @@ func Logout(c *gin.Context) {
 	sess, _ := c.Get("session")
 	session := sess.(*sessions.Session)
 
-	// 写日志操作
-	auditlog.InsertLog(c, auditlog.LoginType, i18n.Sprintf("logout successfully"))
+	ip := c.ClientIP()
+	user := api.GetUser(c)
+	if user != nil {
+		username, _ := user["username"].(string)
+		// 写日志操作
+		auditlog.InsertLog(ip, username, auditlog.LoginType, i18n.Sprintf("logout successfully"))
+	}
 
 	delete(session.Values, "user")
 
@@ -287,10 +299,16 @@ func Create(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 	}
 
-	auditlog.InsertLog(c,
-		auditlog.OperationType,
-		i18n.Sprintf("create user sussessfully"),
-	)
+	ip := c.ClientIP()
+	user := api.GetUser(c)
+	if user != nil {
+		username, _ := user["username"].(string)
+		auditlog.InsertLog(ip,
+			username,
+			auditlog.OperationType,
+			i18n.Sprintf("create user %s sussessfully", apimsg.UserName),
+		)
+	}
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
@@ -306,11 +324,17 @@ func Delete(c *gin.Context) {
 		})
 		return
 	}
-
-	auditlog.InsertLog(c,
-		auditlog.OperationType,
-		i18n.Sprintf("delete user sussessfully"),
-	)
+	ip := c.ClientIP()
+	user := api.GetUser(c)
+	if user != nil {
+		username, _ := user["username"].(string)
+		// 写日志操作
+		auditlog.InsertLog(ip,
+			username,
+			auditlog.OperationType,
+			i18n.Sprintf("delete user sussessfully"),
+		)
+	}
 
 	c.JSON(200, gin.H{"ret": 0, "msg": ""})
 }

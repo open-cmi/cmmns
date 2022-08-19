@@ -44,18 +44,19 @@ func Create(c *gin.Context) {
 	}
 	user := api.GetUser(c)
 	userID, _ := user["id"].(string)
-
+	ip := c.ClientIP()
+	username, _ := user["username"].(string)
 	// 校验，这里暂时忽略
 	var option api.Option
 	option.UserID = userID
 	_, err := agent.Create(&option, &createmsg)
 	if err != nil {
-		auditlog.InsertLog(c, auditlog.OperationType, i18n.Sprintf("create agent failed"))
+		auditlog.InsertLog(ip, username, auditlog.OperationType, i18n.Sprintf("create agent failed"))
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 	// 写日志操作
-	auditlog.InsertLog(c, auditlog.OperationType, i18n.Sprintf("create agent successfully"))
+	auditlog.InsertLog(ip, username, auditlog.OperationType, i18n.Sprintf("create agent successfully"))
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
@@ -65,20 +66,22 @@ func Delete(c *gin.Context) {
 	id := c.Param("id")
 	user := api.GetUser(c)
 	userID, _ := user["id"].(string)
+	ip := c.ClientIP()
+	username, _ := user["username"].(string)
 
 	var option api.Option
 	option.UserID = userID
 	err := agent.Delete(&option, id)
 	if err != nil {
 		// 写日志操作
-		auditlog.InsertLog(c, auditlog.OperationType, i18n.Sprintf("delete agent failed"))
+		auditlog.InsertLog(ip, username, auditlog.OperationType, i18n.Sprintf("delete agent failed"))
 
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 
 	// 写日志操作
-	auditlog.InsertLog(c, auditlog.OperationType, i18n.Sprintf("delete agent successfully"))
+	auditlog.InsertLog(ip, username, auditlog.OperationType, i18n.Sprintf("delete agent successfully"))
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
