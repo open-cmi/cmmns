@@ -2,3 +2,4 @@ go.sum
 .vscode
 data/*
 out.gotext.json
+uncommit.sh
