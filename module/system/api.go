@@ -30,11 +30,13 @@ func InitDevID() {
 	db := sqldb.GetDB()
 	_, err := db.Exec(sqlquery)
 	if err != nil {
+		logger.Errorf("update system status failed: %s\n", err.Error())
 	}
-	return
 }
 
 type SystemStatus struct {
+	CPUCores        int     `json:"cpu_cores"`
+	CPUThreads      int     `json:"cpu_threads"`
 	CPUUsage        float64 `json:"cpu_usage"`
 	DiskUsed        uint64  `json:"disk_used"`
 	DiskTotal       uint64  `json:"disk_total"`
@@ -51,7 +53,7 @@ type SystemStatus struct {
 
 func GetStatus() SystemStatus {
 	var status SystemStatus
-	status.CPUUsage = CPUSummary()
+	status.CPUCores, status.CPUThreads, status.CPUUsage = CPUSummary()
 
 	diskUsed, diskTotal, diskUsedPercent := DiskSummary()
 	status.DiskTotal = diskTotal
@@ -156,7 +158,7 @@ func StartMonitor() {
 
 	LocalModel.UpdatedTime = time.Now().Unix()
 
-	LocalModel.CPUUsage = CPUSummary()
+	_, _, LocalModel.CPUUsage = CPUSummary()
 
 	diskUsed, diskTotal, diskUsedPercent := DiskSummary()
 	LocalModel.DiskTotal = diskTotal

@@ -31,12 +31,14 @@ func NetRateSummary() (uint64, uint64) {
 }
 
 // CPUSummary get cpu usgae
-func CPUSummary() (usage float64) {
+func CPUSummary() (cores int, threads int, usage float64) {
 	arr, err := cpu.Percent(time.Second, false)
 	if err != nil || len(arr) == 0 {
 		return
 	}
 	usage = arr[0]
+	cores, _ = cpu.Counts(false)
+	threads, _ = cpu.Counts(true)
 	return
 }
 
