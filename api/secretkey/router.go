@@ -19,5 +19,11 @@ func AuthGroup(e *gin.Engine) {
 }
 
 func init() {
-	webserver.RegisterAuthRouter("secretkey", AuthGroup)
+	webserver.RegisterAuthRouter("secretkey", "/api/common/v3/secret-key")
+	webserver.RegisterAuthAPI("secretkey", "GET", "/", List)
+	webserver.RegisterAuthAPI("secretkey", "POST", "/", Create)
+	webserver.RegisterAuthAPI("secretkey", "POST", "/multi-delete", MultiDelete)
+	webserver.RegisterAuthAPI("secretkey", "GET", "/:id", Get)
+	webserver.RegisterAuthAPI("secretkey", "DELETE", "/:id", Delete)
+	webserver.RegisterAuthAPI("secretkey", "PUT", "/:id", Edit)
 }

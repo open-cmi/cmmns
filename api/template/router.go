@@ -19,5 +19,11 @@ func AuthGroup(e *gin.Engine) {
 }
 
 func init() {
-	webserver.RegisterAuthRouter("template", AuthGroup)
+	webserver.RegisterAuthRouter("template", "/api/common/v3/template")
+	webserver.RegisterAuthAPI("template", "GET", "/", List)
+	webserver.RegisterAuthAPI("template", "POST", "/", Create)
+	webserver.RegisterAuthAPI("template", "POST", "/multi-delete", MultiDelete)
+	webserver.RegisterAuthAPI("template", "GET", "/:id", Get)
+	webserver.RegisterAuthAPI("template", "DELETE", "/:id", Delete)
+	webserver.RegisterAuthAPI("template", "PUT", "/:id", Edit)
 }

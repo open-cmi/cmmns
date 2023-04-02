@@ -17,5 +17,9 @@ func AuthGroup(e *gin.Engine) {
 }
 
 func init() {
-	webserver.RegisterAuthRouter("scheduler", AuthGroup)
+	webserver.RegisterAuthRouter("scheduler", "/api/common/v3/scheduler")
+	webserver.RegisterAuthAPI("scheduler", "GET", "/", List)
+	webserver.RegisterAuthAPI("scheduler", "POST", "/multi-delete", MultiDelete)
+	webserver.RegisterAuthAPI("scheduler", "GET", "/:id", Get)
+	webserver.RegisterAuthAPI("scheduler", "DELETE", "/:id", Delete)
 }

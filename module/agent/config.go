@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	CheckStatus bool `json:"enable"`
+	CheckStatus bool `json:"enable,omitempty"`
 }
 
 var gConf Config
