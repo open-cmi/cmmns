@@ -20,7 +20,7 @@ func UnauthInit(e *gin.Engine) {
 		{
 			modPath, found := unauthAPIPath[mod]
 			if !found {
-				return
+				continue
 			}
 
 			for _, r := range modPath {
@@ -30,6 +30,8 @@ func UnauthInit(e *gin.Engine) {
 					g.GET(r.Path, r.Callback)
 				} else if r.Method == "DELETE" {
 					g.DELETE(r.Path, r.Callback)
+				} else if r.Method == "PUT" {
+					g.PUT(r.Path, r.Callback)
 				}
 			}
 		}
@@ -43,7 +45,7 @@ func AuthInit(e *gin.Engine) {
 		{
 			modPath, found := authAPIPath[mod]
 			if !found {
-				return
+				continue
 			}
 
 			for _, r := range modPath {
