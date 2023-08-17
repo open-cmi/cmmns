@@ -22,7 +22,7 @@ func Save() {
 }
 
 // RegisterConfig register config
-func RegisterConfig(name string, initFunc func(json.RawMessage) error, saveFunc func() json.RawMessage) error {
+func RegisterConfig(name string, parseFunc func(json.RawMessage) error, saveFunc func() json.RawMessage) error {
 
 	if gConfCtx == nil {
 		gConfCtx = confparser.NewContext()
@@ -30,7 +30,7 @@ func RegisterConfig(name string, initFunc func(json.RawMessage) error, saveFunc 
 
 	var opt confparser.Option
 	opt.Name = name
-	opt.Init = initFunc
-	opt.Save = saveFunc
+	opt.ParseFunc = parseFunc
+	opt.SaveFunc = saveFunc
 	return gConfCtx.Register(&opt)
 }

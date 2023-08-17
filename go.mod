@@ -14,10 +14,11 @@ require (
 	github.com/gorilla/sessions v1.2.1
 	github.com/jackpal/gateway v1.0.7 // indirect
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
-	github.com/jmoiron/sqlx v1.3.4
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
-	github.com/lib/pq v1.10.2 // indirect
-	github.com/open-cmi/goutils v0.4.4-0.20220804224346-6c3a9628c068
+	github.com/lib/pq v1.10.9 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
+	github.com/open-cmi/goutils v0.4.4-0.20230817070338-43f215fb32a5
 	github.com/open-cmi/memstore v0.1.0
 	github.com/open-cmi/migrate v0.4.1-0.20220816105101-ec0f83dfc0cb
 	github.com/pkg/sftp v1.13.4 // indirect
