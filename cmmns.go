@@ -9,6 +9,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/scmd"
+	"github.com/open-cmi/cmmns/service/business"
 	"github.com/open-cmi/cmmns/service/ticker"
 	"github.com/open-cmi/cmmns/service/webserver"
 	"github.com/open-cmi/migrate"
@@ -39,6 +40,11 @@ func Init(configFile string) error {
 	err := config.Init(configFile)
 	if err != nil {
 		logger.Errorf("config init failed: %s\n", err.Error())
+		return err
+	}
+	err = business.Init()
+	if err != nil {
+		logger.Errorf("%s\n", err.Error())
 		return err
 	}
 

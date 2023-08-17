@@ -7,16 +7,14 @@ import (
 	"github.com/robfig/cron/v3"
 )
 
-type TickerFunc func()
-
 type Ticker struct {
 	Spec string
-	Func TickerFunc
+	Func func()
 }
 
 var tickers map[string]Ticker = make(map[string]Ticker)
 
-func Register(name string, spec string, f TickerFunc) error {
+func Register(name string, spec string, f func()) error {
 	_, found := tickers[name]
 	if found {
 		errMsg := fmt.Sprintf("ticker %s registered failed", name)
