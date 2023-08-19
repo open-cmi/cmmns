@@ -37,6 +37,7 @@ func init() {
 	webserver.RegisterAuthAPI("user", "POST", "/", Create)
 	webserver.RegisterAuthAPI("user", "POST", "/changepass", ChangePassword)
 	webserver.RegisterAuthAPI("user", "POST", "/logout", Logout)
+	webserver.RegisterUnauthAPI("user", "POST", "/jwt-token/", CreateToken)
 	webserver.RegisterAuthAPI("user", "GET", "/:id", Get)
 	webserver.RegisterAuthAPI("user", "DELETE", "/:id", Delete)
 

@@ -10,6 +10,7 @@ require (
 	github.com/fatedier/golib v0.1.1-0.20200901083111-1f870741e185
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-redis/redis/v8 v8.11.3
+	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/sessions v1.2.1
 	github.com/jackpal/gateway v1.0.7 // indirect
@@ -24,7 +25,6 @@ require (
 	github.com/pkg/sftp v1.13.4 // indirect
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil v3.21.7+incompatible
-	github.com/spf13/viper v1.7.1 // indirect
 	github.com/tklauser/go-sysconf v0.3.8 // indirect
 	github.com/topmyself/redistore v0.1.0
 	golang.org/x/crypto v0.0.0-20211209193657-4570a0811e8b // indirect
