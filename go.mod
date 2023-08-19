@@ -25,7 +25,6 @@ require (
 	github.com/pkg/sftp v1.13.4 // indirect
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil v3.21.7+incompatible
-	github.com/spf13/viper v1.7.1 // indirect
 	github.com/tklauser/go-sysconf v0.3.8 // indirect
 	github.com/topmyself/redistore v0.1.0
 	golang.org/x/crypto v0.0.0-20211209193657-4570a0811e8b // indirect
