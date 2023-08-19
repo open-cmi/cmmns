@@ -5,17 +5,22 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 )
 
 func GetUser(c *gin.Context) map[string]interface{} {
-	sess, exist := c.Get("session")
+	//sess, exist := c.Get("session")
+	u, exist := c.Get("user")
 	if exist {
-		session := sess.(*sessions.Session)
-		user, ok := session.Values["user"].(map[string]interface{})
+		// session := sess.(*sessions.Session)
+		// user, ok := session.Values["user"].(map[string]interface{})
+		// if ok {
+		// 	return user
+		// }
+		user, ok := u.(map[string]interface{})
 		if ok {
 			return user
 		}
+		return user
 	}
 
 	return nil

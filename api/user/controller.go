@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/common/api"
 	"github.com/open-cmi/cmmns/common/errcode"
+	"github.com/open-cmi/cmmns/service/webserver/middleware"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/email"
@@ -337,4 +338,24 @@ func Delete(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"ret": 0, "msg": ""})
+}
+
+func CreateToken(c *gin.Context) {
+	user := api.GetUser(c)
+	if user == nil {
+		c.JSON(200, gin.H{"ret": -1, "msg": "user data is empty"})
+		return
+	}
+
+	username, _ := user["username"].(string)
+	userid, _ := user["id"].(string)
+	email, _ := user["email"].(string)
+	role, _ := user["role"].(int)
+	status, _ := user["status"].(int)
+	tk, err := middleware.GenerateAuthToken(username, userid, email, role, status, 30)
+	if err != nil {
+		c.JSON(200, gin.H{"ret": -1, "msg": "create token failed"})
+		return
+	}
+	c.JSON(200, gin.H{"ret": 0, "msg": "", "token": tk})
 }

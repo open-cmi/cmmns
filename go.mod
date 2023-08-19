@@ -10,6 +10,7 @@ require (
 	github.com/fatedier/golib v0.1.1-0.20200901083111-1f870741e185
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-redis/redis/v8 v8.11.3
+	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/sessions v1.2.1
 	github.com/jackpal/gateway v1.0.7 // indirect
