@@ -10,8 +10,9 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// DB sql db
-var DB *sqlx.DB
+// gConfDB sql db
+var gConfDB *sqlx.DB
+var gDataDB *sqlx.DB
 
 // DBConfig database model
 type Config struct {
@@ -24,42 +25,77 @@ type Config struct {
 	Password string `json:"password,omitempty"`
 }
 
-var gConf Config
+var gConfModel Config
+var gDataModel Config
 
 // GetDB get db
-func GetDB() *sqlx.DB {
-	return DB
+func GetConfDB() *sqlx.DB {
+	return gConfDB
 }
 
-// Init db init
-func Init(raw json.RawMessage) error {
-	err := json.Unmarshal(raw, &gConf)
+func GetDataDB() *sqlx.DB {
+	return gDataDB
+}
+
+// Parse db init
+func Parse(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gConfModel)
 	if err != nil {
 		return err
 	}
 	var dbconf database.Config
-	dbconf.Type = gConf.Type
-	dbconf.File = gConf.File
-	dbconf.Host = gConf.Host
-	dbconf.Port = gConf.Port
-	dbconf.User = gConf.User
-	dbconf.Password = gConf.Password
-	dbconf.Database = gConf.Database
+	dbconf.Type = gConfModel.Type
+	dbconf.File = gConfModel.File
+	dbconf.Host = gConfModel.Host
+	dbconf.Port = gConfModel.Port
+	dbconf.User = gConfModel.User
+	dbconf.Password = gConfModel.Password
+	dbconf.Database = gConfModel.Database
 
 	dbi, err := dbsql.SQLInit(&dbconf)
 	if err != nil {
 		return err
 	}
-	DB = dbi
+	gConfDB = dbi
 
 	return nil
 }
 
 func Save() json.RawMessage {
-	raw, _ := json.Marshal(&gConf)
+	raw, _ := json.Marshal(&gConfModel)
+	return raw
+}
+
+// Parse db init
+func DataModelParse(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gDataModel)
+	if err != nil {
+		return err
+	}
+	var dbconf database.Config
+	dbconf.Type = gDataModel.Type
+	dbconf.File = gDataModel.File
+	dbconf.Host = gDataModel.Host
+	dbconf.Port = gDataModel.Port
+	dbconf.User = gDataModel.User
+	dbconf.Password = gDataModel.Password
+	dbconf.Database = gDataModel.Database
+
+	dbi, err := dbsql.SQLInit(&dbconf)
+	if err != nil {
+		return err
+	}
+	gDataDB = dbi
+
+	return nil
+}
+
+func DataModelSave() json.RawMessage {
+	raw, _ := json.Marshal(&gDataModel)
 	return raw
 }
 
 func init() {
-	config.RegisterConfig("model", Init, Save)
+	config.RegisterConfig("model", Parse, Save)
+	config.RegisterConfig("data_model", DataModelParse, DataModelSave)
 }

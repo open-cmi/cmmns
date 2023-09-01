@@ -14,7 +14,7 @@ func Get(mo *api.Option, field string, value string) *Model {
 	columns := api.GetColumn(Model{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from manhour where %s=$1`, strings.Join(columns, ","), field)
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	row := db.QueryRowx(queryClause, value)
 
 	var mdl Model
@@ -29,7 +29,7 @@ func Get(mo *api.Option, field string, value string) *Model {
 
 // List list
 func List(option *api.Option) (int, []Model, error) {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	var results []Model = []Model{}
 
@@ -71,7 +71,7 @@ func List(option *api.Option) (int, []Model, error) {
 
 // List list
 func MultiDelete(mo *api.Option, ids []string) error {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	if len(ids) == 0 {
 		return errors.New("no items deleted")

@@ -21,7 +21,7 @@ func Get(mo *api.Option, field string, value string) *Job {
 	columns := api.GetColumn(Job{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from job where %s=$1`, strings.Join(columns, ","), field)
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	row := db.QueryRowx(queryClause, value)
 
 	var mdl Job
@@ -36,7 +36,7 @@ func Get(mo *api.Option, field string, value string) *Job {
 
 // List list
 func List(option *api.Option) (int, []Job, error) {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	var results []Job = []Job{}
 
@@ -78,7 +78,7 @@ func List(option *api.Option) (int, []Job, error) {
 
 // List list
 func MultiDelete(mo *api.Option, ids []string) error {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	if len(ids) == 0 {
 		return errors.New("no items deleted")

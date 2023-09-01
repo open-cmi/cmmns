@@ -26,7 +26,7 @@ type Model struct {
 }
 
 func (m *Model) Save() error {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	if m.isNew {
 		// 存储到数据库
@@ -65,7 +65,7 @@ func (m *Model) Save() error {
 }
 
 func (m *Model) Remove() error {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	deleteClause := "delete from setting where id=$1"
 	_, err := db.Exec(deleteClause, m.ID)

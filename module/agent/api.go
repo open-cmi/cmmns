@@ -25,7 +25,7 @@ func FilterGet(mo *api.Option, fields []string, values []interface{}) *Model {
 
 	queryClause := fmt.Sprintf(`select %s from agent %s`, strings.Join(columns, ","), whereClause)
 	logger.Debugf(queryClause + "\n")
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	row := db.QueryRowx(queryClause, values...)
 
 	var mdl Model
@@ -50,7 +50,7 @@ func Get(field string, value interface{}) *Model {
 
 // List list
 func List(option *api.Option) (int, []Model, error) {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	var results []Model = []Model{}
 
@@ -91,7 +91,7 @@ func List(option *api.Option) (int, []Model, error) {
 
 // List list
 func MultiDelete(mo *api.Option, ids []string) error {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	if len(ids) == 0 {
 		return errors.New("no items deleted")

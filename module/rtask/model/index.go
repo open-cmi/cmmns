@@ -45,7 +45,7 @@ func (t *Task) Persist() {
 		update set total=$3, success=$4, failed=$5, end_time=$7
 	`
 
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	_, err := db.Exec(clause, t.ID, t.Type, t.Total,
 		t.Success, t.Failed, t.StartTime, t.EndTime)
 	if err != nil {

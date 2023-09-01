@@ -32,7 +32,7 @@ type Model struct {
 }
 
 func (m *Model) Save() error {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	if m.IsNew {
 		// 存储到数据库

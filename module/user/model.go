@@ -26,7 +26,7 @@ type Model struct {
 
 // List list func
 func List(query *api.Option) (int, []Model, error) {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	var users []Model = []Model{}
 	countClause := fmt.Sprintf("select count(*) from users")
@@ -68,7 +68,7 @@ func Get(option *api.Option, field string, value string) (user *Model) {
 	columns := api.GetColumn(Model{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from users where %s=$1`, strings.Join(columns, ","), field)
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	row := db.QueryRowx(queryClause, value)
 
 	var mdl Model
@@ -85,7 +85,7 @@ func VerifyPasswordByID(userid string, password string) bool {
 	queryclause := fmt.Sprintf("select password from users where id=$1")
 
 	var pass string
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	row := db.QueryRow(queryclause, userid)
 	err := row.Scan(&pass)
 	if err != nil {
@@ -103,7 +103,7 @@ func ChangePassword(userid string, password string) error {
 	salt, _ := bcrypt.Salt(10)
 	hash, _ := bcrypt.Hash(password, salt)
 	updateClause := fmt.Sprintf("update users set password='%s'", hash)
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	_, err := db.Exec(updateClause)
 	return err
 }
@@ -113,7 +113,7 @@ func GetByName(name string) (user Model, err error) {
 	// 先检查用户名是否存在
 	queryclause := fmt.Sprintf("select id,username,email,role,description from users where username='%s'", name)
 
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	row := db.QueryRow(queryclause)
 	err = row.Scan(&user.ID, &user.UserName, &user.Email, &user.Role, &user.Description)
 	if err != nil {
@@ -131,7 +131,7 @@ func Login(m *LoginMsg) (authuser *Model, err error) {
 
 	var user Model
 	var password string
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	row := db.QueryRow(queryclause, m.UserName)
 	err = row.Scan(&user.ID, &user.UserName, &user.Email, &password, &user.Status)
 	if err != nil {
@@ -153,7 +153,7 @@ func Login(m *LoginMsg) (authuser *Model, err error) {
 // Activate activate user
 func Activate(username string) error {
 	updateClause := "update users set status=1 where username=$1"
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	_, err := db.Exec(updateClause, username)
 	if err != nil {
 		return errors.New("activate user failed")
@@ -164,7 +164,7 @@ func Activate(username string) error {
 // Delete delete user
 func DeleteByName(username string) error {
 	deleteClause := fmt.Sprintf("delete from users where username=$1")
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	_, err := db.Exec(deleteClause, username)
 	if err != nil {
 		return errors.New("del user failed")
@@ -174,7 +174,7 @@ func DeleteByName(username string) error {
 
 func DeleteByID(id string) error {
 	deleteClause := fmt.Sprintf("delete from users where id=$1")
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	_, err := db.Exec(deleteClause, id)
 	if err != nil {
 		return errors.New("del user failed")
@@ -188,7 +188,7 @@ func Register(m *RegisterMsg) (err error) {
 	queryclause := fmt.Sprintf("select username from users where username=$1")
 
 	var un string
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	row := db.QueryRow(queryclause, m.UserName)
 	err = row.Scan(&un)
 	if err == nil {
@@ -223,7 +223,7 @@ func Create(m *CreateMsg) (err error) {
 	queryclause := fmt.Sprintf("select username from users where username=$1 or email=$2")
 
 	var un string
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	row := db.QueryRow(queryclause, m.UserName, m.Email)
 	err = row.Scan(&un)
 	if err == nil {

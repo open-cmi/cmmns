@@ -49,7 +49,7 @@ type Job struct {
 }
 
 func (m *Job) Save() error {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	m.setCache()
 
 	if m.IsNew {
@@ -88,7 +88,7 @@ func (m *Job) Save() error {
 }
 
 func (m *Job) Remove() error {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	deleteClause := "delete from job where id=:id"
 	_, err := db.NamedExec(deleteClause, m)

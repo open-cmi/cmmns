@@ -13,7 +13,7 @@ func Get(mo *api.Option, id string) *Model {
 	queryclause := fmt.Sprintf("select id,name,key_type,key_length,comment from secret_key where id=$1")
 
 	var model Model
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 	row := db.QueryRow(queryclause, id)
 	err := row.Scan(&model.ID, &model.Name, &model.KeyType, &model.KeyLength, &model.Comment)
 	if err == nil {
@@ -25,7 +25,7 @@ func Get(mo *api.Option, id string) *Model {
 
 // List list
 func List(mo *api.Option) (int, []Model, error) {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	var results []Model = []Model{}
 
@@ -62,7 +62,7 @@ func List(mo *api.Option) (int, []Model, error) {
 
 // List list
 func MultiDelete(mo *api.Option, ids []string) error {
-	db := sqldb.GetDB()
+	db := sqldb.GetConfDB()
 
 	if len(ids) == 0 {
 		return errors.New("no items deleted")
