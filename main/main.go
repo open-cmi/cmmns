@@ -27,10 +27,7 @@ func main() {
 	}
 	defer cmmns.Fini()
 
-	var opt cmmns.Option
-	opt.WebServiceEnable = true
-	opt.TickServiceEnable = true
-	cmmns.Run(&opt)
+	cmmns.Run()
 
 	cmmns.Wait()
 }

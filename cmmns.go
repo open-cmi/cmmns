@@ -1,7 +1,6 @@
 package cmmns
 
 import (
-	"errors"
 	"os"
 	"os/signal"
 	"syscall"
@@ -19,11 +18,6 @@ import (
 	_ "github.com/open-cmi/cmmns/migration"
 	_ "github.com/open-cmi/cmmns/module"
 )
-
-type Option struct {
-	WebServiceEnable  bool
-	TickServiceEnable bool
-}
 
 func TryRunScmd() bool {
 	if migrate.TryRun() {
@@ -51,30 +45,29 @@ func Init(configFile string) error {
 	return nil
 }
 
-func Run(opt *Option) error {
-	var count int
-	if opt.WebServiceEnable {
-		s := webserver.New()
-		// Init
-		s.Init()
-		// Run
-		s.Run()
-		count++
+func Run() error {
+	// start web service
+	s := webserver.New()
+	// Init
+	err := s.Init()
+	if err != nil {
+		return err
+	}
+	// Run
+	err = s.Run()
+	if err != nil {
+		return err
 	}
 
-	if opt.TickServiceEnable {
-		// run ticker service
-		t := ticker.New()
-		t.Init()
-		t.Run()
-		count++
+	// run ticker service
+	t := ticker.New()
+	err = t.Init()
+	if err != nil {
+		return err
 	}
+	err = t.Run()
 
-	if count > 1 {
-		return nil
-	}
-
-	return errors.New("at least one service enabled")
+	return err
 }
 
 func Wait() {
