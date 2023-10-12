@@ -14,7 +14,7 @@ type Semaphore struct {
 
 func New(size int) *Semaphore {
 	return &Semaphore{
-		w:  semaphore.NewWeighted(size),
+		w:  semaphore.NewWeighted(int64(size)),
 		wg: sync.WaitGroup{},
 	}
 }
