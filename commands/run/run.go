@@ -34,12 +34,26 @@ func Fini() {
 
 func (c *RunCommand) Run() error {
 
-	flag.StringVar(&c.ConfigFile, "config", c.ConfigFile, "config file")
-	flag.Parse()
+	if os.Args[1] == "run" {
+		runCmd := flag.NewFlagSet("run", flag.ExitOnError)
+		runCmd.StringVar(&c.ConfigFile, "config", c.ConfigFile, "config file")
 
-	if c.ConfigFile == "" {
-		flag.Usage()
-		return errors.New("config file must not be empty")
+		err := runCmd.Parse(os.Args[2:])
+		if err != nil {
+			return err
+		}
+		if c.ConfigFile == "" {
+			runCmd.Usage()
+			return errors.New("config file must not be empty")
+		}
+	} else {
+		flag.StringVar(&c.ConfigFile, "config", c.ConfigFile, "config file")
+		flag.Parse()
+
+		if c.ConfigFile == "" {
+			flag.Usage()
+			return errors.New("config file must not be empty")
+		}
 	}
 
 	err := config.Init(c.ConfigFile)
