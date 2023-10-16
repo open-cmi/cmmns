@@ -37,7 +37,7 @@ func (m *Model) Save() error {
 	if m.IsNew {
 		// 存储到数据库
 		columns := api.GetColumn(*m, []string{})
-		values := api.GetColumnNamed(columns)
+		values := api.GetColumnInsertNamed(columns)
 
 		insertClause := fmt.Sprintf("insert into system_status(%s) values(%s)",
 			strings.Join(columns, ","), strings.Join(values, ","))

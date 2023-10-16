@@ -3,6 +3,8 @@ package api
 import (
 	"fmt"
 	"reflect"
+
+	"github.com/gin-gonic/gin"
 )
 
 // 条件比较
@@ -28,6 +30,7 @@ type OrderOption struct {
 // Option model option
 type Option struct {
 	UserID      string
+	Context     *gin.Context
 	DevID       string
 	PageOption  PageOption
 	OrderOption OrderOption
@@ -61,7 +64,7 @@ func GetColumn(v interface{}, skipColumn []string) []string {
 	return columns
 }
 
-func GetColumnNamed(columns []string) []string {
+func GetColumnInsertNamed(columns []string) []string {
 	var named []string = []string{}
 	for _, col := range columns {
 		seq := fmt.Sprintf(`:%s`, col)

@@ -16,8 +16,8 @@
 │   └── server
 ├── migration
 ├── module
-│   ├── agent
-│   └── agentgroup
+│   ├── assist
+│   └── auditlog
 ```
 
 - common common function or const, stateless

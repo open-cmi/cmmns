@@ -34,6 +34,8 @@ func ParseParams(c *gin.Context, option *Option) (err error) {
 		userID = user["id"].(string)
 	}
 	option.UserID = userID
+	option.Context = c
+
 	devID := c.DefaultQuery("dev_id", "")
 	option.DevID = devID
 

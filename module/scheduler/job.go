@@ -55,7 +55,7 @@ func (m *Job) Save() error {
 	if m.IsNew {
 		// 存储到数据库
 		columns := api.GetColumn(*m, []string{})
-		values := api.GetColumnNamed(columns)
+		values := api.GetColumnInsertNamed(columns)
 
 		insertClause := fmt.Sprintf("insert into job(%s) values(%s)",
 			strings.Join(columns, ","), strings.Join(values, ","))

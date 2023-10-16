@@ -1,8 +1,6 @@
 package api
 
 import (
-	_ "github.com/open-cmi/cmmns/api/agent"
-	_ "github.com/open-cmi/cmmns/api/agentgroup"
 	_ "github.com/open-cmi/cmmns/api/assist"
 	_ "github.com/open-cmi/cmmns/api/auditlog"
 	_ "github.com/open-cmi/cmmns/api/captcha"

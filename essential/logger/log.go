@@ -95,7 +95,7 @@ func Debugf(format string, v ...interface{}) {
 
 var gConf Config
 
-func Init(raw json.RawMessage) error {
+func Parse(raw json.RawMessage) error {
 	err := json.Unmarshal(raw, &gConf)
 	if err != nil {
 		return err
@@ -131,6 +131,7 @@ func Init(raw json.RawMessage) error {
 
 	return nil
 }
+
 func Save() json.RawMessage {
 	raw, _ := json.Marshal(&gConf)
 	return raw
@@ -139,5 +140,5 @@ func Save() json.RawMessage {
 func init() {
 	gConf.Level = "debug"
 	gConf.Path = "/tmp/"
-	config.RegisterConfig("log", Init, Save)
+	config.RegisterConfig("log", Parse, Save)
 }

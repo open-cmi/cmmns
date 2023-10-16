@@ -10,8 +10,8 @@ import (
 	"github.com/open-cmi/cmmns/common/api"
 	"github.com/open-cmi/cmmns/common/def"
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/essential/pubsub"
 	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/module/pubsub"
 )
 
 type Model struct {
