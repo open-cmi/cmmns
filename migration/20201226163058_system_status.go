@@ -1,9 +1,8 @@
 package migration
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/open-cmi/migrate"
-	"github.com/open-cmi/migrate/cmdopt"
-	"github.com/open-cmi/migrate/global"
 )
 
 // SystemInfoMigration migrate
@@ -11,8 +10,7 @@ type SystemInfoMigration struct {
 }
 
 // Up up migrate
-func (mi SystemInfoMigration) Up() error {
-	db := global.DB
+func (mi SystemInfoMigration) Up(db *sqlx.DB) error {
 
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS system_status (
@@ -38,8 +36,7 @@ func (mi SystemInfoMigration) Up() error {
 }
 
 // Down down migrate
-func (mi SystemInfoMigration) Down() error {
-	db := global.DB
+func (mi SystemInfoMigration) Down(db *sqlx.DB) error {
 
 	_, err := db.Exec(`
 		DROP TABLE IF EXISTS system_status;
@@ -48,7 +45,7 @@ func (mi SystemInfoMigration) Down() error {
 }
 
 func init() {
-	migrate.Register(&cmdopt.SeqInfo{
+	migrate.Register(&migrate.SeqInfo{
 		Seq:         "20201226163058",
 		Description: "system_status",
 		Ext:         "go",

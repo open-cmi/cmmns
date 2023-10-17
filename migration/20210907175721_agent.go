@@ -1,9 +1,8 @@
 package migration
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/open-cmi/migrate"
-	"github.com/open-cmi/migrate/cmdopt"
-	"github.com/open-cmi/migrate/global"
 )
 
 // AgentInstance migrate
@@ -11,8 +10,7 @@ type AgentInstance struct {
 }
 
 // Up up migrate
-func (mi AgentInstance) Up() error {
-	db := global.DB
+func (mi AgentInstance) Up(db *sqlx.DB) error {
 
 	// conn_type: password表示用户名密码 secretkey表示密钥
 	// state:
@@ -46,8 +44,7 @@ func (mi AgentInstance) Up() error {
 }
 
 // Down down migrate
-func (mi AgentInstance) Down() error {
-	db := global.DB
+func (mi AgentInstance) Down(db *sqlx.DB) error {
 
 	dbsql := `
 	DROP TABLE IF EXISTS agent;
@@ -57,7 +54,7 @@ func (mi AgentInstance) Down() error {
 }
 
 func init() {
-	migrate.Register(&cmdopt.SeqInfo{
+	migrate.Register(&migrate.SeqInfo{
 		Seq:         "20210907175721",
 		Description: "agent",
 		Ext:         "go",

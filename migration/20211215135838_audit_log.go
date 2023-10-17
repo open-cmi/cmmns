@@ -1,9 +1,8 @@
 package migration
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/open-cmi/migrate"
-	"github.com/open-cmi/migrate/cmdopt"
-	"github.com/open-cmi/migrate/global"
 )
 
 // AuditLogInstance migrate
@@ -12,9 +11,7 @@ type AuditLogInstance struct {
 }
 
 // Up up migrate
-func (mi AuditLogInstance) Up() error {
-	db := global.DB
-
+func (mi AuditLogInstance) Up(db *sqlx.DB) error {
 	dbsql := `
 		CREATE TABLE IF NOT EXISTS audit_log (
 			id varchar(64) NOT NULL primary key,
@@ -30,8 +27,7 @@ func (mi AuditLogInstance) Up() error {
 }
 
 // Down down migrate
-func (mi AuditLogInstance) Down() error {
-	db := global.DB
+func (mi AuditLogInstance) Down(db *sqlx.DB) error {
 
 	dbsql := `
 		DROP TABLE IF EXISTS audit_log;
@@ -41,7 +37,7 @@ func (mi AuditLogInstance) Down() error {
 }
 
 func init() {
-	migrate.Register(&cmdopt.SeqInfo{
+	migrate.Register(&migrate.SeqInfo{
 		Seq:         "20211215135838",
 		Description: "audit_log",
 		Ext:         "go",

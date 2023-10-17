@@ -1,9 +1,8 @@
 package migration
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/open-cmi/migrate"
-	"github.com/open-cmi/migrate/cmdopt"
-	"github.com/open-cmi/migrate/global"
 )
 
 // ManhourInstance migrate
@@ -11,8 +10,7 @@ type ManhourInstance struct {
 }
 
 // Up up migrate
-func (mi ManhourInstance) Up() error {
-	db := global.DB
+func (mi ManhourInstance) Up(db *sqlx.DB) error {
 
 	sqlClause := `
 		CREATE TABLE IF NOT EXISTS manhour (
@@ -30,8 +28,7 @@ func (mi ManhourInstance) Up() error {
 }
 
 // Down down migrate
-func (mi ManhourInstance) Down() error {
-	db := global.DB
+func (mi ManhourInstance) Down(db *sqlx.DB) error {
 
 	sqlClause := `DROP TABLE IF EXISTS manhour`
 	_, err := db.Exec(sqlClause)
@@ -39,7 +36,7 @@ func (mi ManhourInstance) Down() error {
 }
 
 func init() {
-	migrate.Register(&cmdopt.SeqInfo{
+	migrate.Register(&migrate.SeqInfo{
 		Seq:         "20220123214701",
 		Description: "manhour",
 		Ext:         "go",

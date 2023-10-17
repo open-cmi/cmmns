@@ -1,9 +1,8 @@
 package migration
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/open-cmi/migrate"
-	"github.com/open-cmi/migrate/cmdopt"
-	"github.com/open-cmi/migrate/global"
 )
 
 // TemplateInstance migrate
@@ -11,8 +10,7 @@ type TemplateInstance struct {
 }
 
 // Up up migrate
-func (mi TemplateInstance) Up() error {
-	db := global.DB
+func (mi TemplateInstance) Up(db *sqlx.DB) error {
 
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS template (
@@ -27,8 +25,7 @@ func (mi TemplateInstance) Up() error {
 }
 
 // Down down migrate
-func (mi TemplateInstance) Down() error {
-	db := global.DB
+func (mi TemplateInstance) Down(db *sqlx.DB) error {
 
 	_, err := db.Exec(`
 		DROP TABLE IF EXISTS template;
@@ -37,7 +34,7 @@ func (mi TemplateInstance) Down() error {
 }
 
 func init() {
-	migrate.Register(&cmdopt.SeqInfo{
+	migrate.Register(&migrate.SeqInfo{
 		Seq:         "20191218163058",
 		Description: "template",
 		Ext:         "go",

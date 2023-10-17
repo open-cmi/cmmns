@@ -1,6 +1,8 @@
 package system
 
 import (
+	"os"
+	"runtime"
 	"time"
 
 	"github.com/shirou/gopsutil/cpu"
@@ -80,4 +82,23 @@ func LoadSummary() (load1 float64, load5 float64, load15 float64) {
 		return
 	}
 	return stat.Load1, stat.Load5, stat.Load15
+}
+
+func GetCurrentOS() string {
+	if runtime.GOOS == "linux" {
+		_, err := os.Stat("/usr/bin/yum")
+		if err == nil {
+			// centos系，包含centos、openalinos等
+			return "linux"
+		}
+
+		_, err = os.Stat("/usr/bin/apt")
+		if err == nil {
+			// debian系，包含debian, ubuntu, kali等
+			return "linux"
+		}
+		// 如果不是以上系统，则默认是openwrt，因为其他系统暂时没见过
+		return "openwrt"
+	}
+	return runtime.GOOS
 }

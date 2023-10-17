@@ -1,9 +1,8 @@
 package migration
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/open-cmi/migrate"
-	"github.com/open-cmi/migrate/cmdopt"
-	"github.com/open-cmi/migrate/global"
 )
 
 // JobInstance migrate
@@ -11,8 +10,7 @@ type JobInstance struct {
 }
 
 // Up up migrate
-func (mi JobInstance) Up() error {
-	db := global.DB
+func (mi JobInstance) Up(db *sqlx.DB) error {
 
 	sqlClause := `
 		CREATE TABLE IF NOT EXISTS job (
@@ -40,8 +38,7 @@ func (mi JobInstance) Up() error {
 }
 
 // Down down migrate
-func (mi JobInstance) Down() error {
-	db := global.DB
+func (mi JobInstance) Down(db *sqlx.DB) error {
 
 	sqlClause := `DROP TABLE IF EXISTS job`
 	_, err := db.Exec(sqlClause)
@@ -49,7 +46,7 @@ func (mi JobInstance) Down() error {
 }
 
 func init() {
-	migrate.Register(&cmdopt.SeqInfo{
+	migrate.Register(&migrate.SeqInfo{
 		Seq:         "20220122230238",
 		Description: "job",
 		Ext:         "go",

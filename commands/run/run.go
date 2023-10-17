@@ -32,6 +32,10 @@ func Wait() {
 func Fini() {
 }
 
+func (c *RunCommand) Synopsis() string {
+	return "run main program"
+}
+
 func (c *RunCommand) Run() error {
 
 	if os.Args[1] == "run" {
@@ -91,11 +95,14 @@ func (c *RunCommand) Run() error {
 		return err
 	}
 	err = t.Run()
-
+	if err != nil {
+		return nil
+	}
 	Wait()
-	return err
+	return nil
 }
 
 func init() {
-	subcommands.RegisterCommand("run", true, &RunCommand{})
+	subcommands.RegisterCommand("run", &RunCommand{})
+	subcommands.DefaultCommand(&RunCommand{})
 }

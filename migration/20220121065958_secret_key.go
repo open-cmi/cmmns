@@ -3,9 +3,8 @@ package migration
 import (
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/open-cmi/migrate"
-	"github.com/open-cmi/migrate/cmdopt"
-	"github.com/open-cmi/migrate/global"
 )
 
 // SecretKeyInstance migrate
@@ -13,9 +12,7 @@ type SecretKeyInstance struct {
 }
 
 // Up up migrate
-func (mi SecretKeyInstance) Up() error {
-	db := global.DB
-
+func (mi SecretKeyInstance) Up(db *sqlx.DB) error {
 	sqlClause := fmt.Sprintf(`
 		CREATE TABLE IF NOT EXISTS secret_key (
 			id char(64) NOT NULL PRIMARY KEY,
@@ -37,9 +34,7 @@ func (mi SecretKeyInstance) Up() error {
 }
 
 // Down down migrate
-func (mi SecretKeyInstance) Down() error {
-	db := global.DB
-
+func (mi SecretKeyInstance) Down(db *sqlx.DB) error {
 	sqlClause := fmt.Sprintf(`
 		DROP TABLE IF EXISTS secret_key
 	`)
@@ -48,7 +43,7 @@ func (mi SecretKeyInstance) Down() error {
 }
 
 func init() {
-	migrate.Register(&cmdopt.SeqInfo{
+	migrate.Register(&migrate.SeqInfo{
 		Seq:         "20220121065958",
 		Description: "secret_key",
 		Ext:         "go",

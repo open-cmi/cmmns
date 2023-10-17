@@ -5,9 +5,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 	"github.com/open-cmi/migrate"
-	"github.com/open-cmi/migrate/cmdopt"
-	"github.com/open-cmi/migrate/global"
 
 	"github.com/jameskeane/bcrypt"
 )
@@ -17,8 +16,7 @@ type UserInstance struct {
 }
 
 // SyncData sync data
-func (mi UserInstance) SyncData() error {
-	db := global.DB
+func (mi UserInstance) SyncData(db *sqlx.DB) error {
 	id := uuid.New().String()
 
 	salt, _ := bcrypt.Salt(10)
@@ -35,8 +33,7 @@ func (mi UserInstance) SyncData() error {
 }
 
 // Up up migrate
-func (mi UserInstance) Up() error {
-	db := global.DB
+func (mi UserInstance) Up(db *sqlx.DB) error {
 
 	_, err := db.Exec(`
 	CREATE TABLE IF NOT EXISTS users (
@@ -52,14 +49,13 @@ func (mi UserInstance) Up() error {
       );
 	`)
 	if err == nil {
-		mi.SyncData()
+		mi.SyncData(db)
 	}
 	return err
 }
 
 // Down down migrate
-func (mi UserInstance) Down() error {
-	db := global.DB
+func (mi UserInstance) Down(db *sqlx.DB) error {
 
 	_, err := db.Exec(`
 		DROP TABLE IF EXISTS users;
@@ -68,7 +64,7 @@ func (mi UserInstance) Down() error {
 }
 
 func init() {
-	migrate.Register(&cmdopt.SeqInfo{
+	migrate.Register(&migrate.SeqInfo{
 		Seq:         "20191219110652",
 		Description: "user",
 		Ext:         "go",
