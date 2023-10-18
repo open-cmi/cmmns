@@ -9,7 +9,7 @@ import (
 func init() {
 	webserver.RegisterAuthRouter("system-setting", "/api/system-setting/v1/")
 	webserver.RegisterAuthAPI("system-setting", "GET", "/status/", status.GetStatus)
-	webserver.RegisterAuthAPI("system-setting", "GET", "/device/", status.GetDevID)
+	webserver.RegisterAuthAPI("system-setting", "GET", "/device/", setting.GetDevID)
 	webserver.RegisterAuthAPI("system-setting", "POST", "/reboot/", setting.Reboot)
 	webserver.RegisterAuthAPI("system-setting", "POST", "/shutdown/", setting.ShutDown)
 	webserver.RegisterAuthAPI("system-setting", "PUT", "/locale", setting.ChangeLang)

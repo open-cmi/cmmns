@@ -1,4 +1,4 @@
-package overview
+package status
 
 import (
 	"net/http"

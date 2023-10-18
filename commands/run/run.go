@@ -89,15 +89,11 @@ func (c *RunCommand) Run() error {
 	}
 
 	// run ticker service
-	t := ticker.New()
-	err = t.Init()
+	err = ticker.Init()
 	if err != nil {
 		return err
 	}
-	err = t.Run()
-	if err != nil {
-		return nil
-	}
+
 	Wait()
 	return nil
 }
