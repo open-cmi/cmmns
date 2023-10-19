@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/robfig/cron/v3"
 )
 
@@ -12,13 +13,14 @@ var initialized bool
 type Ticker struct {
 	Name string
 	Spec string
-	Func func()
+	Func func(data interface{})
+	Data interface{}
 }
 
 var tickers map[string]Ticker = make(map[string]Ticker)
 var cronMap map[string]*cron.Cron = make(map[string]*cron.Cron)
 
-func Register(name string, spec string, f func()) error {
+func Register(name string, spec string, f func(interface{}), data interface{}) error {
 	_, found := tickers[name]
 	if found {
 		errMsg := fmt.Sprintf("ticker %s registered failed", name)
@@ -28,26 +30,35 @@ func Register(name string, spec string, f func()) error {
 		Name: name,
 		Spec: spec,
 		Func: f,
+		Data: data,
 	}
 	if initialized {
 		// 如果已经初始化了，此时需要立即创建
 		ins := cron.New(cron.WithSeconds())
-		ins.AddFunc(spec, f)
-		ins.Start()
+		ins.AddFunc(spec, func() {
+			logger.Infof("start to run timer %s\n", name)
+			f(data)
+		})
+		go ins.Run()
 		cronMap[name] = ins
 	}
 	return nil
 }
 
-var cronInstance *cron.Cron
-
 func Init() error {
 
-	for _, ticker := range tickers {
-		cronInstance = cron.New(cron.WithSeconds())
-		cronInstance.AddFunc(ticker.Spec, ticker.Func)
-		cronInstance.Start()
-		cronMap[ticker.Name] = cronInstance
+	for i, _ := range tickers {
+		t := tickers[i]
+		ins := cron.New(cron.WithSeconds())
+		_, err := ins.AddFunc(t.Spec, func() {
+			logger.Infof("start to run timer %s\n", t.Name)
+			t.Func(t.Data)
+		})
+		if err != nil {
+			return err
+		}
+		go ins.Start()
+		cronMap[t.Name] = ins
 	}
 
 	initialized = true

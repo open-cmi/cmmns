@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -34,7 +33,6 @@ func ParseParams(c *gin.Context, option *Option) (err error) {
 		userID = user["id"].(string)
 	}
 	option.UserID = userID
-	option.Context = c
 
 	devID := c.DefaultQuery("dev_id", "")
 	option.DevID = devID
@@ -57,12 +55,5 @@ func ParseParams(c *gin.Context, option *Option) (err error) {
 	option.OrderOption.Order = c.Query("order")
 	option.OrderOption.OrderBy = c.Query("orderBy")
 
-	filters := c.Query("filters")
-	if filters != "" {
-		err = json.Unmarshal([]byte(filters), &option.Filters)
-		// 记录日志
-	} else {
-		option.Filters = []FilterOption{}
-	}
 	return err
 }

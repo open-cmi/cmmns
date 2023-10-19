@@ -65,6 +65,7 @@ func (c *RunCommand) Run() error {
 		logger.Errorf("config init failed: %s\n", err.Error())
 		return err
 	}
+
 	err = business.Init()
 	if err != nil {
 		logger.Errorf("%s\n", err.Error())
@@ -94,6 +95,7 @@ func (c *RunCommand) Run() error {
 		return err
 	}
 
+	logger.Infof("start successfully, wait for signal to terminate progress")
 	Wait()
 	return nil
 }

@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	cmmns.Run()
+	cmmns.Main()
 }

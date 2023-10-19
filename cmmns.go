@@ -10,7 +10,7 @@ import (
 	_ "github.com/open-cmi/cmmns/module"
 )
 
-func Run() error {
+func Main() error {
 
 	return subcommands.Run()
 }

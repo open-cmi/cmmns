@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	ticker.Register("system_status", "0 */5 * * * *", func() {
+	ticker.Register("system_status", "0 */2 * * * *", func(data interface{}) {
 		StartMonitor()
-	})
+	}, nil)
 }

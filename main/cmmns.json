@@ -31,13 +31,6 @@
     "port": 25431,
     "password": "8ik,\u003cKI*"
   },
-  "smtp": {
-    "server": "",
-    "port": 465,
-    "user": "",
-    "password": "",
-    "use_tls": true
-  },
   "webserver": {
     "server": [
       {
