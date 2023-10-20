@@ -10,8 +10,8 @@ import (
 	"github.com/dchest/captcha"
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
-	"github.com/open-cmi/cmmns/common/api"
 	"github.com/open-cmi/cmmns/common/errcode"
+	"github.com/open-cmi/cmmns/common/parameter"
 	"github.com/open-cmi/cmmns/service/webserver/middleware"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
@@ -48,7 +48,7 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	usermap := api.GetUser(c)
+	usermap := parameter.GetUser(c)
 	if usermap == nil {
 		c.JSON(200, gin.H{
 			"ret": 1,
@@ -84,7 +84,7 @@ func ChangePassword(c *gin.Context) {
 	}
 
 	ip := c.ClientIP()
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	if user != nil {
 		username, _ := user["username"].(string)
 		auditlog.InsertLog(ip,
@@ -103,8 +103,8 @@ func ChangePassword(c *gin.Context) {
 // List list user
 func List(c *gin.Context) {
 
-	var query api.Option
-	api.ParseParams(c, &query)
+	var query parameter.Option
+	parameter.ParseParams(c, &query)
 
 	count, users, err := user.List(&query)
 	if err != nil {
@@ -220,7 +220,7 @@ func Logout(c *gin.Context) {
 	session := sess.(*sessions.Session)
 
 	ip := c.ClientIP()
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	if user != nil {
 		username, _ := user["username"].(string)
 		// 写日志操作
@@ -301,7 +301,7 @@ func Create(c *gin.Context) {
 	}
 
 	ip := c.ClientIP()
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	if user != nil {
 		username, _ := user["username"].(string)
 		auditlog.InsertLog(ip,
@@ -326,7 +326,7 @@ func Delete(c *gin.Context) {
 		return
 	}
 	ip := c.ClientIP()
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	if user != nil {
 		username, _ := user["username"].(string)
 		// 写日志操作
@@ -341,7 +341,7 @@ func Delete(c *gin.Context) {
 }
 
 func CreateToken(c *gin.Context) {
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	if user == nil {
 		c.JSON(200, gin.H{"ret": -1, "msg": "user data is empty"})
 		return

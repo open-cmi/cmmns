@@ -3,7 +3,7 @@ package status
 import (
 	"net/http"
 
-	"github.com/open-cmi/cmmns/common/api"
+	"github.com/open-cmi/cmmns/common/parameter"
 	"github.com/open-cmi/cmmns/module/system"
 
 	"github.com/gin-gonic/gin"
@@ -11,8 +11,8 @@ import (
 
 // History list status history info
 func StatusHistoryList(c *gin.Context) {
-	var option api.Option
-	api.ParseParams(c, &option)
+	var option parameter.Option
+	parameter.ParseParams(c, &option)
 
 	count, list, err := system.List(&option)
 	if err != nil {
@@ -32,10 +32,10 @@ func StatusHistoryList(c *gin.Context) {
 // Get get device info
 func StatusHistoryGet(c *gin.Context) {
 	id := c.Param("id")
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	var option api.Option
+	var option parameter.Option
 	option.UserID = userID
 	mdl := system.Get(&option, "id", id)
 	if mdl == nil {

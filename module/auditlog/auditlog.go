@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/open-cmi/cmmns/common/api"
+	"github.com/open-cmi/cmmns/common/parameter"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
@@ -19,13 +19,13 @@ type Model struct {
 }
 
 // List list
-func List(p *api.Option) (int, []Model, error) {
+func List(p *parameter.Option) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var logs []Model = []Model{}
 
 	countClause := "select count(*) from audit_log"
-	whereClause, args := api.BuildWhereClause(p)
+	whereClause, args := parameter.BuildWhereClause(p)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
 
@@ -37,11 +37,11 @@ func List(p *api.Option) (int, []Model, error) {
 		return 0, logs, nil
 	}
 
-	columns := api.GetColumn(Model{}, []string{})
+	columns := parameter.GetColumn(Model{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from audit_log`, strings.Join(columns, ","))
 	queryClause += whereClause
-	finalClause := api.BuildFinalClause(p)
+	finalClause := parameter.BuildFinalClause(p)
 	queryClause += finalClause
 	rows, err := db.Queryx(queryClause, args...)
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/open-cmi/cmmns/common/api"
+	"github.com/open-cmi/cmmns/common/parameter"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
@@ -27,8 +27,8 @@ func (m *EmailModel) Save() error {
 	if m.IsNew {
 		m.ID = uuid.NewString()
 		// 存储到数据库
-		columns := api.GetColumn(*m, []string{})
-		values := api.GetColumnInsertNamed(columns)
+		columns := parameter.GetColumn(*m, []string{})
+		values := parameter.GetColumnInsertNamed(columns)
 
 		insertClause := fmt.Sprintf("insert into sender_email(%s) values(%s)",
 			strings.Join(columns, ","), strings.Join(values, ","))
@@ -41,7 +41,7 @@ func (m *EmailModel) Save() error {
 			return errors.New("create model failed")
 		}
 	} else {
-		columns := api.GetColumn(*m, []string{"id"})
+		columns := parameter.GetColumn(*m, []string{"id"})
 
 		var updates []string = []string{}
 		for _, column := range columns {

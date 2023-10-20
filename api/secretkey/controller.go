@@ -5,13 +5,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/open-cmi/cmmns/common/api"
+	"github.com/open-cmi/cmmns/common/parameter"
 	"github.com/open-cmi/cmmns/module/secretkey"
 )
 
 func List(c *gin.Context) {
-	var param api.Option
-	api.ParseParams(c, &param)
+	var param parameter.Option
+	parameter.ParseParams(c, &param)
 
 	count, results, err := secretkey.List(&param)
 	if err != nil {
@@ -37,10 +37,10 @@ func MultiDelete(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	var option api.Option
+	var option parameter.Option
 	option.UserID = userID
 	err := secretkey.MultiDelete(&option, reqMsg.Name)
 	if err != nil {
@@ -65,10 +65,10 @@ func Create(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	_, err := secretkey.Create(&api.Option{
+	_, err := secretkey.Create(&parameter.Option{
 		UserID: userID,
 	}, &reqMsg)
 	if err != nil {
@@ -86,10 +86,10 @@ func Create(c *gin.Context) {
 func Get(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	m := secretkey.Get(&api.Option{
+	m := secretkey.Get(&parameter.Option{
 		UserID: userID,
 	}, identify)
 
@@ -104,9 +104,9 @@ func Get(c *gin.Context) {
 func Delete(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	userID, _ := user["id"].(string)
-	err := secretkey.Delete(&api.Option{
+	err := secretkey.Delete(&parameter.Option{
 		UserID: userID,
 	}, identify)
 	if err != nil {
@@ -131,9 +131,9 @@ func Edit(c *gin.Context) {
 		return
 	}
 
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	userID, _ := user["id"].(string)
-	err := secretkey.Edit(&api.Option{
+	err := secretkey.Edit(&parameter.Option{
 		UserID: userID,
 	}, identify, &reqMsg)
 	if err != nil {

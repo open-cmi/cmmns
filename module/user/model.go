@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jameskeane/bcrypt"
-	"github.com/open-cmi/cmmns/common/api"
 	"github.com/open-cmi/cmmns/common/def"
+	"github.com/open-cmi/cmmns/common/parameter"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/pubsub"
 	"github.com/open-cmi/cmmns/essential/sqldb"
@@ -25,16 +25,16 @@ type Model struct {
 }
 
 // List list func
-func List(query *api.Option) (int, []Model, error) {
+func List(query *parameter.Option) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var users []Model = []Model{}
 	countClause := fmt.Sprintf("select count(*) from users")
 
-	whereClause, args := api.BuildWhereClause(query)
+	whereClause, args := parameter.BuildWhereClause(query)
 
 	countClause += whereClause
-	row := db.QueryRow(countClause, args...)
+	row := db.QueryRow(countClause, args)
 
 	var count int
 	err := row.Scan(&count)
@@ -43,7 +43,7 @@ func List(query *api.Option) (int, []Model, error) {
 	}
 
 	queryClause := fmt.Sprintf(`select id,username,email,role,description from users`)
-	finalClause := api.BuildFinalClause(query)
+	finalClause := parameter.BuildFinalClause(query)
 	queryClause += (whereClause + finalClause)
 	rows, err := db.Query(queryClause, args...)
 	if err != nil {
@@ -64,8 +64,8 @@ func List(query *api.Option) (int, []Model, error) {
 }
 
 // Get get id
-func Get(option *api.Option, field string, value string) (user *Model) {
-	columns := api.GetColumn(Model{}, []string{})
+func Get(option *parameter.Option, field string, value string) (user *Model) {
+	columns := parameter.GetColumn(Model{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from users where %s=$1`, strings.Join(columns, ","), field)
 	db := sqldb.GetConfDB()

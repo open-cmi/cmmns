@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/open-cmi/cmmns/common/api"
+	"github.com/open-cmi/cmmns/common/parameter"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
 
-func Get(mo *api.Option, field string, value string) *Job {
+func Get(mo *parameter.Option, field string, value string) *Job {
 	if field == "id" {
 		job := getCache(value)
 		if job != nil {
@@ -18,7 +18,7 @@ func Get(mo *api.Option, field string, value string) *Job {
 		}
 	}
 
-	columns := api.GetColumn(Job{}, []string{})
+	columns := parameter.GetColumn(Job{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from job where %s=$1`, strings.Join(columns, ","), field)
 	db := sqldb.GetConfDB()
@@ -35,13 +35,13 @@ func Get(mo *api.Option, field string, value string) *Job {
 }
 
 // List list
-func List(option *api.Option) (int, []Job, error) {
+func List(option *parameter.Option) (int, []Job, error) {
 	db := sqldb.GetConfDB()
 
 	var results []Job = []Job{}
 
 	countClause := "select count(*) from job"
-	whereClause, args := api.BuildWhereClause(option)
+	whereClause, args := parameter.BuildWhereClause(option)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
 
@@ -52,9 +52,9 @@ func List(option *api.Option) (int, []Job, error) {
 		return 0, results, errors.New("get count failed")
 	}
 
-	columns := api.GetColumn(Job{}, []string{})
+	columns := parameter.GetColumn(Job{}, []string{})
 	queryClause := fmt.Sprintf(`select %s from job`, strings.Join(columns, ","))
-	finalClause := api.BuildFinalClause(option)
+	finalClause := parameter.BuildFinalClause(option)
 	queryClause += (whereClause + finalClause)
 	rows, err := db.Queryx(queryClause, args...)
 	if err != nil {
@@ -77,7 +77,7 @@ func List(option *api.Option) (int, []Job, error) {
 }
 
 // List list
-func MultiDelete(mo *api.Option, ids []string) error {
+func MultiDelete(mo *parameter.Option, ids []string) error {
 	db := sqldb.GetConfDB()
 
 	if len(ids) == 0 {
@@ -107,7 +107,7 @@ func MultiDelete(mo *api.Option, ids []string) error {
 	return nil
 }
 
-func Delete(mo *api.Option, id string) error {
+func Delete(mo *parameter.Option, id string) error {
 	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")

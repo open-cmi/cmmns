@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/open-cmi/cmmns/common/api"
+	"github.com/open-cmi/cmmns/common/parameter"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
 
-func Get(mo *api.Option, id string) *Model {
+func Get(mo *parameter.Option, id string) *Model {
 	// 先检查用户名是否存在
 	queryclause := fmt.Sprintf("select id,name,key_type,key_length,comment from secret_key where id=$1")
 
@@ -24,13 +24,13 @@ func Get(mo *api.Option, id string) *Model {
 }
 
 // List list
-func List(mo *api.Option) (int, []Model, error) {
+func List(mo *parameter.Option) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var results []Model = []Model{}
 
 	countClause := fmt.Sprintf("select count(*) from secret_key")
-	whereClause, args := api.BuildWhereClause(mo)
+	whereClause, args := parameter.BuildWhereClause(mo)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
 
@@ -61,7 +61,7 @@ func List(mo *api.Option) (int, []Model, error) {
 }
 
 // List list
-func MultiDelete(mo *api.Option, ids []string) error {
+func MultiDelete(mo *parameter.Option, ids []string) error {
 	db := sqldb.GetConfDB()
 
 	if len(ids) == 0 {
@@ -90,7 +90,7 @@ func MultiDelete(mo *api.Option, ids []string) error {
 	return nil
 }
 
-func Create(mo *api.Option, reqMsg *CreateMsg) (m *Model, err error) {
+func Create(mo *parameter.Option, reqMsg *CreateMsg) (m *Model, err error) {
 	// 先检查用户名是否存在
 	model := Get(mo, reqMsg.Name)
 	if model != nil {
@@ -104,7 +104,7 @@ func Create(mo *api.Option, reqMsg *CreateMsg) (m *Model, err error) {
 	return m, err
 }
 
-func Edit(mo *api.Option, id string, reqMsg *EditMsg) error {
+func Edit(mo *parameter.Option, id string, reqMsg *EditMsg) error {
 	m := Get(mo, id)
 	if m == nil {
 		return errors.New("item not exist")
@@ -115,7 +115,7 @@ func Edit(mo *api.Option, id string, reqMsg *EditMsg) error {
 	return err
 }
 
-func Delete(mo *api.Option, id string) error {
+func Delete(mo *parameter.Option, id string) error {
 	m := Get(mo, id)
 	if m == nil {
 		return errors.New("item not exist")

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/open-cmi/cmmns/common/api"
+	"github.com/open-cmi/cmmns/common/parameter"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
 
-func FilterGet(mo *api.Option, fields []string, values []interface{}) *Model {
+func FilterGet(mo *parameter.Option, fields []string, values []interface{}) *Model {
 	var key string = ""
 	for index, field := range fields {
 		if index != 0 {
@@ -24,7 +24,7 @@ func FilterGet(mo *api.Option, fields []string, values []interface{}) *Model {
 		return mdl
 	}
 
-	columns := api.GetColumn(Model{}, []string{})
+	columns := parameter.GetColumn(Model{}, []string{})
 
 	var whereClause string
 	for index, field := range fields {
@@ -51,18 +51,18 @@ func FilterGet(mo *api.Option, fields []string, values []interface{}) *Model {
 	return &model
 }
 
-func Get(mo *api.Option, field string, value interface{}) *Model {
+func Get(mo *parameter.Option, field string, value interface{}) *Model {
 	return FilterGet(mo, []string{field}, []interface{}{value})
 }
 
 // List list
-func List(option *api.Option) (int, []Model, error) {
+func List(option *parameter.Option) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var results []Model = []Model{}
 
 	countClause := "select count(*) from setting"
-	whereClause, args := api.BuildWhereClause(option)
+	whereClause, args := parameter.BuildWhereClause(option)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
 
@@ -73,9 +73,9 @@ func List(option *api.Option) (int, []Model, error) {
 		return 0, results, errors.New("get count failed")
 	}
 
-	columns := api.GetColumn(Model{}, []string{})
+	columns := parameter.GetColumn(Model{}, []string{})
 	queryClause := fmt.Sprintf(`select %s from setting`, strings.Join(columns, ","))
-	finalClause := api.BuildFinalClause(option)
+	finalClause := parameter.BuildFinalClause(option)
 	queryClause += (whereClause + finalClause)
 	rows, err := db.Queryx(queryClause, args...)
 	if err != nil {
@@ -97,7 +97,7 @@ func List(option *api.Option) (int, []Model, error) {
 	return count, results, err
 }
 
-func Edit(mo *api.Option, id string, reqMsg *EditMsg) error {
+func Edit(mo *parameter.Option, id string, reqMsg *EditMsg) error {
 	m := FilterGet(mo, []string{"id"}, []interface{}{id})
 	if m == nil {
 		return errors.New("item not exist")

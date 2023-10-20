@@ -5,13 +5,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/open-cmi/cmmns/common/api"
+	"github.com/open-cmi/cmmns/common/parameter"
 	"github.com/open-cmi/cmmns/module/scheduler"
 )
 
 func List(c *gin.Context) {
-	var option api.Option
-	api.ParseParams(c, &option)
+	var option parameter.Option
+	parameter.ParseParams(c, &option)
 
 	count, results, err := scheduler.List(&option)
 	if err != nil {
@@ -38,10 +38,10 @@ func MultiDelete(c *gin.Context) {
 		return
 	}
 
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	var option api.Option
+	var option parameter.Option
 	option.UserID = userID
 	err := scheduler.MultiDelete(&option, reqMsg.ID)
 	if err != nil {
@@ -61,9 +61,9 @@ func MultiDelete(c *gin.Context) {
 func Get(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	userID, _ := user["id"].(string)
-	var option api.Option
+	var option parameter.Option
 	option.UserID = userID
 
 	m := scheduler.Get(&option, "id", identify)
@@ -78,9 +78,9 @@ func Get(c *gin.Context) {
 func Delete(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := api.GetUser(c)
+	user := parameter.GetUser(c)
 	userID, _ := user["id"].(string)
-	var option api.Option
+	var option parameter.Option
 	option.UserID = userID
 
 	err := scheduler.Delete(&option, identify)
