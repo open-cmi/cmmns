@@ -1,6 +1,7 @@
 package parameter
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -37,12 +38,17 @@ func ParseParams(c *gin.Context, option *Option) (err error) {
 	devID := c.DefaultQuery("dev_id", "")
 	option.DevID = devID
 
-	pagestr := c.DefaultQuery("page", "0")
+	pagestr := c.DefaultQuery("page", "1")
 	page, err := strconv.Atoi(pagestr)
 	if err != nil {
-		page = 0
+		page = 1
 	}
-	option.PageOption.Page = page
+
+	if page <= 0 {
+		return errors.New("param page's min number is 1")
+	}
+
+	option.PageOption.Page = page - 1
 
 	// page size
 	pagesizestr := c.DefaultQuery("page_size", "25")
