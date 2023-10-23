@@ -53,7 +53,7 @@ func ParseParams(c *gin.Context, option *Option) (err error) {
 	option.PageOption.PageSize = pagesize
 
 	option.OrderOption.Order = c.Query("order")
-	option.OrderOption.OrderBy = c.Query("orderBy")
+	option.OrderOption.OrderBy = c.Query("order_by")
 
 	return err
 }
