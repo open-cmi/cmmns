@@ -70,3 +70,14 @@ func Close() {
 		c.Stop()
 	}
 }
+
+func Remove(name string) error {
+	ins, ok := cronMap[name]
+	if !ok {
+		return errors.New("cron task not exist")
+	}
+	ins.Stop()
+	delete(cronMap, name)
+	delete(tickers, name)
+	return nil
+}
