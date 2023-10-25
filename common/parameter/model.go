@@ -85,14 +85,12 @@ func BuildWhereClause(opt *Option) (format string, args []interface{}) {
 	}
 	var clause string = ""
 
-	var whereUsed bool = false
-
 	args = []interface{}{}
 	for index, filter := range opt.Filters {
-		if whereUsed {
-			clause += " and"
-		} else {
+		if index == 0 {
 			clause += " where"
+		} else {
+			clause += " and"
 		}
 
 		if filter.Type == "string" {
