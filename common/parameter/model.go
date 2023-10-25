@@ -105,7 +105,7 @@ func BuildWhereClause(opt *Option) (format string, args []interface{}) {
 				args = append(args, value)
 			}
 		} else if filter.Type == "number" {
-			value := filter.Value.(int32)
+			value := filter.Value.(int)
 			if filter.Condition == "eq" {
 				clause += fmt.Sprintf(" %s = $%d", filter.Name, index+1)
 				args = append(args, value)
