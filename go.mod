@@ -21,7 +21,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/open-cmi/goutils v0.4.4-0.20230817070338-43f215fb32a5
 	github.com/open-cmi/memstore v0.1.0
-	github.com/open-cmi/migrate v0.5.0
+	github.com/open-cmi/migrate v0.5.1-0.20231030104537-d281fb94fd6d
 	github.com/pkg/sftp v1.13.4 // indirect
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil v3.21.7+incompatible
