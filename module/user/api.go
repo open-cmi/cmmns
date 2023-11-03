@@ -157,3 +157,34 @@ func Register(m *RegisterMsg) (err error) {
 
 	return err
 }
+
+func Edit(req *EditMsg) error {
+	user := Get("id", req.ID)
+	if user == nil {
+		return errors.New("user is not exist")
+	}
+	user.Email = req.Email
+	user.Role = req.Role
+	user.Description = req.Description
+	user.UserName = req.Username
+	err := user.Save()
+	return err
+}
+
+func ChangePassword(userid string, password string) error {
+	salt, _ := bcrypt.Salt(10)
+	hash, _ := bcrypt.Hash(password, salt)
+	updateClause := `update users set password=$1 where id=$2`
+	db := sqldb.GetConfDB()
+	_, err := db.Exec(updateClause, hash, userid)
+	return err
+}
+
+func ResetPasswd(req *ResetPasswdRequest) error {
+	salt, _ := bcrypt.Salt(10)
+	hash, _ := bcrypt.Hash(req.Password, salt)
+	updateClause := `update users set password=$1 where id=$2`
+	db := sqldb.GetConfDB()
+	_, err := db.Exec(updateClause, hash, req.ID)
+	return err
+}

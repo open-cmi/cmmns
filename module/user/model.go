@@ -106,15 +106,6 @@ func VerifyPasswordByID(userid string, password string) bool {
 	return true
 }
 
-func ChangePassword(userid string, password string) error {
-	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash(password, salt)
-	updateClause := fmt.Sprintf("update users set password='%s'", hash)
-	db := sqldb.GetConfDB()
-	_, err := db.Exec(updateClause)
-	return err
-}
-
 // Activate activate user
 func Activate(username string) error {
 	updateClause := "update users set status=1 where username=$1"
@@ -137,7 +128,7 @@ func DeleteByName(username string) error {
 	return err
 }
 
-func DeleteByID(id string) error {
+func Delete(id string) error {
 	deleteClause := "delete from users where id=$1"
 	db := sqldb.GetConfDB()
 	_, err := db.Exec(deleteClause, id)
