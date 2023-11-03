@@ -358,7 +358,6 @@ func init() {
 	webserver.RegisterAuthAPI("user", "POST", "/", Create)
 	webserver.RegisterAuthAPI("user", "POST", "/changepass", ChangePassword)
 	webserver.RegisterAuthAPI("user", "POST", "/logout", Logout)
-	webserver.RegisterUnauthAPI("user", "POST", "/jwt-token/", CreateToken)
 	webserver.RegisterAuthAPI("user", "GET", "/:id", Get)
 	webserver.RegisterAuthAPI("user", "DELETE", "/:id", Delete)
 
@@ -366,4 +365,5 @@ func init() {
 	webserver.RegisterUnauthAPI("user", "POST", "/login", Login)
 	webserver.RegisterUnauthAPI("user", "POST", "/register", Register)
 	webserver.RegisterUnauthAPI("user", "GET", "/activate/:code", Activate)
+	webserver.RegisterUnauthAPI("user", "POST", "/jwt-token/", CreateToken)
 }

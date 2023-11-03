@@ -10,7 +10,7 @@ import (
 	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/module/role"
+	"github.com/open-cmi/cmmns/module/rbac"
 )
 
 type User struct {
@@ -57,7 +57,7 @@ func (u *User) Save() error {
 }
 
 func (u *User) HasReadPermision(m string) bool {
-	r := role.Get(u.Role)
+	r := rbac.GetRole(u.Role)
 	if r == nil {
 		return false
 	}
@@ -65,7 +65,7 @@ func (u *User) HasReadPermision(m string) bool {
 }
 
 func (u *User) HasWritePermision(m string) bool {
-	r := role.Get(u.Role)
+	r := rbac.GetRole(u.Role)
 	if r == nil {
 		return false
 	}
@@ -81,7 +81,7 @@ func Get(field string, value string) (user *User) {
 	var mdl User
 	err := row.StructScan(&mdl)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Errorf("user %s by %s not found: %s\n", value, field, err.Error())
 		return nil
 	}
 

@@ -1,4 +1,4 @@
-package role
+package rbac
 
 import (
 	"errors"
@@ -82,7 +82,7 @@ func (r *Role) hasPermision(m string, perm string) bool {
 	return hasPerm
 }
 
-func Get(name string) *Role {
+func GetRole(name string) *Role {
 	queryClause := `select * from roles where name=$1`
 	db := sqldb.GetConfDB()
 	row := db.QueryRowx(queryClause, name)
