@@ -9,14 +9,13 @@ type ChangePasswordMsg struct {
 
 // RegisterMsg register msg
 type RegisterMsg struct {
-	UserName      string `json:"username"`
-	Email         string `json:"email"`
-	Password      string `json:"password"`
-	Description   string `json:"description,omitempty"`
-	Confirmpass   string `json:"confirmpass"`
-	Captcha       string `json:"Captcha,omitempty"`
-	CaptchaID     string `json:"captchaid,omitempty"`
-	IgnoreCaptcha bool   `json:"ignorecaptcha"`
+	UserName    string `json:"username"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	Description string `json:"description,omitempty"`
+	Confirmpass string `json:"confirmpass"`
+	Captcha     string `json:"Captcha,omitempty"`
+	CaptchaID   string `json:"captchaid,omitempty"`
 }
 
 type CreateMsg struct {
@@ -24,6 +23,7 @@ type CreateMsg struct {
 	Email       string `json:"email"`
 	Password    string `json:"password"`
 	Confirmpass string `json:"confirmpass"`
+	Role        string `json:"role"`
 	Description string `json:"description,omitempty"`
 }
 

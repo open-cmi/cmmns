@@ -5,13 +5,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/open-cmi/cmmns/common/parameter"
+	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/module/secretkey"
 )
 
 func List(c *gin.Context) {
-	var param parameter.Option
-	parameter.ParseParams(c, &param)
+	var param goparam.Option
+	goparam.ParseParams(c, &param)
 
 	count, results, err := secretkey.List(&param)
 	if err != nil {
@@ -37,10 +37,10 @@ func MultiDelete(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	var option parameter.Option
+	var option goparam.Option
 	option.UserID = userID
 	err := secretkey.MultiDelete(&option, reqMsg.Name)
 	if err != nil {
@@ -65,10 +65,10 @@ func Create(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	_, err := secretkey.Create(&parameter.Option{
+	_, err := secretkey.Create(&goparam.Option{
 		UserID: userID,
 	}, &reqMsg)
 	if err != nil {
@@ -86,10 +86,10 @@ func Create(c *gin.Context) {
 func Get(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	m := secretkey.Get(&parameter.Option{
+	m := secretkey.Get(&goparam.Option{
 		UserID: userID,
 	}, identify)
 
@@ -104,9 +104,9 @@ func Get(c *gin.Context) {
 func Delete(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	err := secretkey.Delete(&parameter.Option{
+	err := secretkey.Delete(&goparam.Option{
 		UserID: userID,
 	}, identify)
 	if err != nil {
@@ -131,9 +131,9 @@ func Edit(c *gin.Context) {
 		return
 	}
 
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	err := secretkey.Edit(&parameter.Option{
+	err := secretkey.Edit(&goparam.Option{
 		UserID: userID,
 	}, identify, &reqMsg)
 	if err != nil {

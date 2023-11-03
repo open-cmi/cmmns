@@ -6,6 +6,5 @@ import (
 )
 
 func init() {
-
 	rdb.Register("user", def.RDBUser)
 }

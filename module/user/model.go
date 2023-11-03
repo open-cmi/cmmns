@@ -4,74 +4,81 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
-	"github.com/google/uuid"
 	"github.com/jameskeane/bcrypt"
-	"github.com/open-cmi/cmmns/common/def"
-	"github.com/open-cmi/cmmns/common/parameter"
+	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/essential/pubsub"
 	"github.com/open-cmi/cmmns/essential/sqldb"
+	"github.com/open-cmi/cmmns/module/role"
 )
 
-type Model struct {
+type User struct {
 	UserName    string `json:"username" db:"username"`
 	ID          string `json:"id" db:"id"`
 	Email       string `json:"email" db:"email"`
 	Password    string `json:"-" db:"password"`
-	Role        int    `json:"role" db:"role"`
+	Role        string `json:"role" db:"role"`
 	Description string `json:"description,omitempty" db:"description"`
-	Status      int    `json:"status" db:"status"`
+	Activate    bool   `json:"activate" db:"activate"`
+	Status      string `json:"status" db:"status"`
+	CreatedTime int64  `json:"created_time" db:"itime"`
+	UpdatedTime int64  `json:"updated_time" db:"utime"`
+	isNew       bool
 }
 
-// List list func
-func List(query *parameter.Option) (int, []Model, error) {
+func (u *User) Save() error {
 	db := sqldb.GetConfDB()
 
-	var users []Model = []Model{}
-	countClause := fmt.Sprintf("select count(*) from users")
+	if u.isNew {
+		columns := goparam.GetColumn(User{}, []string{})
+		values := goparam.GetColumnInsertNamed(columns)
 
-	whereClause, args := parameter.BuildWhereClause(query)
+		insertClause := fmt.Sprintf("insert into users(%s) values(%s)",
+			strings.Join(columns, ","), strings.Join(values, ","))
 
-	countClause += whereClause
-	row := db.QueryRow(countClause, args)
-
-	var count int
-	err := row.Scan(&count)
-	if err != nil {
-		return 0, users, errors.New("get count failed")
-	}
-
-	queryClause := fmt.Sprintf(`select id,username,email,role,description from users`)
-	finalClause := parameter.BuildFinalClause(query)
-	queryClause += (whereClause + finalClause)
-	rows, err := db.Query(queryClause, args...)
-	if err != nil {
-		// 没有的话，也不需要报错
-		return count, users, nil
-	}
-
-	for rows.Next() {
-		var item Model
-		err := rows.Scan(&item.ID, &item.UserName, &item.Email, &item.Role, &item.Description)
+		_, err := db.NamedExec(insertClause, u)
 		if err != nil {
-			break
+			return errors.New("create user failed")
 		}
+	} else {
+		columns := goparam.GetColumn(User{}, []string{})
+		values := goparam.GetColumnUpdateNamed(columns)
 
-		users = append(users, item)
+		insertClause := fmt.Sprintf("update users set %s where id=:id",
+			strings.Join(values, ","))
+
+		_, err := db.NamedExec(insertClause, u)
+		if err != nil {
+			return errors.New("update user failed")
+		}
 	}
-	return count, users, err
+	return nil
+}
+
+func (u *User) HasReadPermision(m string) bool {
+	r := role.Get(u.Role)
+	if r == nil {
+		return false
+	}
+	return r.HasReadPermision(m)
+}
+
+func (u *User) HasWritePermision(m string) bool {
+	r := role.Get(u.Role)
+	if r == nil {
+		return false
+	}
+	return r.HasWritePermision(m)
 }
 
 // Get get id
-func Get(option *parameter.Option, field string, value string) (user *Model) {
-	columns := parameter.GetColumn(Model{}, []string{})
-
-	queryClause := fmt.Sprintf(`select %s from users where %s=$1`, strings.Join(columns, ","), field)
+func Get(field string, value string) (user *User) {
+	queryClause := fmt.Sprintf(`select * from users where %s=$1`, field)
 	db := sqldb.GetConfDB()
 	row := db.QueryRowx(queryClause, value)
 
-	var mdl Model
+	var mdl User
 	err := row.StructScan(&mdl)
 	if err != nil {
 		logger.Error(err.Error())
@@ -82,7 +89,7 @@ func Get(option *parameter.Option, field string, value string) (user *Model) {
 }
 
 func VerifyPasswordByID(userid string, password string) bool {
-	queryclause := fmt.Sprintf("select password from users where id=$1")
+	queryclause := "select password from users where id=$1"
 
 	var pass string
 	db := sqldb.GetConfDB()
@@ -108,48 +115,6 @@ func ChangePassword(userid string, password string) error {
 	return err
 }
 
-// GetByName get by name
-func GetByName(name string) (user Model, err error) {
-	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select id,username,email,role,description from users where username='%s'", name)
-
-	db := sqldb.GetConfDB()
-	row := db.QueryRow(queryclause)
-	err = row.Scan(&user.ID, &user.UserName, &user.Email, &user.Role, &user.Description)
-	if err != nil {
-		// 用户名不存在
-		return user, errors.New("user not exist")
-	}
-
-	return user, nil
-}
-
-// Login  user login
-func Login(m *LoginMsg) (authuser *Model, err error) {
-	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select id,username,email,password,status from users where username=$1")
-
-	var user Model
-	var password string
-	db := sqldb.GetConfDB()
-	row := db.QueryRow(queryclause, m.UserName)
-	err = row.Scan(&user.ID, &user.UserName, &user.Email, &password, &user.Status)
-	if err != nil {
-		// 用户名不存在
-		return nil, errors.New("username and password not match")
-	}
-
-	// 验证密码是否正确， 后续添加salt
-	if !bcrypt.Match(m.Password, password) {
-		// 用户名密码错误
-		return nil, errors.New("username and password not match")
-	}
-	if user.Status == 0 {
-		return nil, errors.New("user has not been activated")
-	}
-	return &user, nil
-}
-
 // Activate activate user
 func Activate(username string) error {
 	updateClause := "update users set status=1 where username=$1"
@@ -163,7 +128,7 @@ func Activate(username string) error {
 
 // Delete delete user
 func DeleteByName(username string) error {
-	deleteClause := fmt.Sprintf("delete from users where username=$1")
+	deleteClause := "delete from users where username=$1"
 	db := sqldb.GetConfDB()
 	_, err := db.Exec(deleteClause, username)
 	if err != nil {
@@ -173,7 +138,7 @@ func DeleteByName(username string) error {
 }
 
 func DeleteByID(id string) error {
-	deleteClause := fmt.Sprintf("delete from users where id=$1")
+	deleteClause := "delete from users where id=$1"
 	db := sqldb.GetConfDB()
 	_, err := db.Exec(deleteClause, id)
 	if err != nil {
@@ -182,65 +147,11 @@ func DeleteByID(id string) error {
 	return err
 }
 
-// Register register user
-func Register(m *RegisterMsg) (err error) {
-	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select username from users where username=$1")
-
-	var un string
-	db := sqldb.GetConfDB()
-	row := db.QueryRow(queryclause, m.UserName)
-	err = row.Scan(&un)
-	if err == nil {
-		// 用户名已经被占用
-		return errors.New("username has been used")
+func NewUser() *User {
+	n := time.Now().Unix()
+	return &User{
+		isNew:       true,
+		CreatedTime: n,
+		UpdatedTime: n,
 	}
-
-	queryclause = fmt.Sprintf("select email from users where email=$1")
-
-	var email string
-	row = db.QueryRow(queryclause, m.Email)
-	err = row.Scan(&email)
-	if err == nil {
-		// 邮箱已经被占用
-		return errors.New("email has been used")
-	}
-
-	id := uuid.New()
-	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash(m.Password, salt)
-	insertClause := fmt.Sprintf("insert into users(id, username, password, email, description) values($1, $2, $3, $4, $5)")
-
-	_, err = db.Exec(insertClause, id.String(), m.UserName, hash, m.Email, m.Description)
-	if err != nil {
-		return errors.New("create user failed")
-	}
-	return nil
-}
-
-func Create(m *CreateMsg) (err error) {
-	// 先检查用户名是否存在
-	queryclause := fmt.Sprintf("select username from users where username=$1 or email=$2")
-
-	var un string
-	db := sqldb.GetConfDB()
-	row := db.QueryRow(queryclause, m.UserName, m.Email)
-	err = row.Scan(&un)
-	if err == nil {
-		// 用户名已经被占用
-		return errors.New("username or email has been used")
-	}
-
-	id := uuid.New()
-	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash(m.Password, salt)
-	insertClause := fmt.Sprintf("insert into users(id, username, password, email, status, description) values($1, $2, $3, $4, $5, $6)")
-
-	_, err = db.Exec(insertClause, id.String(), m.UserName, hash, m.Email, 1, m.Description)
-	if err != nil {
-		return errors.New("create user failed")
-	}
-
-	pubsub.Publish(def.EventUserCreate, m.UserName)
-	return nil
 }

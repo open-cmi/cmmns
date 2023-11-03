@@ -11,7 +11,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/common/errcode"
-	"github.com/open-cmi/cmmns/common/parameter"
+	"github.com/open-cmi/cmmns/common/goparam"
+	"github.com/open-cmi/cmmns/service/webserver"
 	"github.com/open-cmi/cmmns/service/webserver/middleware"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
@@ -48,7 +49,7 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	usermap := parameter.GetUser(c)
+	usermap := goparam.GetUser(c)
 	if usermap == nil {
 		c.JSON(200, gin.H{
 			"ret": 1,
@@ -84,7 +85,7 @@ func ChangePassword(c *gin.Context) {
 	}
 
 	ip := c.ClientIP()
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	if user != nil {
 		username, _ := user["username"].(string)
 		auditlog.InsertLog(ip,
@@ -103,8 +104,8 @@ func ChangePassword(c *gin.Context) {
 // List list user
 func List(c *gin.Context) {
 
-	var query parameter.Option
-	parameter.ParseParams(c, &query)
+	var query goparam.Option
+	goparam.ParseParams(c, &query)
 
 	count, users, err := user.List(&query)
 	if err != nil {
@@ -128,17 +129,8 @@ func List(c *gin.Context) {
 // Get get user by id
 func Get(c *gin.Context) {
 
-	expire := time.Now().Add(10 * time.Minute)
-	cookie := http.Cookie{
-		Name:     "test",
-		Value:    "this is a test",
-		Expires:  expire,
-		Path:     "/",
-		HttpOnly: false,
-	}
-
 	id := c.Param("id")
-	user := user.Get(nil, "id", id)
+	user := user.Get("id", id)
 	if user == nil {
 		c.JSON(200, gin.H{
 			"ret": errcode.ErrFailed,
@@ -148,7 +140,6 @@ func Get(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"ret": 0, "msg": "", "data": user})
-	http.SetCookie(c.Writer, &cookie)
 }
 
 // Activate activate user
@@ -220,7 +211,7 @@ func Logout(c *gin.Context) {
 	session := sess.(*sessions.Session)
 
 	ip := c.ClientIP()
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	if user != nil {
 		username, _ := user["username"].(string)
 		// 写日志操作
@@ -241,7 +232,7 @@ func Register(c *gin.Context) {
 	}
 
 	// 验证验证码的有效性
-	if !apimsg.IgnoreCaptcha && !captcha.VerifyString(apimsg.CaptchaID, apimsg.Captcha) {
+	if !captcha.VerifyString(apimsg.CaptchaID, apimsg.Captcha) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "captcha is incorrect"})
 		return
 	}
@@ -289,7 +280,7 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	// 验证邮箱有效性
+	// 验证邮箱格式
 	if !typeutil.EmailIsValid(apimsg.Email) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email is not valid"})
 		return
@@ -301,7 +292,7 @@ func Create(c *gin.Context) {
 	}
 
 	ip := c.ClientIP()
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	if user != nil {
 		username, _ := user["username"].(string)
 		auditlog.InsertLog(ip,
@@ -326,7 +317,7 @@ func Delete(c *gin.Context) {
 		return
 	}
 	ip := c.ClientIP()
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	if user != nil {
 		username, _ := user["username"].(string)
 		// 写日志操作
@@ -341,7 +332,7 @@ func Delete(c *gin.Context) {
 }
 
 func CreateToken(c *gin.Context) {
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	if user == nil {
 		c.JSON(200, gin.H{"ret": -1, "msg": "user data is empty"})
 		return
@@ -358,4 +349,21 @@ func CreateToken(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"ret": 0, "msg": "", "token": tk})
+}
+
+func init() {
+	webserver.RegisterAuthRouter("user", "/api/common/v3/user")
+	webserver.RegisterAuthAPI("user", "GET", "/checkauth", CheckAuth)
+	webserver.RegisterAuthAPI("user", "GET", "/", List)
+	webserver.RegisterAuthAPI("user", "POST", "/", Create)
+	webserver.RegisterAuthAPI("user", "POST", "/changepass", ChangePassword)
+	webserver.RegisterAuthAPI("user", "POST", "/logout", Logout)
+	webserver.RegisterUnauthAPI("user", "POST", "/jwt-token/", CreateToken)
+	webserver.RegisterAuthAPI("user", "GET", "/:id", Get)
+	webserver.RegisterAuthAPI("user", "DELETE", "/:id", Delete)
+
+	webserver.RegisterUnauthRouter("user", "/api/common/v3/user")
+	webserver.RegisterUnauthAPI("user", "POST", "/login", Login)
+	webserver.RegisterUnauthAPI("user", "POST", "/register", Register)
+	webserver.RegisterUnauthAPI("user", "GET", "/activate/:code", Activate)
 }

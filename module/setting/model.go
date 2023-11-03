@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/open-cmi/cmmns/common/parameter"
+	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
@@ -30,8 +30,8 @@ func (m *Model) Save() error {
 
 	if m.isNew {
 		// 存储到数据库
-		columns := parameter.GetColumn(*m, []string{})
-		values := parameter.GetColumnInsertNamed(columns)
+		columns := goparam.GetColumn(*m, []string{})
+		values := goparam.GetColumnInsertNamed(columns)
 
 		insertClause := fmt.Sprintf("insert into setting(%s) values(%s)",
 			strings.Join(columns, ","), strings.Join(values, ","))
@@ -45,7 +45,7 @@ func (m *Model) Save() error {
 		}
 		m.isNew = false
 	} else {
-		columns := parameter.GetColumn(*m, []string{"id", "created_time"})
+		columns := goparam.GetColumn(*m, []string{"id", "created_time"})
 
 		m.UpdatedTime = time.Now().Unix()
 		var updates []string = []string{}

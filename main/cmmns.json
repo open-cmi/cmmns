@@ -1,7 +1,4 @@
 {
-  "locale": {
-    "lang": "zh-CN"
-  },
   "assist": {
     "server_addr": "",
     "server_port": 0
@@ -15,21 +12,52 @@
     "port": 0,
     "proto": ""
   },
+  "locale": {
+    "lang": "zh-CN"
+  },
   "log": {
     "level": "debug",
     "path": "/tmp/"
   },
   "model": {
     "type": "postgresql",
+    "file": "/tmp/cmmns.sqlite3",
     "host": "127.0.0.1",
     "port": 25432,
     "database": "test_cmmns",
     "user": "postgres"
   },
+  "network": {
+    "dev": "",
+    "dhcp": true
+  },
+  "process": {
+    "services": [
+      {
+        "name": "dnsmasq",
+        "exec_start": "/usr/sbin/dnsmasq"
+      }
+    ]
+  },
   "redis": {
     "host": "127.0.0.1",
     "port": 25431,
     "password": "8ik,\u003cKI*"
+  },
+  "session_middleware": {
+    "store_type": "redis",
+    "redis_store": {
+      "host": "127.0.0.1",
+      "port": 25431,
+      "db": 2,
+      "passwd": "8ik,\u003cKI*"
+    }
+  },
+  "transport": {
+    "tcp_server": "localhost:30017"
+  },
+  "user": {
+    "activate_url": ""
   },
   "webserver": {
     "server": [
@@ -43,25 +71,5 @@
         "proto": "unix"
       }
     ]
-  },
-  "session_middleware": {
-    "store_type": "redis",
-    "redis_store": {
-      "host": "127.0.0.1",
-      "port": 25431,
-      "db": 2,
-      "passwd": "8ik,\u003cKI*"
-    }
-  },
-  "process": {
-    "services": [
-      {
-        "name": "dnsmasq",
-        "exec_start": "/usr/sbin/dnsmasq"
-      }
-    ]
-  },
-  "transport": {
-    "tcp_server": "localhost:30017"
   }
 }
