@@ -12,6 +12,9 @@
     "port": 0,
     "proto": ""
   },
+  "data_model": {
+    "type": ""
+  },
   "locale": {
     "lang": "zh-CN"
   },
