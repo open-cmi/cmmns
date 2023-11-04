@@ -9,6 +9,23 @@ import (
 	"github.com/open-cmi/cmmns/module/secretkey"
 )
 
+func NameList(c *gin.Context) {
+	count, results, err := secretkey.NameList()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
+		"data": map[string]interface{}{
+			"count":   count,
+			"results": results,
+		},
+	})
+}
+
 func List(c *gin.Context) {
 	var param goparam.Option
 	goparam.ParseParams(c, &param)
@@ -27,7 +44,6 @@ func List(c *gin.Context) {
 			"results": results,
 		},
 	})
-	return
 }
 
 func MultiDelete(c *gin.Context) {
@@ -55,7 +71,6 @@ func MultiDelete(c *gin.Context) {
 		"ret": 0,
 		"msg": "",
 	})
-	return
 }
 
 func Create(c *gin.Context) {
@@ -80,7 +95,6 @@ func Create(c *gin.Context) {
 		"ret": 0,
 		"msg": "",
 	})
-	return
 }
 
 func Get(c *gin.Context) {
@@ -96,9 +110,8 @@ func Get(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,
 		"msg":  "",
-		"date": m,
+		"data": m,
 	})
-	return
 }
 
 func Delete(c *gin.Context) {
@@ -118,7 +131,6 @@ func Delete(c *gin.Context) {
 		"ret": 0,
 		"msg": "",
 	})
-	return
 }
 
 func Edit(c *gin.Context) {
@@ -145,5 +157,4 @@ func Edit(c *gin.Context) {
 		"ret": 0,
 		"msg": "",
 	})
-	return
 }

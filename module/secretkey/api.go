@@ -23,6 +23,40 @@ func Get(mo *goparam.Option, id string) *Model {
 	return nil
 }
 
+// NameList name list
+func NameList() (int, []string, error) {
+	db := sqldb.GetConfDB()
+
+	var results []string = []string{}
+
+	countClause := "select count(*) from secret_key"
+	row := db.QueryRow(countClause)
+
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, results, errors.New("get count failed")
+	}
+
+	queryClause := `select name from secret_key`
+	rows, err := db.Query(queryClause)
+	if err != nil {
+		// 没有的话，也不需要报错
+		return count, results, nil
+	}
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			break
+		}
+
+		results = append(results, item)
+	}
+	return count, results, err
+}
+
 // List list
 func List(mo *goparam.Option) (int, []Model, error) {
 	db := sqldb.GetConfDB()
