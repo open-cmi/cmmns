@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/open-cmi/cmmns/common/def"
-	"github.com/open-cmi/cmmns/common/parameter"
+	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/rdb"
 	"github.com/open-cmi/cmmns/essential/sqldb"
@@ -54,8 +54,8 @@ func (m *Job) Save() error {
 
 	if m.IsNew {
 		// 存储到数据库
-		columns := parameter.GetColumn(*m, []string{})
-		values := parameter.GetColumnInsertNamed(columns)
+		columns := goparam.GetColumn(*m, []string{})
+		values := goparam.GetColumnInsertNamed(columns)
 
 		insertClause := fmt.Sprintf("insert into job(%s) values(%s)",
 			strings.Join(columns, ","), strings.Join(values, ","))
@@ -69,7 +69,7 @@ func (m *Job) Save() error {
 		}
 		m.IsNew = false
 	} else {
-		columns := parameter.GetColumn(*m, []string{"id", "started_time"})
+		columns := goparam.GetColumn(*m, []string{"id", "started_time"})
 
 		var updates []string = []string{}
 		for _, column := range columns {

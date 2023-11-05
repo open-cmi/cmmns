@@ -1,4 +1,4 @@
-package user
+package user2
 
 import (
 	"encoding/json"
@@ -24,5 +24,5 @@ func Save() json.RawMessage {
 var gConf Config
 
 func init() {
-	config.RegisterConfig("user", Init, Save)
+	config.RegisterConfig("user2", Init, Save)
 }

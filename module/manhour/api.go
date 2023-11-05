@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/open-cmi/cmmns/common/parameter"
+	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
 
-func Get(mo *parameter.Option, field string, value string) *Model {
-	columns := parameter.GetColumn(Model{}, []string{})
+func Get(mo *goparam.Option, field string, value string) *Model {
+	columns := goparam.GetColumn(Model{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from manhour where %s=$1`, strings.Join(columns, ","), field)
 	db := sqldb.GetConfDB()
@@ -28,13 +28,13 @@ func Get(mo *parameter.Option, field string, value string) *Model {
 }
 
 // List list
-func List(option *parameter.Option) (int, []Model, error) {
+func List(option *goparam.Option) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var results []Model = []Model{}
 
 	countClause := "select count(*) from manhour"
-	whereClause, args := parameter.BuildWhereClause(option)
+	whereClause, args := goparam.BuildWhereClause(option)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
 
@@ -45,9 +45,9 @@ func List(option *parameter.Option) (int, []Model, error) {
 		return 0, results, errors.New("get count failed")
 	}
 
-	columns := parameter.GetColumn(Model{}, []string{})
+	columns := goparam.GetColumn(Model{}, []string{})
 	queryClause := fmt.Sprintf(`select %s from manhour`, strings.Join(columns, ","))
-	finalClause := parameter.BuildFinalClause(option)
+	finalClause := goparam.BuildFinalClause(option)
 	queryClause += (whereClause + finalClause)
 	rows, err := db.Queryx(queryClause, args...)
 	if err != nil {
@@ -70,7 +70,7 @@ func List(option *parameter.Option) (int, []Model, error) {
 }
 
 // List list
-func MultiDelete(mo *parameter.Option, ids []string) error {
+func MultiDelete(mo *goparam.Option, ids []string) error {
 	db := sqldb.GetConfDB()
 
 	if len(ids) == 0 {
@@ -100,7 +100,7 @@ func MultiDelete(mo *parameter.Option, ids []string) error {
 	return nil
 }
 
-func Create(mo *parameter.Option, reqMsg *CreateMsg) (m *Model, err error) {
+func Create(mo *goparam.Option, reqMsg *CreateMsg) (m *Model, err error) {
 	m = New()
 	m.Date = reqMsg.Date
 	m.StartTime = reqMsg.StartTime
@@ -111,7 +111,7 @@ func Create(mo *parameter.Option, reqMsg *CreateMsg) (m *Model, err error) {
 	return m, err
 }
 
-func Edit(mo *parameter.Option, id string, reqMsg *EditMsg) error {
+func Edit(mo *goparam.Option, id string, reqMsg *EditMsg) error {
 	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")
@@ -125,7 +125,7 @@ func Edit(mo *parameter.Option, id string, reqMsg *EditMsg) error {
 	return err
 }
 
-func Delete(mo *parameter.Option, id string) error {
+func Delete(mo *goparam.Option, id string) error {
 	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")

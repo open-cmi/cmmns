@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/open-cmi/cmmns/common/parameter"
+	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 	"github.com/open-cmi/goutils/devutil"
@@ -76,8 +76,8 @@ func GetStatus() SystemStatus {
 	return status
 }
 
-func Get(mo *parameter.Option, field string, value string) *Model {
-	columns := parameter.GetColumn(Model{}, []string{})
+func Get(mo *goparam.Option, field string, value string) *Model {
+	columns := goparam.GetColumn(Model{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from system_status where %s=$1`, strings.Join(columns, ","), field)
 	db := sqldb.GetConfDB()
@@ -94,13 +94,13 @@ func Get(mo *parameter.Option, field string, value string) *Model {
 }
 
 // List list
-func List(option *parameter.Option) (int, []Model, error) {
+func List(option *goparam.Option) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var results []Model = []Model{}
 
 	countClause := fmt.Sprintf("select count(*) from system_status")
-	whereClause, args := parameter.BuildWhereClause(option)
+	whereClause, args := goparam.BuildWhereClause(option)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
 
@@ -110,9 +110,9 @@ func List(option *parameter.Option) (int, []Model, error) {
 		return 0, results, errors.New("get count failed")
 	}
 
-	columns := parameter.GetColumn(Model{}, []string{})
+	columns := goparam.GetColumn(Model{}, []string{})
 	queryClause := fmt.Sprintf(`select %s from system_status`, strings.Join(columns, ","))
-	finalClause := parameter.BuildFinalClause(option)
+	finalClause := goparam.BuildFinalClause(option)
 	queryClause += (whereClause + finalClause)
 	rows, err := db.Queryx(queryClause, args...)
 	if err != nil {

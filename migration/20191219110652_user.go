@@ -23,9 +23,9 @@ func (mi UserInstance) SyncData(db *sqlx.DB) error {
 	hash, _ := bcrypt.Hash("admin12345678", salt)
 	itime := time.Now().Unix()
 	dbsql := fmt.Sprintf(`
-		INSERT INTO users (id, username, password, email, role, status, itime, utime, description) 
-			values ('%s', 'admin', '%s', 'admin@admin.com',
-			'0', 1, %d, %d, '');
+		INSERT INTO users (id, username, password, email, role, status, activate, itime, utime, description) 
+			values ('%s', 'admin', '%s', 'admin@localhost',
+			'admin', 'offline', true, %d, %d, 'administrator');
   `, id, hash, itime, itime)
 	_, err := db.Exec(dbsql)
 
@@ -38,11 +38,12 @@ func (mi UserInstance) Up(db *sqlx.DB) error {
 	_, err := db.Exec(`
 	CREATE TABLE IF NOT EXISTS users (
 		id varchar(36) primary key,
-		username varchar(100) NOT NULL,
+		username varchar(100) NOT NULL UNIQUE,
 		password varchar(200) NOT NULL,
 		email varchar(100) UNIQUE NOT NULL,
-		role integer NOT NULL default 100,
-		status integer NOT NULL default 0,
+		role varchar(32) NOT NULL default '',
+		status varchar(32) NOT NULL default 'offline',
+		activate bool not NULL default false,
 		itime integer NOT NULL default 0,
 		utime integer NOT NULL default 0,
 		description text NOT NULL DEFAULT ''

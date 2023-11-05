@@ -5,13 +5,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/open-cmi/cmmns/common/parameter"
+	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/module/template"
 )
 
 func List(c *gin.Context) {
-	var option parameter.Option
-	parameter.ParseParams(c, &option)
+	var option goparam.Option
+	goparam.ParseParams(c, &option)
 
 	count, results, err := template.List(&option)
 	if err != nil {
@@ -36,10 +36,10 @@ func MultiDelete(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	var option parameter.Option
+	var option goparam.Option
 	option.UserID = userID
 	err := template.MultiDelete(&option, reqMsg.Name)
 	if err != nil {
@@ -63,10 +63,10 @@ func Create(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	var option parameter.Option
+	var option goparam.Option
 	option.UserID = userID
 
 	_, err := template.Create(&option, &reqMsg)
@@ -84,9 +84,9 @@ func Create(c *gin.Context) {
 func Get(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	var option parameter.Option
+	var option goparam.Option
 	option.UserID = userID
 
 	m := template.FilterGet(&option, []string{"id"}, []interface{}{identify})
@@ -101,9 +101,9 @@ func Get(c *gin.Context) {
 func Delete(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	var option parameter.Option
+	var option goparam.Option
 	option.UserID = userID
 
 	err := template.Delete(&option, identify)
@@ -128,9 +128,9 @@ func Edit(c *gin.Context) {
 		return
 	}
 
-	user := parameter.GetUser(c)
+	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	var option parameter.Option
+	var option goparam.Option
 	option.UserID = userID
 
 	err := template.Edit(&option, identify, &reqMsg)

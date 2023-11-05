@@ -12,7 +12,6 @@ import (
 
 // gConfDB sql db
 var gConfDB *sqlx.DB
-var gDataDB *sqlx.DB
 
 // DBConfig database model
 type Config struct {
@@ -26,15 +25,10 @@ type Config struct {
 }
 
 var gConfModel Config
-var gDataModel Config
 
 // GetDB get db
 func GetConfDB() *sqlx.DB {
 	return gConfDB
-}
-
-func GetDataDB() *sqlx.DB {
-	return gDataDB
 }
 
 // Parse db init
@@ -66,36 +60,6 @@ func Save() json.RawMessage {
 	return raw
 }
 
-// Parse db init
-func DataModelParse(raw json.RawMessage) error {
-	err := json.Unmarshal(raw, &gDataModel)
-	if err != nil {
-		return err
-	}
-	var dbconf database.Config
-	dbconf.Type = gDataModel.Type
-	dbconf.File = gDataModel.File
-	dbconf.Host = gDataModel.Host
-	dbconf.Port = gDataModel.Port
-	dbconf.User = gDataModel.User
-	dbconf.Password = gDataModel.Password
-	dbconf.Database = gDataModel.Database
-
-	dbi, err := dbsql.SQLInit(&dbconf)
-	if err != nil {
-		return err
-	}
-	gDataDB = dbi
-
-	return nil
-}
-
-func DataModelSave() json.RawMessage {
-	raw, _ := json.Marshal(&gDataModel)
-	return raw
-}
-
 func init() {
 	config.RegisterConfig("model", Parse, Save)
-	config.RegisterConfig("data_model", DataModelParse, DataModelSave)
 }

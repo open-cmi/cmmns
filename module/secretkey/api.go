@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/open-cmi/cmmns/common/parameter"
+	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
 
-func Get(mo *parameter.Option, id string) *Model {
+func Get(mo *goparam.Option, id string) *Model {
 	// 先检查用户名是否存在
 	queryclause := fmt.Sprintf("select id,name,key_type,key_length,comment from secret_key where id=$1")
 
@@ -23,14 +23,48 @@ func Get(mo *parameter.Option, id string) *Model {
 	return nil
 }
 
+// NameList name list
+func NameList() (int, []string, error) {
+	db := sqldb.GetConfDB()
+
+	var results []string = []string{}
+
+	countClause := "select count(*) from secret_key"
+	row := db.QueryRow(countClause)
+
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, results, errors.New("get count failed")
+	}
+
+	queryClause := `select name from secret_key`
+	rows, err := db.Query(queryClause)
+	if err != nil {
+		// 没有的话，也不需要报错
+		return count, results, nil
+	}
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			break
+		}
+
+		results = append(results, item)
+	}
+	return count, results, err
+}
+
 // List list
-func List(mo *parameter.Option) (int, []Model, error) {
+func List(mo *goparam.Option) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var results []Model = []Model{}
 
 	countClause := fmt.Sprintf("select count(*) from secret_key")
-	whereClause, args := parameter.BuildWhereClause(mo)
+	whereClause, args := goparam.BuildWhereClause(mo)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
 
@@ -61,7 +95,7 @@ func List(mo *parameter.Option) (int, []Model, error) {
 }
 
 // List list
-func MultiDelete(mo *parameter.Option, ids []string) error {
+func MultiDelete(mo *goparam.Option, ids []string) error {
 	db := sqldb.GetConfDB()
 
 	if len(ids) == 0 {
@@ -90,7 +124,7 @@ func MultiDelete(mo *parameter.Option, ids []string) error {
 	return nil
 }
 
-func Create(mo *parameter.Option, reqMsg *CreateMsg) (m *Model, err error) {
+func Create(mo *goparam.Option, reqMsg *CreateMsg) (m *Model, err error) {
 	// 先检查用户名是否存在
 	model := Get(mo, reqMsg.Name)
 	if model != nil {
@@ -104,7 +138,7 @@ func Create(mo *parameter.Option, reqMsg *CreateMsg) (m *Model, err error) {
 	return m, err
 }
 
-func Edit(mo *parameter.Option, id string, reqMsg *EditMsg) error {
+func Edit(mo *goparam.Option, id string, reqMsg *EditMsg) error {
 	m := Get(mo, id)
 	if m == nil {
 		return errors.New("item not exist")
@@ -115,7 +149,7 @@ func Edit(mo *parameter.Option, id string, reqMsg *EditMsg) error {
 	return err
 }
 
-func Delete(mo *parameter.Option, id string) error {
+func Delete(mo *goparam.Option, id string) error {
 	m := Get(mo, id)
 	if m == nil {
 		return errors.New("item not exist")
