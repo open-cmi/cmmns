@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/open-cmi/migrate"
 
@@ -17,7 +16,7 @@ type UserInstance struct {
 
 // SyncData sync data
 func (mi UserInstance) SyncData(db *sqlx.DB) error {
-	id := uuid.New().String()
+	id := "87fd7602-d20d-4ccb-80c5-b554cae79ce8"
 
 	salt, _ := bcrypt.Salt(10)
 	hash, _ := bcrypt.Hash("admin12345678", salt)
