@@ -7,8 +7,8 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/common/errcode"
 	"github.com/open-cmi/cmmns/common/goparam"
+	"github.com/open-cmi/cmmns/module/middleware"
 	"github.com/open-cmi/cmmns/service/webserver"
-	"github.com/open-cmi/cmmns/service/webserver/middleware"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/user"
@@ -288,6 +288,23 @@ func ResetPassword(c *gin.Context) {
 		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+	usermap := goparam.GetUser(c)
+	if usermap == nil {
+		c.JSON(200, gin.H{
+			"ret": 1,
+			"msg": i18n.Sprintf("user not exist"),
+		})
+		return
+	}
+
+	if req.Password != req.Password2 {
+		c.JSON(200, gin.H{
+			"ret": 1,
+			"msg": i18n.Sprintf("password confirmation doesn't match the password"),
+		})
+		return
+	}
+
 	err := user.ResetPasswd(&req)
 	if err != nil {
 		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})

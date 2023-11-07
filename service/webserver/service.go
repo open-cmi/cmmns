@@ -10,7 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/service/webserver/middleware"
+	"github.com/open-cmi/cmmns/module/middleware"
 	"github.com/open-cmi/goutils/pathutil"
 )
 

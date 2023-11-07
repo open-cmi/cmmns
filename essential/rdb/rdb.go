@@ -38,8 +38,12 @@ func Register(module string, db int) error {
 	return nil
 }
 
-// Init db init
-func Init(raw json.RawMessage) error {
+func GetConf() *Config {
+	return &gConf
+}
+
+// Parse db init
+func Parse(raw json.RawMessage) error {
 	err := json.Unmarshal(raw, &gConf)
 	if err != nil {
 		return err
@@ -70,7 +74,7 @@ func Save() json.RawMessage {
 func init() {
 	gConf.Host = "127.0.0.1"
 	gConf.Port = 25431
-	config.RegisterConfig("redis", Init, Save)
+	config.RegisterConfig("redis", Parse, Save)
 
 	Register("public", def.RDBPublic)
 }
