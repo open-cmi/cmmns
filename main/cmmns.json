@@ -45,7 +45,7 @@
     "password": "8ik,\u003cKI*"
   },
   "middleware": {
-    "store_type": "redis"
+    "store": "redis"
   },
   "transport": {
     "tcp_server": "localhost:30017"

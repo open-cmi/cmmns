@@ -14,12 +14,11 @@ import (
 	"github.com/topmyself/redistore"
 )
 
-var storeType string = "redis"
 var redisStore *redistore.RediStore
 var memoryStore *memstore.MemStore
 
 func GetSession(c *gin.Context) (*sessions.Session, error) {
-	if storeType == "memory" {
+	if gConf.Store == "memory" {
 		return memoryStore.Get(c.Request, "cmmns")
 	} else {
 		return redisStore.Get(c.Request, "koa")

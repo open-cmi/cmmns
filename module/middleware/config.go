@@ -14,7 +14,7 @@ import (
 )
 
 type Config struct {
-	StoreType string `json:"store_type"`
+	Store string `json:"store"`
 }
 
 var gConf Config
@@ -22,11 +22,10 @@ var gConf Config
 func Init() error {
 	var err error
 	rdbConf := rdb.GetConf()
-	if gConf.StoreType == "memory" {
+	if gConf.Store == "memory" {
 		memoryStore = memstore.NewMemStore([]byte("memorystore"),
 			[]byte("enckey12341234567890123456789012"))
-		storeType = "memory"
-	} else if gConf.StoreType == "redis" {
+	} else if gConf.Store == "redis" {
 		host := fmt.Sprintf("%s:%d", rdbConf.Host, rdbConf.Port)
 		redisStore, err = redistore.NewRediStoreWithDB(100, "tcp", host, rdbConf.Password, "2")
 		if err != nil {
@@ -59,7 +58,7 @@ func Save() json.RawMessage {
 
 func init() {
 	// default config
-	gConf.StoreType = "memory"
+	gConf.Store = "memory"
 
 	config.RegisterConfig("middleware", Parse, Save)
 	business.Register("middleware", Init)
