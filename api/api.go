@@ -14,4 +14,5 @@ import (
 	_ "github.com/open-cmi/cmmns/api/template"
 	_ "github.com/open-cmi/cmmns/api/user"
 	_ "github.com/open-cmi/cmmns/api/user2"
+	_ "github.com/open-cmi/cmmns/api/wac"
 )

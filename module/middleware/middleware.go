@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/module/wac"
 	"github.com/open-cmi/memstore"
 	"github.com/topmyself/redistore"
 )
@@ -85,6 +86,7 @@ func AuthMiddleware(r *gin.Engine) {
 			c.Abort()
 		}
 		logger.Info(user)
+		c.Next()
 	})
 }
 
@@ -139,4 +141,17 @@ func GenerateAuthToken(username string, id string, email string, role int, statu
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte("cmmns"))
 	return token, err
+}
+
+// Web Access Control middleware
+func WACMiddleware(r *gin.Engine) {
+	r.Use(func(c *gin.Context) {
+		src := c.ClientIP()
+		permit := wac.CheckPermit(src)
+		if !permit {
+			c.String(http.StatusForbidden, "")
+			c.Abort()
+		}
+		c.Next()
+	})
 }

@@ -80,18 +80,21 @@ func (c *RunCommand) Run() error {
 	// Init
 	err = s.Init()
 	if err != nil {
+		logger.Errorf(err.Error())
 		return err
 	}
 
 	// Run
 	err = s.Run()
 	if err != nil {
+		logger.Errorf(err.Error())
 		return err
 	}
 
 	// run ticker service
 	err = ticker.Init()
 	if err != nil {
+		logger.Errorf(err.Error())
 		return err
 	}
 

@@ -2,10 +2,13 @@ package middleware
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/rdb"
+	"github.com/open-cmi/cmmns/service/business"
 	"github.com/open-cmi/memstore"
 	"github.com/topmyself/redistore"
 )
@@ -16,25 +19,34 @@ type Config struct {
 
 var gConf Config
 
-func Init(raw json.RawMessage) error {
-	err := json.Unmarshal(raw, &gConf)
-	if err != nil {
-		return err
-	}
+func Init() error {
+	var err error
 	rdbConf := rdb.GetConf()
 	if gConf.StoreType == "memory" {
 		memoryStore = memstore.NewMemStore([]byte("memorystore"),
 			[]byte("enckey12341234567890123456789012"))
 		storeType = "memory"
-	} else {
+	} else if gConf.StoreType == "redis" {
 		host := fmt.Sprintf("%s:%d", rdbConf.Host, rdbConf.Port)
 		redisStore, err = redistore.NewRediStoreWithDB(100, "tcp", host, rdbConf.Password, "2")
 		if err != nil {
+			logger.Error("redis store new failed\n")
 			return err
 		}
 
 		redisStore.SetKeyPrefix("koa-sess-")
 		redisStore.SetSerializer(redistore.JSONSerializer{})
+	} else {
+		return errors.New("middleware store type not supported")
+	}
+
+	return nil
+}
+
+func Parse(raw json.RawMessage) error {
+	err := json.Unmarshal(raw, &gConf)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -49,5 +61,6 @@ func init() {
 	// default config
 	gConf.StoreType = "memory"
 
-	config.RegisterConfig("middleware", Init, Save)
+	config.RegisterConfig("middleware", Parse, Save)
+	business.Register("middleware", Init)
 }

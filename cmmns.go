@@ -11,6 +11,5 @@ import (
 )
 
 func Main() error {
-
 	return subcommands.Run()
 }

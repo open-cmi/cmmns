@@ -20,7 +20,7 @@ import (
 
 // CheckAuth get userinfo
 func CheckAuth(c *gin.Context) {
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
 	})
@@ -35,7 +35,7 @@ func ChangePassword(c *gin.Context) {
 
 	usermap := goparam.GetUser(c)
 	if usermap == nil {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
 			"msg": i18n.Sprintf("user not exist"),
 		})
@@ -43,7 +43,7 @@ func ChangePassword(c *gin.Context) {
 	}
 
 	if apimsg.NewPassword != apimsg.ConfirmPassword {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
 			"msg": i18n.Sprintf("password confirmation doesn't match the password"),
 		})
@@ -52,7 +52,7 @@ func ChangePassword(c *gin.Context) {
 
 	userID, _ := usermap["id"].(string)
 	if !user.VerifyPasswordByID(userID, apimsg.OldPassword) {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
 			"msg": i18n.Sprintf("user password verify failed"),
 		})
@@ -61,7 +61,7 @@ func ChangePassword(c *gin.Context) {
 
 	err := user.ChangePassword(userID, apimsg.NewPassword)
 	if err != nil {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
 			"msg": i18n.Sprintf("change password failed"),
 		})
@@ -76,7 +76,7 @@ func ChangePassword(c *gin.Context) {
 		i18n.Sprintf("change password sussessfully"),
 	)
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
 	})
@@ -90,14 +90,14 @@ func List(c *gin.Context) {
 
 	count, users, err := user.List(&query)
 	if err != nil {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
 			"msg": i18n.Sprintf("list users failed"),
 		})
 		return
 	}
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
 		"data": map[string]interface{}{
@@ -113,14 +113,14 @@ func Get(c *gin.Context) {
 	id := c.Param("id")
 	user := user.Get("id", id)
 	if user == nil {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"ret": errcode.ErrFailed,
 			"msg": i18n.Sprintf("user not exist"),
 		})
 		return
 	}
 
-	c.JSON(200, gin.H{"ret": 0, "msg": "", "data": user})
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": user})
 }
 
 // Login login user
@@ -218,7 +218,7 @@ func Delete(c *gin.Context) {
 	id := c.Param("id")
 	userID := u["id"].(string)
 	if id == userID {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"ret": -1,
 			"msg": "can't delete youself",
 		})
@@ -227,7 +227,7 @@ func Delete(c *gin.Context) {
 
 	err := user.Delete(id)
 	if err != nil {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"ret": -1,
 			"msg": err.Error(),
 		})
@@ -245,13 +245,13 @@ func Delete(c *gin.Context) {
 		)
 	}
 
-	c.JSON(200, gin.H{"ret": 0, "msg": ""})
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
 func CreateToken(c *gin.Context) {
 	user := goparam.GetUser(c)
 	if user == nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": "user data is empty"})
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "user data is empty"})
 		return
 	}
 
@@ -262,35 +262,35 @@ func CreateToken(c *gin.Context) {
 	status, _ := user["status"].(int)
 	tk, err := middleware.GenerateAuthToken(username, userid, email, role, status, 30)
 	if err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": "create token failed"})
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "create token failed"})
 		return
 	}
-	c.JSON(200, gin.H{"ret": 0, "msg": "", "token": tk})
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "token": tk})
 }
 
 func Edit(c *gin.Context) {
 	var req user.EditMsg
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 	err := user.Edit(&req)
 	if err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"ret": 0, "msg": ""})
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
 func ResetPassword(c *gin.Context) {
 	var req user.ResetPasswdRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 	usermap := goparam.GetUser(c)
 	if usermap == nil {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
 			"msg": i18n.Sprintf("user not exist"),
 		})
@@ -298,7 +298,7 @@ func ResetPassword(c *gin.Context) {
 	}
 
 	if req.Password != req.Password2 {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
 			"msg": i18n.Sprintf("password confirmation doesn't match the password"),
 		})
@@ -307,10 +307,10 @@ func ResetPassword(c *gin.Context) {
 
 	err := user.ResetPasswd(&req)
 	if err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"ret": 0, "msg": ""})
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
 // v1 user适用于普通的后台管理系统，用户由管理员创建管理，不支持自注册用户

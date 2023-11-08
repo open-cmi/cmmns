@@ -27,6 +27,7 @@ func New() *Service {
 func (s *Service) Init() error {
 	// init webserver
 	middleware.DefaultMiddleware(s.Engine)
+	middleware.WACMiddleware(s.Engine)
 	middleware.SessionMiddleware(s.Engine)
 	middleware.JWTMiddleware(s.Engine)
 	UnauthInit(s.Engine)

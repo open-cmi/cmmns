@@ -1,8 +1,6 @@
 package migration
 
 import (
-	"fmt"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/open-cmi/migrate"
 )
@@ -13,7 +11,7 @@ type SecretKeyInstance struct {
 
 // Up up migrate
 func (mi SecretKeyInstance) Up(db *sqlx.DB) error {
-	sqlClause := fmt.Sprintf(`
+	sqlClause := `
 		CREATE TABLE IF NOT EXISTS secret_key (
 			id char(64) NOT NULL PRIMARY KEY,
 			name VARCHAR(256) NOT NULL unique DEFAULT '',
@@ -28,16 +26,16 @@ func (mi SecretKeyInstance) Up(db *sqlx.DB) error {
 			ctime INT DEFAULT 0,
 			utime INT DEFAULT 0
 		)
-	`)
+	`
 	_, err := db.Exec(sqlClause)
 	return err
 }
 
 // Down down migrate
 func (mi SecretKeyInstance) Down(db *sqlx.DB) error {
-	sqlClause := fmt.Sprintf(`
+	sqlClause := `
 		DROP TABLE IF EXISTS secret_key
-	`)
+	`
 	_, err := db.Exec(sqlClause)
 	return err
 }
