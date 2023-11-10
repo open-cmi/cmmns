@@ -135,7 +135,7 @@ func setConfig(msg *ConfigMsg) error {
 	wf.Write(netout)
 
 	var args []string = []string{"apply"}
-	exec.Command("netplan", args...).Run()
+	err = exec.Command("netplan", args...).Run()
 
-	return nil
+	return err
 }

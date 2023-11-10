@@ -26,10 +26,11 @@ type WebAccessControl struct {
 var WebAccessControlKey = "web-access-control"
 
 type Model struct {
-	Mode             string `json:"mode" db:"mode"` // blacklist or whitelist
-	RawPermitAddress string `json:"raw_permit_address" db:"raw_permit_address"`
-	RawDenyAddress   string `json:"raw_deny_address" db:"raw_deny_address"`
-	isNew            bool
+	Enable       bool   `json:"enable" db:"enable"`
+	Mode         string `json:"mode" db:"mode"` // blacklist or whitelist
+	RawWhitelist string `json:"raw_whitelist" db:"raw_whitelist"`
+	RawBlacklist string `json:"raw_blacklist" db:"raw_blacklist"`
+	isNew        bool
 }
 
 func (m *Model) Key() string {
@@ -86,10 +87,16 @@ func Get() *Model {
 	if row == nil {
 		return nil
 	}
-	var m Model
-	err := row.Scan(&m)
+	var value string
+	err := row.Scan(&value)
 	if err != nil {
 		logger.Infof("wac scan model failed: %s\n", err.Error())
+		return nil
+	}
+	var m Model
+	err = json.Unmarshal([]byte(value), &m)
+	if err != nil {
+		logger.Errorf("wac json unmarshal failed: %s\n", err.Error())
 		return nil
 	}
 
@@ -99,7 +106,13 @@ func Get() *Model {
 func (m *Model) ConvertoWAC() WebAccessControl {
 	var wac WebAccessControl
 	wac.Mode = m.Mode
-	arrs := strings.Split(m.RawPermitAddress, ",\n")
+
+	var arrs []string
+	lines := strings.Split(m.RawWhitelist, "\n")
+	for _, line := range lines {
+		tmp := strings.Split(line, ",")
+		arrs = append(arrs, tmp...)
+	}
 	for _, ar := range arrs {
 		ar = strings.Trim(ar, "\t ")
 		if strings.Contains(ar, "/") {
@@ -119,7 +132,12 @@ func (m *Model) ConvertoWAC() WebAccessControl {
 		}
 	}
 
-	arrs = strings.Split(m.RawDenyAddress, ",\n")
+	arrs = []string{}
+	lines = strings.Split(m.RawBlacklist, "\n")
+	for _, line := range lines {
+		tmp := strings.Split(line, ",")
+		arrs = append(arrs, tmp...)
+	}
 	for _, ar := range arrs {
 		ar = strings.Trim(ar, "\t ")
 		if strings.Contains(ar, "/") {

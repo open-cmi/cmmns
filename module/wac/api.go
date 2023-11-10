@@ -1,6 +1,7 @@
 package wac
 
 import (
+	"fmt"
 	"net/netip"
 
 	"github.com/open-cmi/cmmns/essential/logger"
@@ -20,15 +21,17 @@ func SetWAC(req *SetRequest) error {
 	if m == nil {
 		m = New()
 	}
+	m.Enable = req.Enable
 	m.Mode = req.Mode
-	m.RawPermitAddress = req.RawPermitAddress
-	m.RawDenyAddress = req.RawDenyAddress
+	m.RawWhitelist = req.RawWhitelist
+	m.RawBlacklist = req.RawBlacklist
 	err := m.Save()
 	if err != nil {
 		logger.Errorf("wac save failed: %s\n", err.Error())
 		return err
 	}
 	gWebAccessControl = m.ConvertoWAC()
+	fmt.Println(gWebAccessControl)
 	return nil
 }
 
