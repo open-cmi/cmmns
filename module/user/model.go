@@ -14,17 +14,18 @@ import (
 )
 
 type User struct {
-	UserName    string `json:"username" db:"username"`
-	ID          string `json:"id" db:"id"`
-	Email       string `json:"email" db:"email"`
-	Password    string `json:"-" db:"password"`
-	Role        string `json:"role" db:"role"`
-	Description string `json:"description,omitempty" db:"description"`
-	Activate    bool   `json:"activate" db:"activate"`
-	Status      string `json:"status" db:"status"`
-	CreatedTime int64  `json:"created_time" db:"itime"`
-	UpdatedTime int64  `json:"updated_time" db:"utime"`
-	isNew       bool
+	UserName           string `json:"username" db:"username"`
+	ID                 string `json:"id" db:"id"`
+	Email              string `json:"email" db:"email"`
+	Password           string `json:"-" db:"password"`
+	Role               string `json:"role" db:"role"`
+	Description        string `json:"description,omitempty" db:"description"`
+	Activate           bool   `json:"activate" db:"activate"`
+	Status             string `json:"status" db:"status"`
+	CreatedTime        int64  `json:"created_time" db:"itime"`
+	UpdatedTime        int64  `json:"updated_time" db:"utime"`
+	PasswordChangeTime int64  `json:"password_change_time" db:"password_change_time"`
+	isNew              bool
 }
 
 func (u *User) Save() error {

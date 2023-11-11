@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jameskeane/bcrypt"
@@ -172,12 +173,16 @@ func Edit(req *EditMsg) error {
 }
 
 func ChangePassword(userid string, password string) error {
+	u := Get("id", userid)
+	if u == nil {
+		return errors.New("users not exist")
+	}
+
 	salt, _ := bcrypt.Salt(10)
 	hash, _ := bcrypt.Hash(password, salt)
-	updateClause := `update users set password=$1 where id=$2`
-	db := sqldb.GetConfDB()
-	_, err := db.Exec(updateClause, hash, userid)
-	return err
+	u.Password = hash
+	u.PasswordChangeTime = time.Now().Unix()
+	return u.Save()
 }
 
 func ResetPasswd(req *ResetPasswdRequest) error {

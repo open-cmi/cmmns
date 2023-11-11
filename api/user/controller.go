@@ -2,12 +2,15 @@ package user
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/dchest/captcha"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/common/errcode"
 	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/module/middleware"
+	"github.com/open-cmi/cmmns/module/setting/pubnet"
 	"github.com/open-cmi/cmmns/service/webserver"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
@@ -16,6 +19,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/essential/logger"
 )
 
 // CheckAuth get userinfo
@@ -160,6 +164,23 @@ func Login(c *gin.Context) {
 	auditlog.InsertLog(ip, user.UserName, auditlog.LoginType, i18n.Sprintf("login successfully"))
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": *user})
+
+	// 记录公网ip
+	m := pubnet.Get()
+	if m == nil {
+		m = pubnet.New()
+		host := c.Request.Host
+		hostport := strings.Split(host, ":")
+		m.Host = hostport[0]
+		m.Schema = c.Request.URL.Scheme
+		if hostport[1] != "" {
+			m.Port, _ = strconv.Atoi(hostport[1])
+		}
+		err = m.Save()
+		if err != nil {
+			logger.Errorf("save pubnet failed: %s\n", err.Error())
+		}
+	}
 }
 
 func Logout(c *gin.Context) {

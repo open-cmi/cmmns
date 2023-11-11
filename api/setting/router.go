@@ -9,4 +9,6 @@ func init() {
 	webserver.RegisterAuthAPI("setting", "GET", "/", List)
 	webserver.RegisterAuthAPI("setting", "GET", "/:id", Get)
 	webserver.RegisterAuthAPI("setting", "PUT", "/:id", Edit)
+	webserver.RegisterAuthAPI("setting", "GET", "/pubnet/", GetPublicNet)
+	webserver.RegisterAuthAPI("setting", "POST", "/pubnet/", SetPublicNet)
 }
