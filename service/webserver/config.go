@@ -15,7 +15,8 @@ type Server struct {
 }
 
 type Config struct {
-	Server []Server `json:"server"`
+	Server         []Server `json:"server"`
+	StaticLocation string   `json:"static_location"`
 }
 
 var gConf Config
