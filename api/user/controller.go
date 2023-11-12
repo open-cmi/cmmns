@@ -172,7 +172,11 @@ func Login(c *gin.Context) {
 		host := c.Request.Host
 		hostport := strings.Split(host, ":")
 		m.Host = hostport[0]
-		m.Schema = c.Request.URL.Scheme
+		if c.Request.TLS != nil {
+			m.Schema = "https"
+		} else {
+			m.Schema = "http"
+		}
 		if hostport[1] != "" {
 			m.Port, _ = strconv.Atoi(hostport[1])
 		}
