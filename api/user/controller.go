@@ -172,14 +172,18 @@ func Login(c *gin.Context) {
 		host := c.Request.Host
 		hostport := strings.Split(host, ":")
 		m.Host = hostport[0]
+		if hostport[1] != "" {
+			m.Port, _ = strconv.Atoi(hostport[1])
+		}
+
 		if c.Request.TLS != nil {
+			m.Schema = "https"
+		} else if proto := c.GetHeader("X-Forwarded-Proto"); proto == "https" {
 			m.Schema = "https"
 		} else {
 			m.Schema = "http"
 		}
-		if hostport[1] != "" {
-			m.Port, _ = strconv.Atoi(hostport[1])
-		}
+
 		err = m.Save()
 		if err != nil {
 			logger.Errorf("save pubnet failed: %s\n", err.Error())
