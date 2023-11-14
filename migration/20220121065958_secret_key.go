@@ -15,7 +15,6 @@ func (mi SecretKeyInstance) Up(db *sqlx.DB) error {
 		CREATE TABLE IF NOT EXISTS secret_key (
 			id char(64) NOT NULL PRIMARY KEY,
 			name VARCHAR(256) NOT NULL unique DEFAULT '',
-			user_id CHAR(64) NOT NULL DEFAULT '',
 			key_type VARCHAR(12) NOT NULL DEFAULT '',
 			key_length integer DEFAULT 2048,
 			comment VARCHAR(128) NOT NULL DEFAULT '',
@@ -23,8 +22,7 @@ func (mi SecretKeyInstance) Up(db *sqlx.DB) error {
 			confirmation VARCHAR(128) NOT NULL DEFAULT '',
 			private_key TEXT NOT NULL DEFAULT '',
 			public_key TEXT NOT NULL DEFAULT '',
-			ctime INT DEFAULT 0,
-			utime INT DEFAULT 0
+			created_time INTEGER DEFAULT 0
 		)
 	`
 	_, err := db.Exec(sqlClause)

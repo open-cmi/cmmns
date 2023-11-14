@@ -164,7 +164,7 @@ func UploadPrivateKey(c *gin.Context) {
 	logger.Infof("upload private key file: %s\n", file.Filename)
 	name := c.PostForm("name")
 	// Upload the file to specific dst.
-	dst := fmt.Sprintf("/tmp/%s", file.Filename)
+	dst := fmt.Sprintf("%s/%s", os.TempDir(), file.Filename)
 
 	src, err := file.Open()
 	if err != nil {

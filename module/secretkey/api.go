@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/google/uuid"
 	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
@@ -27,12 +28,12 @@ func GetByName(name string) *Model {
 
 func Get(id string) *Model {
 	// 先检查用户名是否存在
-	queryclause := "select id,name,key_type,key_length,comment from secret_key where id=$1"
+	queryclause := "select * from secret_key where id=$1"
 
 	var model Model
 	db := sqldb.GetConfDB()
-	row := db.QueryRow(queryclause, id)
-	err := row.Scan(&model.ID, &model.Name, &model.KeyType, &model.KeyLength, &model.Comment)
+	row := db.QueryRowx(queryclause, id)
+	err := row.StructScan(&model)
 	if err == nil {
 		// 用户名已经被占用
 		return &model
@@ -80,7 +81,7 @@ func List(mo *goparam.Option) (int, []Model, error) {
 
 	var results []Model = []Model{}
 
-	countClause := fmt.Sprintf("select count(*) from secret_key")
+	countClause := "select count(*) from secret_key"
 	whereClause, args := goparam.BuildWhereClause(mo)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
@@ -91,9 +92,10 @@ func List(mo *goparam.Option) (int, []Model, error) {
 		return 0, results, errors.New("get count failed")
 	}
 
-	queryClause := fmt.Sprintf(`select id,name,key_type,key_length,comment,public_key from secret_key`)
+	queryClause := `select * from secret_key`
 	queryClause += whereClause
-	rows, err := db.Query(queryClause, args...)
+	queryClause += goparam.BuildFinalClause(mo)
+	rows, err := db.Queryx(queryClause, args...)
 	if err != nil {
 		// 没有的话，也不需要报错
 		return count, results, nil
@@ -101,7 +103,7 @@ func List(mo *goparam.Option) (int, []Model, error) {
 
 	for rows.Next() {
 		var item Model
-		err := rows.Scan(&item.ID, &item.Name, &item.KeyType, &item.KeyLength, &item.Comment, &item.PublicKey)
+		err := rows.StructScan(&item)
 		if err != nil {
 			break
 		}
@@ -190,6 +192,7 @@ func CreateByFile(name string, privateFile string) error {
 		return errors.New("generate public key failed")
 	}
 	m = &Model{
+		ID:    uuid.NewString(),
 		isNew: true,
 	}
 	m.Name = name

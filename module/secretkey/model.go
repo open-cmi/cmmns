@@ -2,9 +2,13 @@ package secretkey
 
 import (
 	"errors"
+	"fmt"
+	"strings"
+	"time"
 
 	"github.com/google/uuid"
 
+	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
 
@@ -17,8 +21,9 @@ type Model struct {
 	Comment      string `json:"comment" db:"comment"`
 	PassPhrase   string `json:"passphrase" db:"passphrase"`
 	Confirmation string `json:"confirmation" db:"confirmation"`
-	PrivateKey   string `json:"private_key" db:"private_key"`
+	PrivateKey   string `json:"-" db:"private_key"`
 	PublicKey    string `json:"public_key" db:"public_key"`
+	CreatedTime  int64  `json:"created_time" db:"created_time"`
 	isNew        bool
 }
 
@@ -27,18 +32,20 @@ func (m *Model) Save() error {
 
 	if m.isNew {
 		// 存储到数据库
-		id := uuid.New()
-		insertClause := `insert into 
-			secret_key(id, name, key_type, key_length, comment, passphrase, confirmation, private_key, public_key) 
-			values($1, $2, $3, $4, $5, $6, $7, $8, $9)`
-		_, err := db.Exec(insertClause, id.String(), m.Name, m.KeyType,
-			m.KeyLength, m.Comment, m.PassPhrase, m.Confirmation, m.PrivateKey, m.PublicKey)
+		columns := goparam.GetColumn(*m, []string{})
+		insertedColumn := goparam.GetColumnInsertNamed(columns)
+
+		insertClause := fmt.Sprintf(`insert into secret_key(%s) values(%s)`,
+			strings.Join(columns, ","), strings.Join(insertedColumn, ","))
+		_, err := db.NamedExec(insertClause, m)
 		if err != nil {
 			return errors.New("create model failed")
 		}
 	} else {
-		updateClause := `update secret_key set name=$1 where id=$2`
-		_, err := db.Exec(updateClause, m.Name, m.ID)
+		columns := goparam.GetColumn(*m, []string{})
+		updateColumns := goparam.GetColumnUpdateNamed(columns)
+		updateClause := fmt.Sprintf(`update secret_key set %s where id=:id`, strings.Join(updateColumns, ","))
+		_, err := db.NamedExec(updateClause, m)
 		if err != nil {
 			return errors.New("update model failed")
 		}
@@ -63,6 +70,7 @@ func New(reqMsg *CreateMsg) (m *Model) {
 		reqMsg.KeyLength, reqMsg.Comment, reqMsg.PassPhrase)
 
 	return &Model{
+		ID:           uuid.NewString(),
 		Name:         reqMsg.Name,
 		KeyType:      reqMsg.KeyType,
 		KeyLength:    reqMsg.KeyLength,
@@ -71,6 +79,7 @@ func New(reqMsg *CreateMsg) (m *Model) {
 		Confirmation: reqMsg.Confirmation,
 		PrivateKey:   privateKey,
 		PublicKey:    publicKey,
+		CreatedTime:  time.Now().Unix(),
 		isNew:        true,
 	}
 }
