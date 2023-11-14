@@ -1,11 +1,15 @@
 package secretkey
 
 import (
+	"fmt"
+	"io"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/open-cmi/cmmns/common/goparam"
+	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/module/secretkey"
 )
 
@@ -80,6 +84,7 @@ func Create(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
 
@@ -100,12 +105,7 @@ func Create(c *gin.Context) {
 func Get(c *gin.Context) {
 	identify := c.Param("id")
 
-	user := goparam.GetUser(c)
-	userID, _ := user["id"].(string)
-
-	m := secretkey.Get(&goparam.Option{
-		UserID: userID,
-	}, identify)
+	m := secretkey.Get(identify)
 
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,
@@ -148,6 +148,45 @@ func Edit(c *gin.Context) {
 	err := secretkey.Edit(&goparam.Option{
 		UserID: userID,
 	}, identify, &reqMsg)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
+	})
+}
+
+func UploadPrivateKey(c *gin.Context) {
+	file, _ := c.FormFile("file")
+	logger.Infof("upload private key file: %s\n", file.Filename)
+	name := c.PostForm("name")
+	// Upload the file to specific dst.
+	dst := fmt.Sprintf("/tmp/%s", file.Filename)
+
+	src, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	defer src.Close()
+
+	out, err := os.OpenFile(dst, os.O_CREATE|os.O_RDWR, 0600)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, src)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	err = secretkey.CreateByFile(name, dst)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return

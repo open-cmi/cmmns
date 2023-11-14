@@ -10,7 +10,19 @@ import (
 	"github.com/open-cmi/cmmns/essential/logger"
 )
 
-func GenerateSecretKey(name, keyType string, keyLength int, comment string, passphrase string) (privateKey string, publicKey string, err error) {
+func GeneratePublickKey(privateFile string) (string, error) {
+	args := []string{"-y", "-f", privateFile}
+
+	cmd := exec.Command("ssh-keygen", args...)
+	out, err := cmd.Output()
+	if err != nil {
+		logger.Errorf("ssh-keygen failed: %s\n", err.Error())
+		return "", err
+	}
+	return string(out), nil
+}
+
+func GenerateSecretKey(name string, keyType string, keyLength int, comment string, passphrase string) (privateKey string, publicKey string, err error) {
 	filename := fmt.Sprintf("id_%s_%s", keyType, name)
 	file := filepath.Join(os.TempDir(), filename)
 
@@ -24,6 +36,7 @@ func GenerateSecretKey(name, keyType string, keyLength int, comment string, pass
 	cmd := exec.Command("ssh-keygen", args...)
 	if err = cmd.Start(); err != nil {
 		logger.Error(err.Error())
+		return "", "", err
 	}
 
 	// Lastly, wait for the process to exit
@@ -31,10 +44,17 @@ func GenerateSecretKey(name, keyType string, keyLength int, comment string, pass
 
 	// 读取私钥文件
 	privateByte, err := os.ReadFile(file)
+	if err != nil {
+		return "", "", err
+	}
 	// 读取公钥文件
 	privateKey = string(privateByte)
 
 	publicByte, err := os.ReadFile(file + ".pub")
+	if err != nil {
+		return "", "", err
+	}
+
 	publicKey = string(publicByte)
 
 	// remove file

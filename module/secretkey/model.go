@@ -2,7 +2,6 @@ package secretkey
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/google/uuid"
 
@@ -11,15 +10,15 @@ import (
 
 // Model  model
 type Model struct {
-	ID           string `json:"id"`
-	Name         string `json:"name"`
-	KeyType      string `json:"key_type"`
-	KeyLength    int    `json:"key_length"`
-	Comment      string `json:"comment"`
-	PassPhrase   string `json:"passphrase"`
-	Confirmation string `json:"confirmation"`
-	PrivateKey   string `json:"private_key"`
-	PublicKey    string `json:"public_key"`
+	ID           string `json:"id" db:"id"`
+	Name         string `json:"name" db:"name"`
+	KeyType      string `json:"key_type" db:"key_type"`
+	KeyLength    int    `json:"key_length" db:"key_length"`
+	Comment      string `json:"comment" db:"comment"`
+	PassPhrase   string `json:"passphrase" db:"passphrase"`
+	Confirmation string `json:"confirmation" db:"confirmation"`
+	PrivateKey   string `json:"private_key" db:"private_key"`
+	PublicKey    string `json:"public_key" db:"public_key"`
 	isNew        bool
 }
 
@@ -29,16 +28,16 @@ func (m *Model) Save() error {
 	if m.isNew {
 		// 存储到数据库
 		id := uuid.New()
-		insertClause := fmt.Sprintf(`insert into 
+		insertClause := `insert into 
 			secret_key(id, name, key_type, key_length, comment, passphrase, confirmation, private_key, public_key) 
-			values($1, $2, $3, $4, $5, $6, $7, $8, $9)`)
+			values($1, $2, $3, $4, $5, $6, $7, $8, $9)`
 		_, err := db.Exec(insertClause, id.String(), m.Name, m.KeyType,
 			m.KeyLength, m.Comment, m.PassPhrase, m.Confirmation, m.PrivateKey, m.PublicKey)
 		if err != nil {
 			return errors.New("create model failed")
 		}
 	} else {
-		updateClause := fmt.Sprintf(`update secret_key set name=$1 where id=$2`)
+		updateClause := `update secret_key set name=$1 where id=$2`
 		_, err := db.Exec(updateClause, m.Name, m.ID)
 		if err != nil {
 			return errors.New("update model failed")
@@ -51,7 +50,7 @@ func (m *Model) Save() error {
 func (m *Model) Remove() error {
 	db := sqldb.GetConfDB()
 
-	deleteClause := fmt.Sprintf("delete from secret_key where id=$1")
+	deleteClause := "delete from secret_key where id=$1"
 	_, err := db.Exec(deleteClause, m.ID)
 	if err != nil {
 		return errors.New("delete model failed")

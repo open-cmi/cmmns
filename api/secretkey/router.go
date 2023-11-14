@@ -12,4 +12,5 @@ func init() {
 	webserver.RegisterAuthAPI("secretkey", "GET", "/:id", Get)
 	webserver.RegisterAuthAPI("secretkey", "DELETE", "/:id", Delete)
 	webserver.RegisterAuthAPI("secretkey", "PUT", "/:id", Edit)
+	webserver.RegisterAuthAPI("secretkey", "POST", "/upload/", UploadPrivateKey)
 }
