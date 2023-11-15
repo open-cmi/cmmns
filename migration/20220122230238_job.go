@@ -15,14 +15,9 @@ func (mi JobInstance) Up(db *sqlx.DB) error {
 	sqlClause := `
 		CREATE TABLE IF NOT EXISTS job (
 			id char(64) NOT NULL PRIMARY KEY,
-			cron_id VARCHAR(128) NOT NULL DEFAULT '',
 			type VARCHAR(32) NOT NULL DEFAULT '',
-			priority INTEGER NOT NULL DEFAULT 0,
 			content TEXT NOT NULL DEFAULT '',
-			run_type VARCHAR(32) NOT NULL DEFAULT '',
-			run_spec VARCHAR(64) NOT NULL DEFAULT '',
 			sched_group VARCHAR(64) NOT NULL DEFAULT '',
-			sched_object VARCHAR(64) NOT NULL DEFAULT '',
 			state VARCHAR(32) NOT NULL DEFAULT '',
 			count INTEGER NOT NULL DEFAULT 0,
 			done INTEGER NOT NULL DEFAULT 0,
