@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -29,10 +30,9 @@ func (s *Service) Init() error {
 
 	middleware.DefaultMiddleware(s.Engine)
 	middleware.WACMiddleware(s.Engine)
-	var dir string = gConf.StaticLocation
-	if dir == "" {
-		dir = "/var/www/html/"
-	}
+
+	workDir := pathutil.GetRootPath()
+	dir := fmt.Sprintf("%s/static/", workDir)
 	s.Engine.Static("/api-static/", dir)
 	middleware.SessionMiddleware(s.Engine)
 	middleware.JWTMiddleware(s.Engine)

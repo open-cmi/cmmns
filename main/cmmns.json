@@ -3,15 +3,6 @@
     "server_addr": "",
     "server_port": 0
   },
-  "cluster": {
-    "linux_package": "",
-    "local_address": "",
-    "local_port": 0,
-    "local_proto": "",
-    "address": "",
-    "port": 0,
-    "proto": ""
-  },
   "locale": {
     "lang": "zh-CN"
   },
