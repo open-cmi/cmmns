@@ -19,7 +19,6 @@ type TLSKeyPair struct {
 type Config struct {
 	Server     string     `json:"server,omitempty"`
 	TLSKeyPair TLSKeyPair `json:"tls_key_pair"`
-	TCPServer  string     `json:"tcp_server,omitempty"`
 }
 
 var gConf Config
@@ -28,7 +27,7 @@ var gConf Config
 var DefaultClient *http.Client
 
 // Init transport init
-func Init(raw json.RawMessage) error {
+func Parse(raw json.RawMessage) error {
 	err := json.Unmarshal(raw, &gConf)
 	if err != nil {
 		return err
@@ -74,7 +73,6 @@ func Save() json.RawMessage {
 
 func init() {
 	gConf.Server = "localhost"
-	gConf.TCPServer = "127.0.0.1:30017"
 
-	config.RegisterConfig("transport", Init, Save)
+	config.RegisterConfig("transport", Parse, Save)
 }

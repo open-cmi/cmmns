@@ -38,9 +38,6 @@
     "port": 25431,
     "password": "8ik,\u003cKI*"
   },
-  "transport": {
-    "tcp_server": "localhost:30017"
-  },
   "user2": {
     "activate_url": ""
   },
