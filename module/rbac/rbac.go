@@ -32,5 +32,5 @@ func Init() error {
 }
 
 func init() {
-	business.Register("rbac", Init)
+	business.Register("rbac", business.DefaultPriority, Init)
 }

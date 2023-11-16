@@ -13,5 +13,5 @@ func Init() error {
 }
 
 func init() {
-	business.Register("wac", Init)
+	business.Register("wac", business.DefaultPriority, Init)
 }

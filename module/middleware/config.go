@@ -61,5 +61,5 @@ func init() {
 	gConf.Store = "memory"
 
 	config.RegisterConfig("middleware", Parse, Save)
-	business.Register("middleware", Init)
+	business.Register("middleware", business.DefaultPriority, Init)
 }

@@ -3,32 +3,55 @@ package business
 import (
 	"errors"
 	"fmt"
+	"sort"
 )
 
-var businesses map[string]func() error
+const (
+	DefaultPriority = 5
+)
+
+type Business struct {
+	Init     func() error
+	Priority int
+	Name     string
+}
+
+var businesses []Business
 
 func Init() error {
 	var err error
-	for name, fn := range businesses {
-		err = fn()
+
+	sort.SliceStable(businesses, func(i int, j int) bool {
+		bz1 := businesses[i]
+		bz2 := businesses[2]
+		return bz1.Priority < bz2.Priority
+	})
+
+	for i := range businesses {
+		bz := &businesses[i]
+		err = bz.Init()
 		if err != nil {
-			errmsg := fmt.Sprintf("business %s init failed: %s", name, err.Error())
+			errmsg := fmt.Sprintf("business %s init failed: %s", bz.Name, err.Error())
 			return errors.New(errmsg)
 		}
 	}
+
 	return nil
 }
 
-func Register(name string, fn func() error) error {
-	_, ok := businesses[name]
-	if ok {
-		errmsg := fmt.Sprintf("business %s has been registered", name)
-		return errors.New(errmsg)
+func Register(name string, priority int, fn func() error) error {
+	for i := range businesses {
+		bz := &businesses[i]
+		if bz.Name == name {
+			errmsg := fmt.Sprintf("business %s has been registered", name)
+			return errors.New(errmsg)
+		}
 	}
-	businesses[name] = fn
-	return nil
-}
 
-func init() {
-	businesses = make(map[string]func() error)
+	businesses = append(businesses, Business{
+		Init:     fn,
+		Name:     name,
+		Priority: priority,
+	})
+	return nil
 }
