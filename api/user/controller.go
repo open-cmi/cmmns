@@ -278,6 +278,12 @@ func Delete(c *gin.Context) {
 }
 
 func CreateToken(c *gin.Context) {
+	var req middleware.CreateTokenRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
 	user := goparam.GetUser(c)
 	if user == nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "user data is empty"})
@@ -289,7 +295,7 @@ func CreateToken(c *gin.Context) {
 	email, _ := user["email"].(string)
 	role, _ := user["role"].(int)
 	status, _ := user["status"].(int)
-	tk, err := middleware.GenerateAuthToken(username, userid, email, role, status, 30)
+	tk, err := middleware.GenerateAuthToken(req.Name, username, userid, email, role, status, req.ExpireDay)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "create token failed"})
 		return
@@ -342,6 +348,29 @@ func ResetPassword(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
+func TokenList(c *gin.Context) {
+	var query goparam.Option
+	goparam.ParseParams(c, &query)
+
+	count, tokens, err := middleware.TokenList(&query)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"ret": 1,
+			"msg": i18n.Sprintf("list tokens failed"),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
+		"data": map[string]interface{}{
+			"count":   count,
+			"results": tokens,
+		},
+	})
+}
+
 // v1 user适用于普通的后台管理系统，用户由管理员创建管理，不支持自注册用户
 func init() {
 	webserver.RegisterAuthRouter("user", "/api/user/v1")
@@ -354,8 +383,9 @@ func init() {
 	webserver.RegisterAuthAPI("user", "GET", "/:id", Get)
 	webserver.RegisterAuthAPI("user", "PUT", "/:id", Edit)
 	webserver.RegisterAuthAPI("user", "DELETE", "/:id", Delete)
+	webserver.RegisterAuthAPI("user", "POST", "/jwt-token/", CreateToken)
+	webserver.RegisterAuthAPI("user", "GET", "/jwt-token/", TokenList)
 
 	webserver.RegisterUnauthRouter("user", "/api/user/v1")
 	webserver.RegisterUnauthAPI("user", "POST", "/login", Login)
-	webserver.RegisterUnauthAPI("user", "POST", "/jwt-token/", CreateToken)
 }

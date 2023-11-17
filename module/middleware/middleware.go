@@ -79,12 +79,11 @@ func JWTMiddleware(r *gin.Engine) {
 // AuthMiddleware func
 func AuthMiddleware(r *gin.Engine) {
 	r.Use(func(c *gin.Context) {
-		user, exist := c.Get("user")
+		_, exist := c.Get("user")
 		if !exist {
 			c.String(http.StatusUnauthorized, "authenticate is required")
 			c.Abort()
 		}
-		logger.Info(user)
 		c.Next()
 	})
 }
@@ -122,7 +121,7 @@ func ParseAuthToken(token string) (*UserClaims, error) {
 	return nil, err
 }
 
-func GenerateAuthToken(username string, id string, email string, role int, status int, expireDay int) (string, error) {
+func GenerateAuthToken(name string, username string, id string, email string, role int, status int, expireDay int) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(3600 * 24 * (time.Duration)(expireDay) * time.Second)
 	issuer := "cmmns"
@@ -139,6 +138,17 @@ func GenerateAuthToken(username string, id string, email string, role int, statu
 	}
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte("cmmns"))
+	if err != nil {
+		return "", err
+	}
+
+	t := NewTokenRecord()
+	t.ExpireDay = expireDay
+	t.Name = name
+	err = t.Save()
+	if err != nil {
+		return "", err
+	}
 	return token, err
 }
 

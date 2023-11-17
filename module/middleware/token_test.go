@@ -6,7 +6,7 @@ import (
 )
 
 func TestGenerateToken(t *testing.T) {
-	token, err := GenerateAuthToken("frank", "10001", "frank@163.com", 0, 1, 1)
+	token, err := GenerateAuthToken("test", "frank", "10001", "frank@163.com", 0, 1, 1)
 	if err != nil {
 		t.Errorf("user generate token failed")
 	}
