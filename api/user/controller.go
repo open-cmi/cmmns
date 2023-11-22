@@ -89,10 +89,9 @@ func ChangePassword(c *gin.Context) {
 // List list user
 func List(c *gin.Context) {
 
-	var query goparam.Option
-	goparam.ParseParams(c, &query)
+	query := goparam.ParseParams(c)
 
-	count, users, err := user.List(&query)
+	count, users, err := user.List(query)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
@@ -349,10 +348,9 @@ func ResetPassword(c *gin.Context) {
 }
 
 func TokenList(c *gin.Context) {
-	var query goparam.Option
-	goparam.ParseParams(c, &query)
+	query := goparam.ParseParams(c)
 
-	count, tokens, err := middleware.TokenList(&query)
+	count, tokens, err := middleware.TokenList(query)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,

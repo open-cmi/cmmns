@@ -11,10 +11,9 @@ import (
 
 // History list status history info
 func StatusHistoryList(c *gin.Context) {
-	var option goparam.Option
-	goparam.ParseParams(c, &option)
+	param := goparam.ParseParams(c)
 
-	count, list, err := system.List(&option)
+	count, list, err := system.List(param)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return

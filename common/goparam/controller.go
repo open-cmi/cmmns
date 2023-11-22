@@ -26,7 +26,9 @@ func GetUser(c *gin.Context) map[string]interface{} {
 }
 
 // ParseParams parse param
-func ParseParams(c *gin.Context, option *Option) (err error) {
+func ParseParams(c *gin.Context) *Option {
+	var option Option
+
 	var userID string = ""
 	user := GetUser(c)
 	if user != nil {
@@ -60,5 +62,5 @@ func ParseParams(c *gin.Context, option *Option) (err error) {
 	option.OrderOption.Order = c.Query("order")
 	option.OrderOption.OrderBy = c.Query("order_by")
 
-	return err
+	return &option
 }

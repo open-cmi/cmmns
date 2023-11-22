@@ -31,10 +31,9 @@ func NameList(c *gin.Context) {
 }
 
 func List(c *gin.Context) {
-	var param goparam.Option
-	goparam.ParseParams(c, &param)
+	param := goparam.ParseParams(c)
 
-	count, results, err := secretkey.List(&param)
+	count, results, err := secretkey.List(param)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return

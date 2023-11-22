@@ -10,10 +10,9 @@ import (
 )
 
 func List(c *gin.Context) {
-	var option goparam.Option
-	goparam.ParseParams(c, &option)
+	param := goparam.ParseParams(c)
 
-	count, results, err := manhour.List(&option)
+	count, results, err := manhour.List(param)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return

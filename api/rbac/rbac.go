@@ -24,15 +24,9 @@ func RoleNameList(c *gin.Context) {
 }
 
 func RoleList(c *gin.Context) {
-	var param goparam.Option
+	param := goparam.ParseParams(c)
 
-	err := goparam.ParseParams(c, &param)
-	if err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
-		return
-	}
-
-	count, results, err := rbac.RoleList(&param)
+	count, results, err := rbac.RoleList(param)
 	if err != nil {
 		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -48,19 +42,14 @@ func RoleList(c *gin.Context) {
 }
 
 func ModuleList(c *gin.Context) {
-	var param goparam.Option
+	param := goparam.ParseParams(c)
 
-	err := goparam.ParseParams(c, &param)
+	count, results, err := rbac.ModuleList(param)
 	if err != nil {
 		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 
-	count, results, err := rbac.ModuleList(&param)
-	if err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
-		return
-	}
 	c.JSON(200, gin.H{
 		"ret": 0,
 		"msg": "",
