@@ -47,11 +47,22 @@ type SystemInfo struct {
 	MemUsed         uint64  `json:"mem_used"`
 	MemTotal        uint64  `json:"mem_total"`
 	MemUsedPercent  float64 `json:"mem_used_percent"`
-	NetSent         uint64  `json:"net_sent"`
-	NetRecv         uint64  `json:"net_recv"`
 	LoadAvg1        float64 `json:"load_avg_1"`
 	LoadAvg5        float64 `json:"load_avg_5"`
 	LoadAvg15       float64 `json:"load_avg_15"`
+}
+
+type NetLoadInfo struct {
+	NetSent uint64 `json:"net_sent"`
+	NetRecv uint64 `json:"net_recv"`
+}
+
+func GetNetLoadInfo() NetLoadInfo {
+	netSent, netRecv := NetRateSummary()
+	var ns NetLoadInfo
+	ns.NetRecv = netRecv
+	ns.NetSent = netSent
+	return ns
 }
 
 func GetBasicSystemInfo() (si SystemInfo, err error) {
@@ -72,10 +83,6 @@ func GetBasicSystemInfo() (si SystemInfo, err error) {
 	si.MemTotal = memTotal
 	si.MemUsed = memUsed
 	si.MemUsedPercent = memUsedPercent
-
-	netSent, netRecv := NetRateSummary()
-	si.NetRecv = netRecv
-	si.NetSent = netSent
 
 	load1, load5, load15 := LoadSummary()
 	si.LoadAvg1 = load1
