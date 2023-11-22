@@ -3,6 +3,7 @@ package system
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -30,11 +31,13 @@ func InitDevID() {
 	db := sqldb.GetConfDB()
 	_, err := db.Exec(sqlquery)
 	if err != nil {
-		logger.Errorf("update system status failed: %s\n", err.Error())
+		logger.Errorf("update system si failed: %s\n", err.Error())
 	}
 }
 
-type SystemStatus struct {
+type SystemInfo struct {
+	DevID           string  `json:"dev_id"`
+	Hostname        string  `json:"hostname"`
 	CPUCores        int     `json:"cpu_cores"`
 	CPUThreads      int     `json:"cpu_threads"`
 	CPUUsage        float64 `json:"cpu_usage"`
@@ -51,29 +54,34 @@ type SystemStatus struct {
 	LoadAvg15       float64 `json:"load_avg_15"`
 }
 
-func GetStatus() SystemStatus {
-	var status SystemStatus
-	status.CPUCores, status.CPUThreads, status.CPUUsage = CPUSummary()
+func GetBasicSystemInfo() (si SystemInfo, err error) {
+	si.DevID = devutil.GetDeviceID()
+	si.Hostname, err = os.Hostname()
+	if err != nil {
+		return si, err
+	}
+
+	si.CPUCores, si.CPUThreads, si.CPUUsage = CPUSummary()
 
 	diskUsed, diskTotal, diskUsedPercent := DiskSummary()
-	status.DiskTotal = diskTotal
-	status.DiskUsed = diskUsed
-	status.DiskUsedPercent = diskUsedPercent
+	si.DiskTotal = diskTotal
+	si.DiskUsed = diskUsed
+	si.DiskUsedPercent = diskUsedPercent
 
 	memUsed, memTotal, memUsedPercent := MemSummary()
-	status.MemTotal = memTotal
-	status.MemUsed = memUsed
-	status.MemUsedPercent = memUsedPercent
+	si.MemTotal = memTotal
+	si.MemUsed = memUsed
+	si.MemUsedPercent = memUsedPercent
 
 	netSent, netRecv := NetRateSummary()
-	status.NetRecv = netRecv
-	status.NetSent = netSent
+	si.NetRecv = netRecv
+	si.NetSent = netSent
 
 	load1, load5, load15 := LoadSummary()
-	status.LoadAvg1 = load1
-	status.LoadAvg5 = load5
-	status.LoadAvg15 = load15
-	return status
+	si.LoadAvg1 = load1
+	si.LoadAvg5 = load5
+	si.LoadAvg15 = load15
+	return si, nil
 }
 
 func Get(mo *goparam.Option, field string, value string) *Model {
@@ -99,7 +107,7 @@ func List(option *goparam.Option) (int, []Model, error) {
 
 	var results []Model = []Model{}
 
-	countClause := fmt.Sprintf("select count(*) from system_status")
+	countClause := "select count(*) from system_status"
 	whereClause, args := goparam.BuildWhereClause(option)
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)

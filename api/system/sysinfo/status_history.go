@@ -1,4 +1,4 @@
-package status
+package sysinfo
 
 import (
 	"net/http"
