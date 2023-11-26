@@ -202,6 +202,7 @@ func Logout(c *gin.Context) {
 		auditlog.InsertLog(ip, username, auditlog.LoginType, i18n.Sprintf("logout successfully"))
 	}
 
+	session.Options.MaxAge = -1 // aged
 	delete(session.Values, "user")
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
