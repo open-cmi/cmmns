@@ -33,7 +33,7 @@ type LoginMsg struct {
 	Password      string `json:"password"`
 	Captcha       string `json:"captcha,omitempty"`
 	CaptchaID     string `json:"captchaid,omitempty"`
-	IgnoreCaptcha bool   `json:"ignorecaptcha,omitempty"`
+	IgnoreCaptcha bool   `json:"ignore_captcha,omitempty"`
 }
 
 type EditMsg struct {
