@@ -14,7 +14,8 @@ import (
 )
 
 type Config struct {
-	Store string `json:"store"`
+	Store  string `json:"store"`
+	MaxAge int    `json:"max_age"`
 }
 
 var gConf Config
@@ -25,6 +26,7 @@ func Init() error {
 	if gConf.Store == "memory" {
 		memoryStore = memstore.NewMemStore([]byte("memorystore"),
 			[]byte("enckey12341234567890123456789012"))
+		memoryStore.MaxAge(gConf.MaxAge)
 	} else if gConf.Store == "redis" {
 		host := fmt.Sprintf("%s:%d", rdbConf.Host, rdbConf.Port)
 		redisStore, err = redistore.NewRediStoreWithDB(100, "tcp", host, rdbConf.Password, "2")
@@ -35,6 +37,7 @@ func Init() error {
 
 		redisStore.SetKeyPrefix("koa-sess-")
 		redisStore.SetSerializer(redistore.JSONSerializer{})
+		redisStore.SetMaxAge(gConf.MaxAge)
 	} else {
 		return errors.New("middleware store type not supported")
 	}
@@ -47,7 +50,9 @@ func Parse(raw json.RawMessage) error {
 	if err != nil {
 		return err
 	}
-
+	if gConf.MaxAge == 0 {
+		gConf.MaxAge = 3600
+	}
 	return nil
 }
 
