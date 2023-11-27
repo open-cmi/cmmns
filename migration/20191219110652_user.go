@@ -45,6 +45,7 @@ func (mi UserInstance) Up(db *sqlx.DB) error {
 		activate bool not NULL default false,
 		itime integer NOT NULL default 0,
 		utime integer NOT NULL default 0,
+		password_change_time integer not NULL default 0,
 		description text NOT NULL DEFAULT ''
       );
 	`)
