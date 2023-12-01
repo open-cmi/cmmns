@@ -13,14 +13,14 @@ var initialized bool
 type Ticker struct {
 	Name string
 	Spec string
-	Func func(data interface{})
+	Func func(name string, data interface{})
 	Data interface{}
 }
 
 var tickers map[string]Ticker = make(map[string]Ticker)
 var cronMap map[string]*cron.Cron = make(map[string]*cron.Cron)
 
-func Register(name string, spec string, f func(interface{}), data interface{}) error {
+func Register(name string, spec string, f func(string, interface{}), data interface{}) error {
 	_, found := tickers[name]
 	if found {
 		errMsg := fmt.Sprintf("ticker %s registered failed", name)
@@ -37,7 +37,7 @@ func Register(name string, spec string, f func(interface{}), data interface{}) e
 		ins := cron.New(cron.WithSeconds())
 		ins.AddFunc(spec, func() {
 			logger.Infof("start to run timer %s\n", name)
-			f(data)
+			f(name, data)
 		})
 		go ins.Run()
 		cronMap[name] = ins
@@ -52,7 +52,7 @@ func Init() error {
 		ins := cron.New(cron.WithSeconds())
 		_, err := ins.AddFunc(t.Spec, func() {
 			logger.Infof("start to run timer %s\n", t.Name)
-			t.Func(t.Data)
+			t.Func(t.Name, t.Data)
 		})
 		if err != nil {
 			return err
