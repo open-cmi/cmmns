@@ -38,7 +38,7 @@ func (mi UserInstance) Up(db *sqlx.DB) error {
 	CREATE TABLE IF NOT EXISTS users (
 		id varchar(36) primary key,
 		username varchar(100) NOT NULL UNIQUE,
-		password varchar(200) NOT NULL,
+		password varchar(100) NOT NULL,
 		email varchar(100) UNIQUE NOT NULL,
 		role varchar(32) NOT NULL default '',
 		status varchar(32) NOT NULL default 'offline',
@@ -50,7 +50,7 @@ func (mi UserInstance) Up(db *sqlx.DB) error {
       );
 	`)
 	if err == nil {
-		mi.SyncData(db)
+		err = mi.SyncData(db)
 	}
 	return err
 }

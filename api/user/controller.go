@@ -1,9 +1,12 @@
 package user
 
 import (
+	"errors"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/dchest/captcha"
 	"github.com/gorilla/sessions"
@@ -28,6 +31,40 @@ func CheckAuth(c *gin.Context) {
 		"ret": 0,
 		"msg": "",
 	})
+}
+
+var PasswordComplexRegexp *regexp.Regexp
+
+func VerifyPasswordRule(str string, minLen, maxLen int) error {
+	var (
+		isUpper   = false
+		isLower   = false
+		isNumber  = false
+		isSpecial = false
+	)
+
+	if len(str) < minLen || len(str) > maxLen {
+		return errors.New("the password must contain uppercase and lowercase letters, numbers or punctuation, and must be 6-30 digits long. ")
+	}
+
+	for _, s := range str {
+		switch {
+		case unicode.IsUpper(s):
+			isUpper = true
+		case unicode.IsLower(s):
+			isLower = true
+		case unicode.IsNumber(s):
+			isNumber = true
+		case unicode.IsPunct(s) || unicode.IsSymbol(s):
+			isSpecial = true
+		default:
+		}
+	}
+
+	if (isUpper && isLower) && (isNumber || isSpecial) {
+		return nil
+	}
+	return errors.New("the password must contain uppercase and lowercase letters, numbers or punctuation, and must be 6-30 digits long. ")
 }
 
 func ChangePassword(c *gin.Context) {
@@ -62,8 +99,15 @@ func ChangePassword(c *gin.Context) {
 		})
 		return
 	}
-
-	err := user.ChangePassword(userID, apimsg.NewPassword)
+	err := VerifyPasswordRule(apimsg.NewPassword, 8, 30)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"ret": 1,
+			"msg": i18n.Sprintf(err.Error()),
+		})
+		return
+	}
+	err = user.ChangePassword(userID, apimsg.NewPassword)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,

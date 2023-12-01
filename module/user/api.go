@@ -1,7 +1,9 @@
 package user
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -10,8 +12,11 @@ import (
 	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/pubsub"
+	"github.com/open-cmi/cmmns/essential/rdb"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
+
+const UserLoginMaxTried = 5
 
 // List list func
 func List(query *goparam.Option) (int, []User, error) {
@@ -56,6 +61,15 @@ func List(query *goparam.Option) (int, []User, error) {
 
 // Login  user login
 func Login(m *LoginMsg) (authuser *User, err error) {
+	cache := rdb.GetClient("user")
+	loginTriedKey := fmt.Sprintf("login_tried_%s", m.UserName)
+	tried, err := cache.Get(context.TODO(), loginTriedKey).Int()
+	if err == nil && tried >= 5 {
+		errmsg := "your account has been locked, please try again 10 miniutes later"
+		logger.Warnf(errmsg)
+		return nil, errors.New(errmsg)
+	}
+
 	// 先检查用户名是否存在
 	queryclause := `select * from users where username=$1`
 
@@ -65,15 +79,43 @@ func Login(m *LoginMsg) (authuser *User, err error) {
 	err = row.StructScan(&user)
 	if err != nil {
 		// 用户名不存在
-		logger.Warnf("login failed: %s\n", err.Error())
-		return nil, errors.New("username and password not match")
+		cache := rdb.GetClient("user")
+		tried, err := cache.Get(context.TODO(), loginTriedKey).Int()
+		if err != nil {
+			cache.Set(context.TODO(), loginTriedKey, 0, 10*time.Minute).Err()
+			logger.Warnf("login failed: %s\n", err.Error())
+			return nil, errors.New("username and password not match")
+		}
+		tried++
+		cache.Set(context.TODO(), loginTriedKey, tried, 10*time.Minute).Err()
+		if tried < UserLoginMaxTried {
+			errmsg := fmt.Sprintf("username and password not match, you have %d times tried left", UserLoginMaxTried-tried)
+			return nil, errors.New(errmsg)
+		}
+		errmsg := "your account has been locked, please try again 10 miniutes later"
+		return nil, errors.New(errmsg)
 	}
 
 	// 验证密码是否正确， 后续添加salt
 	if !bcrypt.Match(m.Password, user.Password) {
 		// 用户名密码错误
-		logger.Warnf("login failed: password is incorrect\n")
-		return nil, errors.New("username and password not match")
+		logger.Warnf("login failed: user %s password is incorrect\n", user.UserName)
+		// 用户名不存在
+		cache := rdb.GetClient("user")
+		tried, err := cache.Get(context.TODO(), loginTriedKey).Int()
+		if err != nil {
+			cache.Set(context.TODO(), loginTriedKey, 0, 10*time.Minute).Err()
+			logger.Warnf("login failed: %s\n", err.Error())
+			return nil, errors.New("username and password not match")
+		}
+		tried++
+		if tried < UserLoginMaxTried {
+			cache.Set(context.TODO(), loginTriedKey, tried, 10*time.Minute).Err()
+			errmsg := fmt.Sprintf("username and password not match, you have %d times tried left", UserLoginMaxTried-tried)
+			return nil, errors.New(errmsg)
+		}
+		errmsg := "your account has been locked, please try again 10 miniutes later"
+		return nil, errors.New(errmsg)
 	}
 
 	if !user.Activate {

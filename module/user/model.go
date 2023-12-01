@@ -46,11 +46,12 @@ func (u *User) Save() error {
 		columns := goparam.GetColumn(User{}, []string{})
 		values := goparam.GetColumnUpdateNamed(columns)
 
-		insertClause := fmt.Sprintf("update users set %s where id=:id",
+		updateClause := fmt.Sprintf("update users set %s where id=:id",
 			strings.Join(values, ","))
 
-		_, err := db.NamedExec(insertClause, u)
+		_, err := db.NamedExec(updateClause, u)
 		if err != nil {
+			logger.Errorf("update user failed: %s\n", err.Error())
 			return errors.New("update user failed")
 		}
 	}
