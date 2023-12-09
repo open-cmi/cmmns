@@ -1,4 +1,4 @@
-package ntpsetting
+package time
 
 import (
 	"encoding/json"
