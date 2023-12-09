@@ -4,6 +4,7 @@ import (
 	"os/exec"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func Reboot(c *gin.Context) {
@@ -21,4 +22,9 @@ func ShutDown(c *gin.Context) {
 		"ret": 0,
 		"msg": "",
 	})
+}
+
+func init() {
+	webserver.RegisterAuthAPI("system-setting", "POST", "/reboot/", Reboot)
+	webserver.RegisterAuthAPI("system-setting", "POST", "/shutdown/", ShutDown)
 }

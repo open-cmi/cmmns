@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/goutils/database"
-	"github.com/open-cmi/goutils/database/dbsql"
+	"github.com/open-cmi/cmmns/pkg/database/relationdb"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -37,7 +36,7 @@ func Parse(raw json.RawMessage) error {
 	if err != nil {
 		return err
 	}
-	var dbconf database.Config
+	var dbconf relationdb.Config
 	dbconf.Type = gConfModel.Type
 	dbconf.File = gConfModel.File
 	dbconf.Host = gConfModel.Host
@@ -46,7 +45,7 @@ func Parse(raw json.RawMessage) error {
 	dbconf.Password = gConfModel.Password
 	dbconf.Database = gConfModel.Database
 
-	dbi, err := dbsql.SQLInit(&dbconf)
+	dbi, err := relationdb.SQLInit(&dbconf)
 	if err != nil {
 		return err
 	}

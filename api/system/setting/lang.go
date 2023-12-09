@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func ChangeLang(c *gin.Context) {
@@ -28,4 +29,9 @@ func GetLang(c *gin.Context) {
 		"msg":  "",
 		"data": lang,
 	})
+}
+
+func init() {
+	webserver.RegisterAuthAPI("system-setting", "PUT", "/locale/", ChangeLang)
+	webserver.RegisterAuthAPI("system-setting", "GET", "/locale/", GetLang)
 }

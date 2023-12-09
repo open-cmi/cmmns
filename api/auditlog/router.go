@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	webserver.RegisterAuthRouter("auditlog", "/api/common/v3/auditlog")
+	webserver.RegisterAuthRouter("auditlog", "/api/auditlog/v1")
 	webserver.RegisterAuthAPI("auditlog", "GET", "/", List)
 
 	rbac.RegisterModule("Audit log", "audit log")
