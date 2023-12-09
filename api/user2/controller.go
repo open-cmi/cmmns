@@ -11,10 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/open-cmi/cmmns/essential/rdb"
-	"github.com/open-cmi/cmmns/module/email"
+	"github.com/open-cmi/cmmns/module/setting/email"
 	"github.com/open-cmi/cmmns/module/user"
+	"github.com/open-cmi/cmmns/pkg/verify"
 	"github.com/open-cmi/cmmns/service/webserver"
-	"github.com/open-cmi/goutils/typeutil"
 )
 
 // EmailTemplate html content template
@@ -41,7 +41,7 @@ func Register(c *gin.Context) {
 	}
 
 	// 验证邮箱有效性
-	if !typeutil.EmailIsValid(apimsg.Email) {
+	if !verify.EmailIsValid(apimsg.Email) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email is not valid"})
 		return
 	}

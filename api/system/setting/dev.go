@@ -4,12 +4,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/goutils/devutil"
+	"github.com/open-cmi/cmmns/pkg/dev"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func GetDevID(c *gin.Context) {
 
-	deviceID := devutil.GetDeviceID()
+	deviceID := dev.GetDeviceID()
 
 	// 返回LAN参数
 	c.JSON(http.StatusOK, gin.H{
@@ -19,4 +20,8 @@ func GetDevID(c *gin.Context) {
 			"id": deviceID,
 		},
 	})
+}
+
+func init() {
+	webserver.RegisterAuthAPI("system-setting", "GET", "/device/", GetDevID)
 }

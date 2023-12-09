@@ -23,8 +23,6 @@ type WebAccessControl struct {
 	DenyPrefixs   []netip.Prefix
 }
 
-var WebAccessControlKey = "web-access-control"
-
 type Model struct {
 	Enable       bool   `json:"enable" db:"enable"`
 	Mode         string `json:"mode" db:"mode"` // blacklist or whitelist
@@ -34,7 +32,7 @@ type Model struct {
 }
 
 func (m *Model) Key() string {
-	return WebAccessControlKey
+	return "web-access-control"
 }
 
 func (m *Model) Value() string {
@@ -81,9 +79,9 @@ func New() *Model {
 
 func Get() *Model {
 	db := sqldb.GetConfDB()
-
+	var m Model
 	queryClause := `select value from k_v_table where key=$1`
-	row := db.QueryRowx(queryClause, WebAccessControlKey)
+	row := db.QueryRowx(queryClause, m.Key())
 	if row == nil {
 		return nil
 	}
@@ -93,7 +91,7 @@ func Get() *Model {
 		logger.Infof("wac scan model failed: %s\n", err.Error())
 		return nil
 	}
-	var m Model
+
 	err = json.Unmarshal([]byte(value), &m)
 	if err != nil {
 		logger.Errorf("wac json unmarshal failed: %s\n", err.Error())

@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/system"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func GetBasicSystemInfo(c *gin.Context) {
@@ -14,4 +15,8 @@ func GetBasicSystemInfo(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": sysinfo})
+}
+
+func init() {
+	webserver.RegisterAuthAPI("system-info", "GET", "/basic-info/", GetBasicSystemInfo)
 }

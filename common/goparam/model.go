@@ -2,7 +2,8 @@ package goparam
 
 import (
 	"fmt"
-	"reflect"
+
+	"github.com/open-cmi/cmmns/pkg/structure"
 )
 
 // 条件比较
@@ -35,30 +36,20 @@ type Option struct {
 }
 
 func GetColumn(v interface{}, skipColumn []string) []string {
-	var columns []string = []string{}
-	dataValue := reflect.ValueOf(v)
-	if dataValue.Kind() != reflect.Struct {
-		return columns
-	}
 
 	var skipmap map[string]bool = make(map[string]bool, 0)
 	for _, sc := range skipColumn {
 		skipmap[sc] = true
 	}
 
-	t := dataValue.Type()
-	for i := 0; i < t.NumField(); i++ {
-		field := dataValue.Type().Field(i)
-		tagColumn, ok := field.Tag.Lookup("db")
-		if ok {
-			sk := skipmap[tagColumn]
-			if !sk {
-				columns = append(columns, tagColumn)
-			}
+	var fields []string
+	dbFields := structure.GetStructFields(v, "db")
+	for _, field := range dbFields {
+		if !skipmap[field] {
+			fields = append(fields, field)
 		}
 	}
-
-	return columns
+	return fields
 }
 
 func GetColumnUpdateNamed(columns []string) []string {

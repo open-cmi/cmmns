@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 
-	"github.com/open-cmi/goutils/confparser"
+	"github.com/open-cmi/cmmns/pkg/confparser"
 )
 
 var gConfCtx *confparser.Context

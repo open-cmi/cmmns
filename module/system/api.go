@@ -10,13 +10,13 @@ import (
 	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/goutils/devutil"
+	"github.com/open-cmi/cmmns/pkg/dev"
 )
 
 // InitDevID init device id
 func InitDevID() {
 	utime := time.Now().UTC().Format(time.RFC3339)
-	deviceid := devutil.GetDeviceID()
+	deviceid := dev.GetDeviceID()
 	if deviceid == "" {
 		return
 	}
@@ -66,7 +66,7 @@ func GetNetLoadInfo() NetLoadInfo {
 }
 
 func GetBasicSystemInfo() (si SystemInfo, err error) {
-	si.DevID = devutil.GetDeviceID()
+	si.DevID = dev.GetDeviceID()
 	si.Hostname, err = os.Hostname()
 	if err != nil {
 		return si, err
@@ -156,7 +156,7 @@ var devID string
 func StartMonitor() {
 
 	if devID == "" {
-		devID = devutil.GetDeviceID()
+		devID = dev.GetDeviceID()
 		if devID == "" {
 			return
 		}

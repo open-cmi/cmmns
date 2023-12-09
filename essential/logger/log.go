@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/goutils/logutil"
-	"github.com/open-cmi/goutils/pathutil"
+	"github.com/open-cmi/cmmns/pkg/logger"
+	"github.com/open-cmi/cmmns/pkg/path"
 )
 
 type Feature interface {
@@ -105,24 +105,24 @@ func Parse(raw json.RawMessage) error {
 		return nil
 	}
 
-	level := logutil.Info
+	level := logger.Info
 	switch gConf.Level {
 	case "debug":
-		level = logutil.Debug
+		level = logger.Debug
 	case "info":
-		level = logutil.Info
+		level = logger.Info
 	case "warn":
-		level = logutil.Warn
+		level = logger.Warn
 	case "error":
-		level = logutil.Error
+		level = logger.Error
 	}
 	logPath := gConf.Path
 	if logPath == "" {
-		rp := pathutil.GetRootPath()
+		rp := path.GetRootPath()
 		logPath = filepath.Join(rp, "data")
 	}
 
-	Logger = logutil.NewLogger(&logutil.Option{
+	Logger = logger.NewLogger(&logger.Option{
 		Dir:        logPath,
 		Compress:   true,
 		Level:      level,

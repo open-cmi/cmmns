@@ -14,11 +14,11 @@ import (
 	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/module/middleware"
 	"github.com/open-cmi/cmmns/module/setting/pubnet"
+	"github.com/open-cmi/cmmns/pkg/verify"
 	"github.com/open-cmi/cmmns/service/webserver"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/user"
-	"github.com/open-cmi/goutils/typeutil"
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/i18n"
@@ -261,7 +261,7 @@ func Create(c *gin.Context) {
 	}
 
 	// 验证邮箱格式
-	if !typeutil.EmailIsValid(apimsg.Email) {
+	if !verify.EmailIsValid(apimsg.Email) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email is not valid"})
 		return
 	}

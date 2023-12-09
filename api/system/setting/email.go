@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/module/email"
+	"github.com/open-cmi/cmmns/module/setting/email"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func GetEmail(c *gin.Context) {
@@ -30,4 +31,9 @@ func SetEmail(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+}
+
+func init() {
+	webserver.RegisterAuthAPI("system-setting", "POST", "/email/", SetEmail)
+	webserver.RegisterAuthAPI("system-setting", "GET", "/email/", GetEmail)
 }
