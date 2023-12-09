@@ -10,10 +10,9 @@ import (
 
 	"github.com/dchest/captcha"
 	"github.com/gorilla/sessions"
-	"github.com/open-cmi/cmmns/common/errcode"
-	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/module/middleware"
 	"github.com/open-cmi/cmmns/module/setting/pubnet"
+	"github.com/open-cmi/cmmns/pkg/goparam"
 	"github.com/open-cmi/cmmns/pkg/verify"
 	"github.com/open-cmi/cmmns/service/webserver"
 
@@ -161,7 +160,7 @@ func Get(c *gin.Context) {
 	user := user.Get("id", id)
 	if user == nil {
 		c.JSON(http.StatusOK, gin.H{
-			"ret": errcode.ErrFailed,
+			"ret": -1,
 			"msg": i18n.Sprintf("user not exist"),
 		})
 		return

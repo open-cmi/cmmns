@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/module/manhour"
+	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
 func List(c *gin.Context) {

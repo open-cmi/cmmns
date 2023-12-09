@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/jameskeane/bcrypt"
-	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 	"github.com/open-cmi/cmmns/module/rbac"
+	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
 type User struct {

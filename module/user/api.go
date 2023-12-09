@@ -8,12 +8,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jameskeane/bcrypt"
-	"github.com/open-cmi/cmmns/common/def"
-	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/pubsub"
 	"github.com/open-cmi/cmmns/essential/rdb"
 	"github.com/open-cmi/cmmns/essential/sqldb"
+	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
 const UserLoginMaxTried = 5
@@ -153,7 +152,7 @@ func Create(m *CreateMsg) (err error) {
 
 	err = user.Save()
 	if err == nil {
-		pubsub.Publish(def.EventUserCreate, m.UserName)
+		pubsub.Publish(pubsub.EventUserCreate, m.UserName)
 	}
 	return err
 }

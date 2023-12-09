@@ -8,9 +8,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/module/secretkey"
+	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
 func NameList(c *gin.Context) {

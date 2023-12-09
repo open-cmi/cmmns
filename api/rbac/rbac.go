@@ -2,8 +2,8 @@ package rbac
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/module/rbac"
+	"github.com/open-cmi/cmmns/pkg/goparam"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
 

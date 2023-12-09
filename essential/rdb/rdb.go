@@ -6,8 +6,15 @@ import (
 	"fmt"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/open-cmi/cmmns/common/def"
 	"github.com/open-cmi/cmmns/essential/config"
+)
+
+const (
+	RDBPublic = iota + 1
+	RDBSession
+	RDBUser
+	RDBScheduler
+	RDBJob
 )
 
 // clients redis clients
@@ -76,5 +83,5 @@ func init() {
 	gConf.Port = 25431
 	config.RegisterConfig("redis", Parse, Save)
 
-	Register("public", def.RDBPublic)
+	Register("public", RDBPublic)
 }

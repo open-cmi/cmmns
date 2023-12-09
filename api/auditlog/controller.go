@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/user"
+	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
 func List(c *gin.Context) {

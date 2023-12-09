@@ -3,8 +3,8 @@ package sysinfo
 import (
 	"net/http"
 
-	"github.com/open-cmi/cmmns/common/goparam"
 	"github.com/open-cmi/cmmns/module/system"
+	"github.com/open-cmi/cmmns/pkg/goparam"
 
 	"github.com/gin-gonic/gin"
 )
