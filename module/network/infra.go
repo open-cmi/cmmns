@@ -8,12 +8,16 @@ import (
 
 var Location string
 
+type NameServerConfig struct {
+	Addresses []string `json:"addresses,omitempty"`
+}
+
 type EthernetConfig struct {
-	DHCP4       string   `yaml:"dhcp4"`
-	Addresses   []string `yaml:"addresses,omitempty"`
-	Gateway4    string   `yaml:"gateway4,omitempty"`
-	Nameservers []string `yaml:"nameservers,omitempty"`
-	Interfaces  []string `yaml:"interfaces,omitempty"`
+	DHCP4       string           `yaml:"dhcp4"`
+	Addresses   []string         `yaml:"addresses,omitempty"`
+	Gateway4    string           `yaml:"gateway4,omitempty"`
+	Nameservers NameServerConfig `yaml:"nameservers,omitempty"`
+	Interfaces  []string         `yaml:"interfaces,omitempty"`
 }
 
 type Network struct {

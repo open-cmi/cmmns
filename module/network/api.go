@@ -92,9 +92,13 @@ func setConfig(msg *ConfigMsg) error {
 	// 这里要校验格式
 
 	// 写入文件
-	filename := fmt.Sprintf("/tmp/99-%s.yaml", gConf.Dev)
-	wf, err := os.OpenFile(filename,
-		os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	var filename string
+	if gConf.ConfFile == "" {
+		filename = fmt.Sprintf("/tmp/99-%s.yaml", gConf.Dev)
+	} else {
+		filename = gConf.ConfFile
+	}
+	wf, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 	if err != nil {
 		logger.Errorf("open netplan config failed: %s\n", err.Error())
 		return err
@@ -111,12 +115,12 @@ func setConfig(msg *ConfigMsg) error {
 		mask := net.IPMask(net.ParseIP(msg.Netmask).To4()) // If you have the mask as a string
 		maskLen, _ := mask.Size()
 		addr := fmt.Sprintf("%s/%d", msg.Address, maskLen)
-		dns := []string{}
+		var dns NameServerConfig
 		if msg.MainDNS != "" {
-			dns = append(dns, msg.MainDNS)
+			dns.Addresses = append(dns.Addresses, msg.MainDNS)
 		}
 		if msg.SecondaryDNS != "" {
-			dns = append(dns, msg.SecondaryDNS)
+			dns.Addresses = append(dns.Addresses, msg.SecondaryDNS)
 		}
 		netconf.Network.Ethernets[gConf.Dev] = EthernetConfig{
 			DHCP4: "no",

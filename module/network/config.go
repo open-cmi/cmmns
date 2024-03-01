@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Dev          string `json:"dev"`
 	DHCP         bool   `json:"dhcp"`
+	ConfFile     string `json:"conf_file"`
 	Address      string `json:"address,omitempty"`
 	Netmask      string `json:"netmask,omitempty"`
 	Gateway      string `json:"gateway,omitempty"`
@@ -39,6 +40,7 @@ func Init(raw json.RawMessage) error {
 	msg.SecondaryDNS = gConf.SecondaryDNS
 
 	setConfig(&msg)
+
 	return nil
 }
 
