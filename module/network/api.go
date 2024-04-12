@@ -3,32 +3,41 @@ package network
 import (
 	"fmt"
 	"net"
-	"os"
-	"os/exec"
+	"sort"
 
 	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/cmmns/essential/logger"
-	"gopkg.in/yaml.v2"
 )
 
-func Get() ConfigMsg {
+func Get() []ConfigRequest {
 	var mode string = "static"
-	if gConf.DHCP {
-		mode = "dhcp"
+	var devices []ConfigRequest
+	for dev := range gConf.Devices {
+		var conf ConfigRequest
+		v := gConf.Devices[dev]
+		if v.DHCP {
+			mode = "dhcp"
+		}
+
+		conf.Address = v.Address
+		conf.Netmask = v.Netmask
+		conf.Dev = dev
+		conf.Gateway = v.Gateway
+		conf.Mode = mode
+		conf.PrefferDNS = v.PrefferDNS
+		conf.AlternateDNS = v.AlternateDNS
+		devices = append(devices, conf)
 	}
 
-	return ConfigMsg{
-		Mode:         mode,
-		Address:      gConf.Address,
-		Netmask:      gConf.Netmask,
-		Gateway:      gConf.Gateway,
-		MainDNS:      gConf.MainDNS,
-		SecondaryDNS: gConf.SecondaryDNS,
-	}
+	sort.SliceStable(devices, func(i int, j int) bool {
+		dev1 := devices[i]
+		dev2 := devices[j]
+		return dev1.Dev < dev2.Dev
+	})
+	return devices
 }
 
-func GetStatus() ConfigMsg {
-	var conf ConfigMsg
+func GetStatus() ConfigRequest {
+	var conf ConfigRequest
 	intf, err := net.InterfaceByName("en0")
 	if err != nil {
 		return conf
@@ -58,88 +67,47 @@ func GetStatus() ConfigMsg {
 	if len(dns) >= 2 {
 		secondaryDNS = dns[1]
 	}
-	return ConfigMsg{
+	return ConfigRequest{
 		Address:      ipv4,
 		Netmask:      netmask,
 		Gateway:      gw.String(),
-		MainDNS:      mainDNS,
-		SecondaryDNS: secondaryDNS,
+		PrefferDNS:   mainDNS,
+		AlternateDNS: secondaryDNS,
 	}
 }
 
-func Set(msg *ConfigMsg) error {
-	err := setConfig(msg)
-	if err != nil {
-		return err
+func Set(msg *ConfigRequest) error {
+	for name := range gConf.Devices {
+		// 接口相同，或者dev为空，取第一个
+		fmt.Println(name, msg.Dev)
+		if name == msg.Dev {
+			conf := gConf.Devices[name]
+			if msg.Mode == "dhcp" {
+				conf.DHCP = true
+				conf.Address = ""
+				conf.Netmask = ""
+				conf.Gateway = ""
+				conf.PrefferDNS = ""
+				conf.AlternateDNS = ""
+			} else {
+				conf.DHCP = false
+				conf.Address = msg.Address
+				conf.Netmask = msg.Netmask
+				conf.Gateway = msg.Gateway
+				conf.PrefferDNS = msg.PrefferDNS
+				conf.AlternateDNS = msg.AlternateDNS
+			}
+
+			gConf.Devices[name] = conf
+
+			err := NetworkApply(&gConf)
+			if err != nil {
+				return err
+			}
+			config.Save()
+			break
+		}
 	}
 
-	gConf.Address = msg.Address
-	gConf.Netmask = msg.Netmask
-	gConf.Gateway = msg.Gateway
-	gConf.MainDNS = msg.MainDNS
-	gConf.SecondaryDNS = msg.SecondaryDNS
-	if msg.Mode == "dhcp" {
-		gConf.DHCP = true
-	} else {
-		gConf.DHCP = false
-	}
-
-	config.Save()
 	return nil
-}
-
-func setConfig(msg *ConfigMsg) error {
-	// 这里要校验格式
-
-	// 写入文件
-	var filename string
-	if gConf.ConfFile == "" {
-		filename = fmt.Sprintf("/tmp/99-%s.yaml", gConf.Dev)
-	} else {
-		filename = gConf.ConfFile
-	}
-	wf, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
-	if err != nil {
-		logger.Errorf("open netplan config failed: %s\n", err.Error())
-		return err
-	}
-	var netconf NetConfig
-	netconf.Network.Version = 2
-	netconf.Network.Renderer = "networkd"
-	netconf.Network.Ethernets = make(map[string]EthernetConfig)
-	if msg.Mode == "dhcp" {
-		netconf.Network.Ethernets[gConf.Dev] = EthernetConfig{
-			DHCP4: "yes",
-		}
-	} else {
-		mask := net.IPMask(net.ParseIP(msg.Netmask).To4()) // If you have the mask as a string
-		maskLen, _ := mask.Size()
-		addr := fmt.Sprintf("%s/%d", msg.Address, maskLen)
-		var dns NameServerConfig
-		if msg.MainDNS != "" {
-			dns.Addresses = append(dns.Addresses, msg.MainDNS)
-		}
-		if msg.SecondaryDNS != "" {
-			dns.Addresses = append(dns.Addresses, msg.SecondaryDNS)
-		}
-		netconf.Network.Ethernets[gConf.Dev] = EthernetConfig{
-			DHCP4: "no",
-			Addresses: []string{
-				addr,
-			},
-			Gateway4:    msg.Gateway,
-			Nameservers: dns,
-		}
-	}
-
-	netout, err := yaml.Marshal(netconf)
-	if err != nil {
-		return err
-	}
-	wf.Write(netout)
-
-	var args []string = []string{"apply"}
-	err = exec.Command("netplan", args...).Run()
-
-	return err
 }

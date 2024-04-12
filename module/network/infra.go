@@ -8,29 +8,6 @@ import (
 
 var Location string
 
-type NameServerConfig struct {
-	Addresses []string `json:"addresses,omitempty"`
-}
-
-type EthernetConfig struct {
-	DHCP4       string           `yaml:"dhcp4"`
-	Addresses   []string         `yaml:"addresses,omitempty"`
-	Gateway4    string           `yaml:"gateway4,omitempty"`
-	Nameservers NameServerConfig `yaml:"nameservers,omitempty"`
-	Interfaces  []string         `yaml:"interfaces,omitempty"`
-}
-
-type Network struct {
-	Version   int                       `yaml:"version"`
-	Renderer  string                    `yaml:"renderer"`
-	Ethernets map[string]EthernetConfig `yaml:"ethernets"`
-	Bridges   string                    `yaml:"bridges,omitempty"`
-}
-
-type NetConfig struct {
-	Network Network `yaml:"network"`
-}
-
 // 如 24 对应的子网掩码地址为 255.255.255.0
 func NetmaskString(subnet int) string {
 	var buff bytes.Buffer

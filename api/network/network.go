@@ -8,7 +8,7 @@ import (
 )
 
 func SetNetwork(c *gin.Context) {
-	var conf network.ConfigMsg
+	var conf network.ConfigRequest
 
 	if err := c.ShouldBindJSON(&conf); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
@@ -31,5 +31,13 @@ func GetNetwork(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": map[string]interface{}{
 		"setting": conf,
 		"status":  status,
+	}})
+}
+
+func GetNetworkStatus(c *gin.Context) {
+	status := network.GetStatus()
+
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": map[string]interface{}{
+		"status": status,
 	}})
 }

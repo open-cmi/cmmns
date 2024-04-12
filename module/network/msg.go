@@ -1,10 +1,24 @@
 package network
 
-type ConfigMsg struct {
+type ConfigRequest struct {
+	Dev          string `json:"dev"`
 	Mode         string `json:"mode"`
 	Address      string `json:"address"`
 	Netmask      string `json:"netmask"`
 	Gateway      string `json:"gateway"`
-	MainDNS      string `json:"main_dns"`
-	SecondaryDNS string `json:"secondary_dns"`
+	PrefferDNS   string `json:"preffer_dns"`
+	AlternateDNS string `json:"alternate_dns"`
+}
+
+type InterfaceStatus struct {
+	Dev         string `json:"dev"`
+	Address     string `json:"address"`
+	Netmask     string `json:"netmask"`
+	Status      string `json:"status"`
+	MTU         int    `json:"mtu"`
+	EtherAddr   string `json:"ether_addr"`
+	PacketsRecv int64  `json:"packets_recv"`
+	BytesRecv   int64  `json:"bytes_recv"`
+	PacketsSent int64  `json:"packets_sent"`
+	BytesSent   int64  `json:"bytes_sent"`
 }

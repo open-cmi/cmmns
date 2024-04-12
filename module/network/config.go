@@ -6,15 +6,21 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 )
 
-type Config struct {
-	Dev          string `json:"dev"`
+var gConf Config
+
+type DevConfig struct {
 	DHCP         bool   `json:"dhcp"`
-	ConfFile     string `json:"conf_file"`
 	Address      string `json:"address,omitempty"`
 	Netmask      string `json:"netmask,omitempty"`
 	Gateway      string `json:"gateway,omitempty"`
-	MainDNS      string `json:"main_dns,omitempty"`
-	SecondaryDNS string `json:"secondary_dns,omitempty"`
+	PrefferDNS   string `json:"preffer_dns,omitempty"`
+	AlternateDNS string `json:"alternate_dns,omitempty"`
+}
+
+type Config struct {
+	Engine   string               `json:"engine,omitempty"`
+	ConfFile string               `json:"conf_file"`
+	Devices  map[string]DevConfig `json:"devices"`
 }
 
 func Init(raw json.RawMessage) error {
@@ -23,32 +29,18 @@ func Init(raw json.RawMessage) error {
 		return err
 	}
 
-	if gConf.Dev == "" {
-		return nil
+	if gConf.Engine == "" {
+		gConf.Engine = "netplan"
 	}
 
-	var msg ConfigMsg
-	if gConf.DHCP {
-		msg.Mode = "dhcp"
-	} else {
-		msg.Mode = "static"
-	}
-	msg.Address = gConf.Address
-	msg.Netmask = gConf.Netmask
-	msg.Gateway = gConf.Gateway
-	msg.MainDNS = gConf.MainDNS
-	msg.SecondaryDNS = gConf.SecondaryDNS
+	err = NetworkApply(&gConf)
 
-	setConfig(&msg)
-
-	return nil
+	return err
 }
 
 func (c *Config) Save() {
 	config.Save()
 }
-
-var gConf Config
 
 func Save() json.RawMessage {
 	raw, _ := json.Marshal(&gConf)
@@ -56,7 +48,5 @@ func Save() json.RawMessage {
 }
 
 func init() {
-	gConf.Dev = ""
-	gConf.DHCP = true
 	config.RegisterConfig("network", Init, Save)
 }
