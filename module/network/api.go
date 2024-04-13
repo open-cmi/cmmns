@@ -23,7 +23,7 @@ func Get() []ConfigRequest {
 		conf.Dev = dev
 		conf.Gateway = v.Gateway
 		conf.Mode = mode
-		conf.PrefferDNS = v.PrefferDNS
+		conf.PreferredDNS = v.PreferredDNS
 		conf.AlternateDNS = v.AlternateDNS
 		devices = append(devices, conf)
 	}
@@ -71,7 +71,7 @@ func GetStatus() ConfigRequest {
 		Address:      ipv4,
 		Netmask:      netmask,
 		Gateway:      gw.String(),
-		PrefferDNS:   mainDNS,
+		PreferredDNS: mainDNS,
 		AlternateDNS: secondaryDNS,
 	}
 }
@@ -87,14 +87,14 @@ func Set(msg *ConfigRequest) error {
 				conf.Address = ""
 				conf.Netmask = ""
 				conf.Gateway = ""
-				conf.PrefferDNS = ""
+				conf.PreferredDNS = ""
 				conf.AlternateDNS = ""
 			} else {
 				conf.DHCP = false
 				conf.Address = msg.Address
 				conf.Netmask = msg.Netmask
 				conf.Gateway = msg.Gateway
-				conf.PrefferDNS = msg.PrefferDNS
+				conf.PreferredDNS = msg.PreferredDNS
 				conf.AlternateDNS = msg.AlternateDNS
 			}
 

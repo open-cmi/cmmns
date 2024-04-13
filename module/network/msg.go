@@ -6,7 +6,7 @@ type ConfigRequest struct {
 	Address      string `json:"address"`
 	Netmask      string `json:"netmask"`
 	Gateway      string `json:"gateway"`
-	PrefferDNS   string `json:"preffer_dns"`
+	PreferredDNS string `json:"preferred_dns"`
 	AlternateDNS string `json:"alternate_dns"`
 }
 

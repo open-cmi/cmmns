@@ -22,7 +22,9 @@
     "user": "postgres"
   },
   "network": {
-    "engine": "netplan"
+    "engine": "netplan",
+    "devices": {
+    }
   },
   "process": {
     "services": [

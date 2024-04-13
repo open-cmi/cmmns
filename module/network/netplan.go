@@ -82,8 +82,8 @@ func NetplanApply(conf *Config) error {
 			maskLen, _ := mask.Size()
 			addr := fmt.Sprintf("%s/%d", devConf.Address, maskLen)
 			var dns NameServerConfig
-			if devConf.PrefferDNS != "" {
-				dns.Addresses = append(dns.Addresses, devConf.PrefferDNS)
+			if devConf.PreferredDNS != "" {
+				dns.Addresses = append(dns.Addresses, devConf.PreferredDNS)
 			}
 			if devConf.AlternateDNS != "" {
 				dns.Addresses = append(dns.Addresses, devConf.AlternateDNS)

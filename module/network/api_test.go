@@ -17,7 +17,7 @@ func TestSet(t *testing.T) {
 	msg.Address = "192.168.56.2"
 	msg.Netmask = "255.0.0.0"
 	msg.Gateway = "192.168.56.1"
-	msg.PrefferDNS = "8.8.8.8"
+	msg.PreferredDNS = "8.8.8.8"
 	err = Set(&msg)
 	if err != nil {
 		t.Errorf("set net config failed")

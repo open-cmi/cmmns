@@ -13,7 +13,7 @@ type DevConfig struct {
 	Address      string `json:"address,omitempty"`
 	Netmask      string `json:"netmask,omitempty"`
 	Gateway      string `json:"gateway,omitempty"`
-	PrefferDNS   string `json:"preffer_dns,omitempty"`
+	PreferredDNS string `json:"preferred_dns,omitempty"`
 	AlternateDNS string `json:"alternate_dns,omitempty"`
 }
 
