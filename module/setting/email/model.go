@@ -1,57 +1,59 @@
 package email
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
+const NotifyEmailSettingKey = "notify-email-setting"
+
 type EmailModel struct {
-	ID       string `json:"id" db:"id"`
 	Server   string `json:"server" db:"server"`
 	Port     int    `json:"port" db:"port"`
 	Sender   string `json:"sender" db:"sender"`
 	Password string `json:"password" db:"password"`
 	UseTLS   bool   `json:"use_tls" db:"use_tls"`
-	IsNew    bool
+	isNew    bool   `json:"-"`
+}
+
+func (em *EmailModel) Key() string {
+	return NotifyEmailSettingKey
+}
+
+func (em *EmailModel) Value() string {
+	v, _ := json.Marshal(em)
+	return string(v)
 }
 
 func (m *EmailModel) Save() error {
 	db := sqldb.GetConfDB()
 
-	if m.IsNew {
-		m.ID = uuid.NewString()
+	if m.isNew {
 		// 存储到数据库
-		columns := goparam.GetColumn(*m, []string{})
-		values := goparam.GetColumnInsertNamed(columns)
+		columns := []string{"key", "value"}
+		values := []string{"$1", "$2"}
 
-		insertClause := fmt.Sprintf("insert into sender_email(%s) values(%s)",
+		insertClause := fmt.Sprintf("insert into k_v_table(%s) values(%s)",
 			strings.Join(columns, ","), strings.Join(values, ","))
 
-		logger.Debugf("start to exec sql clause: %s", insertClause)
-
-		_, err := db.NamedExec(insertClause, m)
+		logger.Debugf("start to exec sql clause: %s\n", insertClause)
+		_, err := db.Exec(insertClause, m.Key(), m.Value())
 		if err != nil {
 			logger.Errorf("create model failed: %s", err.Error())
 			return errors.New("create model failed")
 		}
+		m.isNew = false
 	} else {
-		columns := goparam.GetColumn(*m, []string{"id"})
-
-		var updates []string = []string{}
-		for _, column := range columns {
-			updates = append(updates, fmt.Sprintf(`%s=:%s`, column, column))
-		}
-		updateClause := fmt.Sprintf("update sender_email set %s where id=:id", strings.Join(updates, ","))
+		updateClause := "update k_v_table set value=$1 where key=$2"
 		logger.Debugf("start to exec sql clause: %s", updateClause)
-		_, err := db.NamedExec(updateClause, m)
+		_, err := db.Exec(updateClause, m.Value(), m.Key())
 		if err != nil {
-			logger.Errorf("update sender_email model failed: %s", err.Error())
+			logger.Errorf("update model failed: %s", err.Error())
 			return errors.New("update model failed")
 		}
 	}
@@ -60,23 +62,27 @@ func (m *EmailModel) Save() error {
 
 func New() *EmailModel {
 	return &EmailModel{
-		IsNew: true,
+		isNew: true,
 	}
 }
 
 func Get() *EmailModel {
-	sqlClause := fmt.Sprintf("select * from sender_email")
-
-	clause := sqlClause
-
+	queryClause := "select value from k_v_table where key=$1"
 	db := sqldb.GetConfDB()
-	row := db.QueryRowx(clause)
+	row := db.QueryRowx(queryClause, NotifyEmailSettingKey)
 	if row == nil {
 		return nil
 	}
-	var m EmailModel
-	err := row.StructScan(&m)
+	var v string
+	err := row.Scan(&v)
 	if err != nil {
+		logger.Errorf("notify email row scan failed: %s\n", err.Error())
+		return nil
+	}
+	var m EmailModel
+	err = json.Unmarshal([]byte(v), &m)
+	if err != nil {
+		logger.Errorf("notify email unmarshal failed: %s\n", err.Error())
 		return nil
 	}
 	return &m

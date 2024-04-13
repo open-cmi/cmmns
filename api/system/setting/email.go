@@ -11,8 +11,7 @@ import (
 func GetEmail(c *gin.Context) {
 	m := email.Get()
 	if m == nil {
-		m = email.New()
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "", "data": *m})
+		c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": *m})
@@ -25,7 +24,22 @@ func SetEmail(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	err := email.SetSenderEmail(&req)
+	err := email.SetNotifyEmail(&req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+}
+
+func CheckEmail(c *gin.Context) {
+	var req email.SetRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	err := email.CheckEmailSetting(&req)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -34,6 +48,7 @@ func SetEmail(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system-setting", "POST", "/email/", SetEmail)
-	webserver.RegisterAuthAPI("system-setting", "GET", "/email/", GetEmail)
+	webserver.RegisterAuthAPI("system-setting", "POST", "/email-setting/", SetEmail)
+	webserver.RegisterAuthAPI("system-setting", "GET", "/email-setting/", GetEmail)
+	webserver.RegisterAuthAPI("system-setting", "POST", "/check-email-setting/", CheckEmail)
 }

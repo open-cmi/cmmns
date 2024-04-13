@@ -68,13 +68,13 @@ func Get() *PublicNet {
 	var v string
 	err := row.Scan(&v)
 	if err != nil {
-		logger.Errorf("qshi pubnet row scan failed: %s\n", err.Error())
+		logger.Errorf("pubnet row scan failed: %s\n", err.Error())
 		return nil
 	}
 	var m PublicNet
 	err = json.Unmarshal([]byte(v), &m)
 	if err != nil {
-		logger.Errorf("qshi pubnet model unmarshal failed: %s\n", err.Error())
+		logger.Errorf("pubnet model unmarshal failed: %s\n", err.Error())
 		return nil
 	}
 	return &m

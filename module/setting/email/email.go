@@ -4,9 +4,12 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"net"
 	"net/smtp"
+	"time"
 
 	"github.com/jordan-wright/email"
+	"github.com/open-cmi/cmmns/essential/logger"
 )
 
 type SendOption struct {
@@ -58,7 +61,7 @@ func Send(to []string, subject string, content string, opt *SendOption) error {
 	return err
 }
 
-func SetSenderEmail(req *SetRequest) error {
+func SetNotifyEmail(req *SetRequest) error {
 	m := Get()
 	if m != nil {
 		m.Server = req.Server
@@ -77,4 +80,53 @@ func SetSenderEmail(req *SetRequest) error {
 
 	err := m.Save()
 	return err
+}
+
+func CheckEmailSetting(req *SetRequest) error {
+	addr := fmt.Sprintf("%s:%d", req.Server, req.Port)
+
+	var client *smtp.Client
+	var err error
+	if req.UseTLS {
+		tlsConfig := &tls.Config{
+			InsecureSkipVerify: true,
+			ServerName:         req.Server,
+		}
+		var timeDialer net.Dialer
+		timeDialer.Timeout = 5 * time.Second
+		conn, err := tls.DialWithDialer(&timeDialer, "tcp", addr, tlsConfig)
+		if err != nil {
+			logger.Infof("check email failed: %s\n", err.Error())
+			return errors.New("server or port is unreachable")
+		}
+		conn.SetReadDeadline(time.Now().Add(5 * time.Second))
+		client, err = smtp.NewClient(conn, req.Server)
+		if err != nil {
+			logger.Infof("check email failed: %s\n", err.Error())
+			return errors.New("check the server is using tls")
+		}
+	} else {
+		conn, err := net.DialTimeout("tcp", addr, 5*time.Second)
+		if err != nil {
+			logger.Infof("check email failed: %s\n", err.Error())
+			return errors.New("server or port is unreachable")
+		}
+
+		conn.SetReadDeadline(time.Now().Add(5 * time.Second))
+
+		client, err = smtp.NewClient(conn, req.Server)
+		if err != nil {
+			logger.Infof("check email failed: %s\n", err.Error())
+			return errors.New("check the server is not using tls")
+		}
+	}
+
+	auth := smtp.PlainAuth("", req.Sender, req.Password, req.Server)
+	err = client.Auth(auth)
+	if err != nil {
+		logger.Infof("check email failed: %s\n", err.Error())
+		return errors.New("user or password is incorrect")
+	}
+	client.Quit()
+	return nil
 }
