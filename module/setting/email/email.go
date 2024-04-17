@@ -103,7 +103,7 @@ func CheckEmailSetting(req *SetRequest) error {
 		client, err = smtp.NewClient(conn, req.Server)
 		if err != nil {
 			logger.Infof("check email failed: %s\n", err.Error())
-			return errors.New("check the server is using tls")
+			return errors.New("check whether the server is using tls")
 		}
 	} else {
 		conn, err := net.DialTimeout("tcp", addr, 5*time.Second)
@@ -117,7 +117,7 @@ func CheckEmailSetting(req *SetRequest) error {
 		client, err = smtp.NewClient(conn, req.Server)
 		if err != nil {
 			logger.Infof("check email failed: %s\n", err.Error())
-			return errors.New("check the server is not using tls")
+			return errors.New("check whether the server is using tls")
 		}
 	}
 
