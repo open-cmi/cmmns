@@ -1,7 +1,6 @@
 package network
 
 import (
-	"fmt"
 	"net"
 	"sort"
 
@@ -36,50 +35,88 @@ func Get() []ConfigRequest {
 	return devices
 }
 
-func GetStatus() ConfigRequest {
-	var conf ConfigRequest
-	intf, err := net.InterfaceByName("en0")
-	if err != nil {
-		return conf
-	}
-	addrs, err := intf.Addrs()
-	if err != nil || len(addrs) == 0 {
-		return conf
-	}
-	fmt.Println(addrs)
-	var ipv4 string
-	var masklen int
-	for _, addr := range addrs {
-		ip, ipnet, _ := net.ParseCIDR(addr.String())
-		if ip.To4() != nil {
-			ipv4 = ip.To4().String()
-			masklen, _ = ipnet.Mask.Size()
+func GetInterfaceStatus(f net.Flags) string {
+	s := ""
+	if f&net.FlagUp != 0 {
+		if s != "" {
+			s += "|"
 		}
+		s += "up"
 	}
-	gw := GetDefaultGateway()
-	netmask := NetmaskString(masklen)
-	dns := GetDNS()
-	var mainDNS string
-	var secondaryDNS string
-	if len(dns) >= 1 {
-		mainDNS = dns[0]
+	if f&net.FlagRunning != 0 {
+		if s != "" {
+			s += "|"
+		}
+		s += "running"
 	}
-	if len(dns) >= 2 {
-		secondaryDNS = dns[1]
+
+	if s == "" {
+		s = "0"
 	}
-	return ConfigRequest{
-		Address:      ipv4,
-		Netmask:      netmask,
-		Gateway:      gw.String(),
-		PreferredDNS: mainDNS,
-		AlternateDNS: secondaryDNS,
+	return s
+}
+
+func GetStatus() ([]InterfaceStatus, error) {
+	var resp []InterfaceStatus
+	for dev := range gConf.Devices {
+		var status InterfaceStatus
+		status.Dev = dev
+
+		intf, err := net.InterfaceByName(dev)
+		if err != nil {
+			return resp, err
+		}
+		addrs, err := intf.Addrs()
+		if err != nil {
+			return resp, err
+		}
+		status.MTU = intf.MTU
+		status.EtherAddr = intf.HardwareAddr.String()
+		status.Status = GetInterfaceStatus(intf.Flags)
+		if len(addrs) != 0 {
+			var ipv4 string
+			var masklen int
+			for _, addr := range addrs {
+				ip, ipnet, _ := net.ParseCIDR(addr.String())
+				if ip.To4() != nil {
+					ipv4 = ip.To4().String()
+					masklen, _ = ipnet.Mask.Size()
+				}
+			}
+			netmask := NetmaskString(masklen)
+			status.Address = ipv4
+			status.Netmask = netmask
+		}
+		// 取网卡的统计信息
 	}
+
+	return resp, nil
+}
+
+func GetRoutes() {
+	// gw := GetDefaultGateway()
+
+	// dns := GetDNS()
+	// var mainDNS string
+	// var secondaryDNS string
+	// if len(dns) >= 1 {
+	// 	mainDNS = dns[0]
+	// }
+	// if len(dns) >= 2 {
+	// 	secondaryDNS = dns[1]
+	// }
+	// return ConfigRequest{
+	// 	Address:      ipv4,
+	// 	Netmask:      netmask,
+	// 	Gateway:      gw.String(),
+	// 	PreferredDNS: mainDNS,
+	// 	AlternateDNS: secondaryDNS,
+	// }
 }
 
 func Set(msg *ConfigRequest) error {
 	for name := range gConf.Devices {
 		// 接口相同，或者dev为空，取第一个
-		fmt.Println(name, msg.Dev)
 		if name == msg.Dev {
 			conf := gConf.Devices[name]
 			if msg.Mode == "dhcp" {

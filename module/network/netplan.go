@@ -59,7 +59,7 @@ func NetplanApply(conf *Config) error {
 	} else {
 		filename = conf.ConfFile
 	}
-	wf, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	wf, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
 	if err != nil {
 		logger.Errorf("open netplan config failed: %s\n", err.Error())
 		return err
