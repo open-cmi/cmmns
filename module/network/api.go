@@ -4,6 +4,8 @@ import (
 	"net"
 	"sort"
 
+	netio "github.com/shirou/gopsutil/net"
+
 	"github.com/open-cmi/cmmns/essential/config"
 )
 
@@ -38,10 +40,9 @@ func Get() []ConfigRequest {
 func GetInterfaceStatus(f net.Flags) string {
 	s := ""
 	if f&net.FlagUp != 0 {
-		if s != "" {
-			s += "|"
-		}
 		s += "up"
+	} else {
+		s += "down"
 	}
 	if f&net.FlagRunning != 0 {
 		if s != "" {
@@ -50,25 +51,27 @@ func GetInterfaceStatus(f net.Flags) string {
 		s += "running"
 	}
 
-	if s == "" {
-		s = "0"
-	}
 	return s
 }
 
-func GetStatus() ([]InterfaceStatus, error) {
+func GetStatus() (int, []InterfaceStatus, error) {
 	var resp []InterfaceStatus
+	counters, err := netio.IOCounters(true)
+	if err != nil {
+		return 0, resp, err
+	}
+
 	for dev := range gConf.Devices {
 		var status InterfaceStatus
 		status.Dev = dev
 
 		intf, err := net.InterfaceByName(dev)
 		if err != nil {
-			return resp, err
+			return 0, resp, err
 		}
 		addrs, err := intf.Addrs()
 		if err != nil {
-			return resp, err
+			return 0, resp, err
 		}
 		status.MTU = intf.MTU
 		status.EtherAddr = intf.HardwareAddr.String()
@@ -88,9 +91,19 @@ func GetStatus() ([]InterfaceStatus, error) {
 			status.Netmask = netmask
 		}
 		// 取网卡的统计信息
+		for _, counter := range counters {
+			if counter.Name == dev {
+				status.BytesRecv = counter.BytesRecv
+				status.BytesSent = counter.BytesSent
+				status.PacketsRecv = counter.PacketsRecv
+				status.PacketsSent = counter.PacketsSent
+			}
+		}
+
+		resp = append(resp, status)
 	}
 
-	return resp, nil
+	return len(resp), resp, nil
 }
 
 func GetRoutes() {

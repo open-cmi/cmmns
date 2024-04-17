@@ -17,8 +17,8 @@ type InterfaceStatus struct {
 	Status      string `json:"status"`
 	MTU         int    `json:"mtu"`
 	EtherAddr   string `json:"ether_addr"`
-	PacketsRecv int64  `json:"packets_recv"`
-	BytesRecv   int64  `json:"bytes_recv"`
-	PacketsSent int64  `json:"packets_sent"`
-	BytesSent   int64  `json:"bytes_sent"`
+	PacketsRecv uint64 `json:"packets_recv"`
+	BytesRecv   uint64 `json:"bytes_recv"`
+	PacketsSent uint64 `json:"packets_sent"`
+	BytesSent   uint64 `json:"bytes_sent"`
 }

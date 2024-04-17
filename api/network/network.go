@@ -33,12 +33,16 @@ func GetNetwork(c *gin.Context) {
 }
 
 func GetNetworkStatus(c *gin.Context) {
-	status, err := network.GetStatus()
+	count, status, err := network.GetStatus()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": map[string]interface{}{
-		"status": status,
-	}})
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
+		"data": map[string]interface{}{
+			"count":   count,
+			"results": status,
+		}})
 }
