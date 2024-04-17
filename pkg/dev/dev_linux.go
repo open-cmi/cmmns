@@ -1,7 +1,7 @@
 package dev
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 )
@@ -19,7 +19,7 @@ func GetDeviceID() string {
 			continue
 		}
 
-		data, _ := ioutil.ReadAll(file)
+		data, _ := io.ReadAll(file)
 		deviceid := strings.Trim(string(data), " \r\n\t ")
 		file.Close()
 		return deviceid
