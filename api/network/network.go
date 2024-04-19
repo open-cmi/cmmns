@@ -46,3 +46,19 @@ func GetNetworkStatus(c *gin.Context) {
 			"results": status,
 		}})
 }
+
+func BlinkingNetworkInterface(c *gin.Context) {
+	var req network.BlinkingRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	err := network.BlinkingInterface(&req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+}

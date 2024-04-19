@@ -7,4 +7,5 @@ func init() {
 	webserver.RegisterAuthAPI("system", "GET", "/", GetNetwork)
 	webserver.RegisterAuthAPI("system", "PUT", "/", SetNetwork)
 	webserver.RegisterAuthAPI("system", "GET", "/status/", GetNetworkStatus)
+	webserver.RegisterAuthAPI("system", "POST", "/blinking/", BlinkingNetworkInterface)
 }

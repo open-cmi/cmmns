@@ -1,12 +1,15 @@
 package network
 
 import (
+	"errors"
 	"net"
+	"os/exec"
 	"sort"
 
 	netio "github.com/shirou/gopsutil/net"
 
 	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/essential/logger"
 )
 
 func Get() []ConfigRequest {
@@ -159,5 +162,16 @@ func Set(msg *ConfigRequest) error {
 		}
 	}
 
+	return nil
+}
+
+func BlinkingInterface(req *BlinkingRequest) error {
+	args := []string{"-p", req.Dev, "5"}
+	cmd := exec.Command("ethtool", args...)
+	err := cmd.Run()
+	if err != nil {
+		logger.Errorf("run ethtool failed: %s\n", err.Error())
+		return errors.New("operation not supported")
+	}
 	return nil
 }

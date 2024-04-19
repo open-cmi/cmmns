@@ -22,3 +22,7 @@ type InterfaceStatus struct {
 	PacketsSent uint64 `json:"packets_sent"`
 	BytesSent   uint64 `json:"bytes_sent"`
 }
+
+type BlinkingRequest struct {
+	Dev string `json:"dev"`
+}
