@@ -10,6 +10,8 @@ func NetworkApply(conf *Config) error {
 
 	if conf.Engine == "netplan" {
 		return NetplanApply(conf)
+	} else if conf.Engine == "networking" {
+		return NetworkingApply(conf)
 	}
 	errmsg := fmt.Sprintf("engine %s is not supported", conf.Engine)
 	return errors.New(errmsg)
