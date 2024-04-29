@@ -59,11 +59,7 @@ func NetplanApply(conf *Config) error {
 	} else {
 		filename = conf.ConfFile
 	}
-	wf, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
-	if err != nil {
-		logger.Errorf("open netplan config failed: %s\n", err.Error())
-		return err
-	}
+
 	var netconf NetplanConfig
 	netconf.Network.Version = 2
 	netconf.Network.Renderer = "networkd"
@@ -104,8 +100,13 @@ func NetplanApply(conf *Config) error {
 		if err != nil {
 			return err
 		}
+		wf, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
+		if err != nil {
+			logger.Errorf("open netplan config failed: %s\n", err.Error())
+			return err
+		}
 		wf.Write(netout)
-
+		wf.Close()
 		var args []string = []string{"apply"}
 		err = exec.Command("netplan", args...).Run()
 
