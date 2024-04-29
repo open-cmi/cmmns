@@ -32,6 +32,6 @@ func GetLang(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system-setting", "PUT", "/locale/", ChangeLang)
-	webserver.RegisterAuthAPI("system-setting", "GET", "/locale/", GetLang)
+	webserver.RegisterAuthAPI("system", "PUT", "/locale/", ChangeLang)
+	webserver.RegisterAuthAPI("system", "GET", "/locale/", GetLang)
 }

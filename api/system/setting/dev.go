@@ -23,5 +23,5 @@ func GetDevID(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system-setting", "GET", "/device/", GetDevID)
+	webserver.RegisterAuthAPI("system", "GET", "/device/", GetDevID)
 }

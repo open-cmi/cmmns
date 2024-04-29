@@ -42,6 +42,6 @@ func GetPublicNet(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system-setting", "GET", "/pubnet/", GetPublicNet)
-	webserver.RegisterAuthAPI("system-setting", "POST", "/pubnet/", SetPublicNet)
+	webserver.RegisterAuthAPI("system", "GET", "/pubnet/", GetPublicNet)
+	webserver.RegisterAuthAPI("system", "POST", "/pubnet/", SetPublicNet)
 }

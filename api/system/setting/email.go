@@ -48,7 +48,7 @@ func CheckEmail(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system-setting", "POST", "/email-setting/", SetEmail)
-	webserver.RegisterAuthAPI("system-setting", "GET", "/email-setting/", GetEmail)
-	webserver.RegisterAuthAPI("system-setting", "POST", "/check-email-setting/", CheckEmail)
+	webserver.RegisterAuthAPI("system", "POST", "/email-setting/", SetEmail)
+	webserver.RegisterAuthAPI("system", "GET", "/email-setting/", GetEmail)
+	webserver.RegisterAuthAPI("system", "POST", "/check-email-setting/", CheckEmail)
 }

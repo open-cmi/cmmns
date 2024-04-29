@@ -37,7 +37,7 @@ func AdjustNtpTime(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system-setting", "GET", "/ntp-time-setting/", GetNtpSetting)
-	webserver.RegisterAuthAPI("system-setting", "POST", "/ntp-time-setting/", SetNtpSetting)
-	webserver.RegisterAuthAPI("system-setting", "POST", "/ntp-time-setting/adjust/", AdjustNtpTime)
+	webserver.RegisterAuthAPI("system", "GET", "/ntp-time-setting/", GetNtpSetting)
+	webserver.RegisterAuthAPI("system", "POST", "/ntp-time-setting/", SetNtpSetting)
+	webserver.RegisterAuthAPI("system", "POST", "/ntp-time-setting/adjust/", AdjustNtpTime)
 }

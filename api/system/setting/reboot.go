@@ -25,6 +25,6 @@ func ShutDown(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system-setting", "POST", "/reboot/", Reboot)
-	webserver.RegisterAuthAPI("system-setting", "POST", "/shutdown/", ShutDown)
+	webserver.RegisterAuthAPI("system", "POST", "/reboot/", Reboot)
+	webserver.RegisterAuthAPI("system", "POST", "/shutdown/", ShutDown)
 }

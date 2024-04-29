@@ -18,5 +18,5 @@ func GetBasicSystemInfo(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system-info", "GET", "/basic-info/", GetBasicSystemInfo)
+	webserver.RegisterAuthAPI("system", "GET", "/basic-info/", GetBasicSystemInfo)
 }
