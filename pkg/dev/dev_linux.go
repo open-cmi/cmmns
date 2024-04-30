@@ -12,7 +12,7 @@ func GetDeviceID() string {
 	if err != nil {
 		return ""
 	}
-	var args []string = []string{"-h", "--output=source", execPath}
+	var args []string = []string{"-h", "--output=target", execPath}
 	cmd := exec.Command("df", args...)
 	output, err := cmd.Output()
 	if err != nil {
@@ -22,9 +22,33 @@ func GetDeviceID() string {
 	if len(arr) < 2 {
 		return ""
 	}
-	disk := arr[1]
+	mountPoint := arr[1]
 
-	var args2 []string = []string{"-o", "value", disk}
+	var args1 []string = []string{"-r", "-p", "-i", "-o", "NAME,MOUNTPOINT", "--noheadings"}
+	cmdLsblk := exec.Command("lsblk", args1...)
+	output, err = cmdLsblk.Output()
+	if err != nil {
+		return ""
+	}
+	arr = strings.Split(string(output), "\n")
+	var device string = ""
+	for _, line := range arr {
+		lineArr := strings.Split(line, " ")
+		if len(lineArr) != 2 {
+			continue
+		}
+		mp := lineArr[1]
+		disk := lineArr[0]
+		if mp == mountPoint {
+			device = disk
+			break
+		}
+	}
+	if device == "" {
+		return ""
+	}
+
+	var args2 []string = []string{"-o", "value", device}
 	cmdBlkid := exec.Command("blkid", args2...)
 	output, err = cmdBlkid.Output()
 	if err != nil {
