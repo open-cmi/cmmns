@@ -16,7 +16,7 @@ type SendOption struct {
 	From string
 }
 
-func Send(to []string, subject string, content string, opt *SendOption) error {
+func Send(to []string, cc []string, subject string, content string, opt *SendOption) error {
 	m := Get()
 	if m == nil {
 		return errors.New("sender email has not been set")
@@ -30,6 +30,7 @@ func Send(to []string, subject string, content string, opt *SendOption) error {
 	}
 
 	e.To = to
+	e.Cc = cc
 	e.Subject = subject
 
 	e.HTML = []byte(content)

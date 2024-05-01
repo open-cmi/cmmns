@@ -66,7 +66,7 @@ func Register(c *gin.Context) {
 	htmlcontent = strings.Replace(htmlcontent, "user_activate_url", activateURL, 1)
 	htmlcontent = strings.Replace(htmlcontent, "username", apimsg.UserName, 1)
 
-	err = email.Send([]string{apimsg.Email}, "Welcome to Nay", htmlcontent, nil)
+	err = email.Send([]string{apimsg.Email}, []string{}, "Welcome to Nay", htmlcontent, nil)
 	if err != nil {
 		user.DeleteByName(apimsg.UserName)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email can't be verified"})

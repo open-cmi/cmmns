@@ -4,27 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/netip"
 	"strings"
 
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
 
-// web access control
-
-var gWebAccessControl WebAccessControl
-
-type WebAccessControl struct {
-	Mode          string
-	PermitAddrs   []netip.Addr
-	PermitPrefixs []netip.Prefix
-	DenyAddrs     []netip.Addr
-	DenyPrefixs   []netip.Prefix
-}
+var globalModel *Model
 
 type Model struct {
 	Enable       bool   `json:"enable" db:"enable"`
+	Seq          int    `json:"seq" db:"seq"`
 	Mode         string `json:"mode" db:"mode"` // blacklist or whitelist
 	RawWhitelist string `json:"raw_whitelist" db:"raw_whitelist"`
 	RawBlacklist string `json:"raw_blacklist" db:"raw_blacklist"`
@@ -99,60 +89,4 @@ func Get() *Model {
 	}
 
 	return &m
-}
-
-func (m *Model) ConvertoWAC() WebAccessControl {
-	var wac WebAccessControl
-	wac.Mode = m.Mode
-
-	var arrs []string
-	lines := strings.Split(m.RawWhitelist, "\n")
-	for _, line := range lines {
-		tmp := strings.Split(line, ",")
-		arrs = append(arrs, tmp...)
-	}
-	for _, ar := range arrs {
-		ar = strings.Trim(ar, "\t ")
-		if strings.Contains(ar, "/") {
-			// prefix
-			p, err := netip.ParsePrefix(ar)
-			if err != nil {
-				continue
-			}
-			wac.PermitPrefixs = append(wac.PermitPrefixs, p)
-		} else {
-			// addr
-			a, err := netip.ParseAddr(ar)
-			if err != nil {
-				continue
-			}
-			wac.PermitAddrs = append(wac.PermitAddrs, a)
-		}
-	}
-
-	arrs = []string{}
-	lines = strings.Split(m.RawBlacklist, "\n")
-	for _, line := range lines {
-		tmp := strings.Split(line, ",")
-		arrs = append(arrs, tmp...)
-	}
-	for _, ar := range arrs {
-		ar = strings.Trim(ar, "\t ")
-		if strings.Contains(ar, "/") {
-			// prefix
-			p, err := netip.ParsePrefix(ar)
-			if err != nil {
-				continue
-			}
-			wac.DenyPrefixs = append(wac.DenyPrefixs, p)
-		} else {
-			// addr
-			a, err := netip.ParseAddr(ar)
-			if err != nil {
-				continue
-			}
-			wac.DenyAddrs = append(wac.DenyAddrs, a)
-		}
-	}
-	return wac
 }

@@ -23,7 +23,7 @@ func Init() error {
 
 	sort.SliceStable(businesses, func(i int, j int) bool {
 		bz1 := businesses[i]
-		bz2 := businesses[2]
+		bz2 := businesses[j]
 		return bz1.Priority < bz2.Priority
 	})
 
