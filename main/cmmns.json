@@ -26,6 +26,10 @@
     "devices": {
     }
   },
+  "wac": {
+    "nginx_conf_path": "",
+    "reload": ""
+  },
   "process": {
     "services": [
       {
@@ -52,6 +56,108 @@
       {
         "address": "/tmp/cmmns.sock",
         "proto": "unix"
+      }
+    ]
+  },
+  "prod": {
+    "name": "cmmns",
+    "footer": "cmmns",
+    "nav": [
+      {
+        "path": "/main/system-log",
+        "name": "system log",
+        "icon": "log",
+        "children": [
+          {
+            "path": "/main/system-log/audit-log",
+            "name": "operate log"
+          }
+        ]
+      },
+      {
+        "path": "/main/system",
+        "name": "system",
+        "icon": "system",
+        "children": [
+          {
+            "path": "/main/system/sysinfo",
+            "name": "system info"
+          },
+          {
+            "path": "/main/system/security-setting",
+            "name": "security setting"
+          },
+          {
+            "path": "/main/system/time-setting",
+            "name": "time setting"
+          },
+          {
+            "path": "/main/system/shutdown-reboot",
+            "name": "shutdown reboot"
+          },
+          {
+            "path": "/main/system/remote-assist",
+            "name": "remote assist"
+          },
+          {
+            "path": "/main/system/notify-setting",
+            "name": "notify setting"
+          },
+          {
+            "path": "/main/system/network-setting",
+            "name": "network setting"
+          },
+          {
+            "path": "/main/system/network-status",
+            "name": "network status"
+          },
+          {
+            "path": "/main/system/users",
+            "name": "user manager"
+          },
+          {
+            "path": "/main/system/rbac",
+            "name": "RBAC"
+          },
+          {
+            "path": "/main/system/license",
+            "name": "license"
+          }
+        ]
+      },
+      {
+        "path": "/main/my",
+        "name": "my",
+        "icon": "user",
+        "children": [
+          {
+            "path": "/main/my/change-password",
+            "name": "change password"
+          },
+          {
+            "path": "/main/my/token",
+            "name": "api token"
+          }
+        ]
+      },
+      {
+        "path": "/main/tools",
+        "name": "tools",
+        "icon": "tool",
+        "children": [
+          {
+            "path": "/main/tools/manhour",
+            "name": "man hour"
+          },
+          {
+            "path": "/main/tools/secret-key",
+            "name": "secret key manager"
+          },
+          {
+            "path": "/main/tools/md5",
+            "name": "md5"
+          }
+        ]
       }
     ]
   }
