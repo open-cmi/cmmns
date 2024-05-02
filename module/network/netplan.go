@@ -36,10 +36,10 @@ type NetplanConfig struct {
 	Network Network `yaml:"network"`
 }
 
-func NetplanApply(conf *Config) error {
+func NetplanApply() error {
 	// 写入文件
 	var filename string
-	if conf.ConfFile == "" {
+	if gConf.ConfFile == "" {
 		files, err := os.ReadDir(NetPlanDir)
 		if err != nil {
 			return err
@@ -57,15 +57,19 @@ func NetplanApply(conf *Config) error {
 		}
 		filename = path.Join(NetPlanDir, filename)
 	} else {
-		filename = conf.ConfFile
+		filename = gConf.ConfFile
 	}
 
 	var netconf NetplanConfig
 	netconf.Network.Version = 2
 	netconf.Network.Renderer = "networkd"
 	netconf.Network.Ethernets = make(map[string]EthernetConfig)
-	for dev := range conf.Devices {
-		devConf := conf.Devices[dev]
+	for _, dev := range gConf.Devices {
+		devConf := GetNetConfig(dev)
+		if devConf == nil {
+			continue
+		}
+
 		if devConf.DHCP {
 			netconf.Network.Ethernets[dev] = EthernetConfig{
 				DHCP4: "yes",

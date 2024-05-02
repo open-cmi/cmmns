@@ -17,13 +17,13 @@ type NetworkingConfig struct {
 	NameServer []string
 }
 
-func NetworkingApply(conf *Config) error {
+func NetworkingApply() error {
 	// 写入文件
 	var filename string
-	if conf.ConfFile == "" {
+	if gConf.ConfFile == "" {
 		filename = "/etc/network/interfaces"
 	} else {
-		filename = conf.ConfFile
+		filename = gConf.ConfFile
 	}
 
 	wf, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
@@ -33,9 +33,11 @@ func NetworkingApply(conf *Config) error {
 	}
 
 	var nicConfs []NetworkingConfig
-	for dev := range conf.Devices {
-		devConf := conf.Devices[dev]
-
+	for _, dev := range gConf.Devices {
+		devConf := GetNetConfig(dev)
+		if devConf == nil {
+			continue
+		}
 		if devConf.DHCP {
 			var nwconf NetworkingConfig
 			nwconf.Dev = dev

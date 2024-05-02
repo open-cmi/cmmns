@@ -3,9 +3,6 @@
     "server_addr": "",
     "server_port": 0
   },
-  "locale": {
-    "lang": "zh-CN"
-  },
   "log": {
     "level": "debug",
     "path": "/tmp/"
@@ -23,8 +20,7 @@
   },
   "network": {
     "engine": "netplan",
-    "devices": {
-    }
+    "devices": []
   },
   "wac": {
     "nginx_conf_path": "",

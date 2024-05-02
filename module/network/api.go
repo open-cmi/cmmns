@@ -8,27 +8,32 @@ import (
 
 	netio "github.com/shirou/gopsutil/net"
 
-	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 )
 
 func Get() []ConfigRequest {
 	var mode string = "static"
 	var devices []ConfigRequest
-	for dev := range gConf.Devices {
+	for _, dev := range gConf.Devices {
 		var conf ConfigRequest
-		v := gConf.Devices[dev]
-		if v.DHCP {
-			mode = "dhcp"
+		v := GetNetConfig(dev)
+		if v == nil {
+			conf.Mode = "static"
+			conf.Dev = dev
+		} else {
+			if v.DHCP {
+				mode = "dhcp"
+			}
+			conf.Dev = dev
+			conf.Mode = mode
+
+			conf.Address = v.Address
+			conf.Netmask = v.Netmask
+			conf.Gateway = v.Gateway
+			conf.PreferredDNS = v.PreferredDNS
+			conf.AlternateDNS = v.AlternateDNS
 		}
 
-		conf.Address = v.Address
-		conf.Netmask = v.Netmask
-		conf.Dev = dev
-		conf.Gateway = v.Gateway
-		conf.Mode = mode
-		conf.PreferredDNS = v.PreferredDNS
-		conf.AlternateDNS = v.AlternateDNS
 		devices = append(devices, conf)
 	}
 
@@ -64,7 +69,7 @@ func GetStatus() (int, []InterfaceStatus, error) {
 		return 0, resp, err
 	}
 
-	for dev := range gConf.Devices {
+	for _, dev := range gConf.Devices {
 		var status InterfaceStatus
 		status.Dev = dev
 
@@ -131,38 +136,45 @@ func GetRoutes() {
 }
 
 func Set(msg *ConfigRequest) error {
-	for name := range gConf.Devices {
+	var found bool = false
+	for _, name := range gConf.Devices {
 		// 接口相同，或者dev为空，取第一个
 		if name == msg.Dev {
-			conf := gConf.Devices[name]
-			if msg.Mode == "dhcp" {
-				conf.DHCP = true
-				conf.Address = ""
-				conf.Netmask = ""
-				conf.Gateway = ""
-				conf.PreferredDNS = ""
-				conf.AlternateDNS = ""
-			} else {
-				conf.DHCP = false
-				conf.Address = msg.Address
-				conf.Netmask = msg.Netmask
-				conf.Gateway = msg.Gateway
-				conf.PreferredDNS = msg.PreferredDNS
-				conf.AlternateDNS = msg.AlternateDNS
-			}
-
-			gConf.Devices[name] = conf
-
-			err := NetworkApply(&gConf)
-			if err != nil {
-				return err
-			}
-			config.Save()
+			found = true
 			break
 		}
 	}
+	if !found {
+		return errors.New("dev not supported")
+	}
 
-	return nil
+	m := GetNetConfig(msg.Dev)
+	if m == nil {
+		m = New()
+	}
+	m.Dev = msg.Dev
+	if msg.Mode == "dhcp" {
+		m.DHCP = true
+		m.Address = ""
+		m.Netmask = ""
+		m.Gateway = ""
+		m.PreferredDNS = ""
+		m.AlternateDNS = ""
+	} else {
+		m.DHCP = false
+		m.Address = msg.Address
+		m.Netmask = msg.Netmask
+		m.Gateway = msg.Gateway
+		m.PreferredDNS = msg.PreferredDNS
+		m.AlternateDNS = msg.AlternateDNS
+	}
+	err := m.Save()
+	if err != nil {
+		return err
+	}
+
+	err = NetworkApply()
+	return err
 }
 
 func BlinkingInterface(req *BlinkingRequest) error {
