@@ -47,13 +47,7 @@ func (mi RBACInstance) Up(db *sqlx.DB) error {
 		return err
 	}
 
-	_, err = db.Exec(`
-	CREATE TABLE IF NOT EXISTS modules (
-		name varchar(32) NOT NULL UNIQUE,
-		description text NOT NULL DEFAULT ''
-      );
-	`)
-	return err
+	return nil
 }
 
 // Down down migrate
@@ -63,11 +57,6 @@ func (mi RBACInstance) Down(db *sqlx.DB) error {
 		DROP TABLE IF EXISTS roles;
 	`)
 
-	if err == nil {
-		_, err = db.Exec(`
-			DROP TABLE IF EXISTS modules;
-		`)
-	}
 	return err
 }
 

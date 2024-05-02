@@ -201,7 +201,7 @@ func Register(m *RegisterMsg) (err error) {
 }
 
 func Edit(req *EditMsg) error {
-	user := Get("id", req.ID)
+	user := Get(req.ID)
 	if user == nil {
 		return errors.New("user is not exist")
 	}
@@ -214,7 +214,7 @@ func Edit(req *EditMsg) error {
 }
 
 func ChangePassword(userid string, password string) error {
-	u := Get("id", userid)
+	u := Get(userid)
 	if u == nil {
 		return errors.New("users not exist")
 	}
@@ -232,5 +232,14 @@ func ResetPasswd(req *ResetPasswdRequest) error {
 	updateClause := `update users set password=$1 where id=$2`
 	db := sqldb.GetConfDB()
 	_, err := db.Exec(updateClause, hash, req.ID)
+	return err
+}
+
+func Delete(id string) error {
+	u := Get(id)
+	if u == nil {
+		return errors.New("user not exist")
+	}
+	err := u.Remove()
 	return err
 }

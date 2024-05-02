@@ -12,8 +12,8 @@ import (
 func List(c *gin.Context) {
 	param := goparam.ParseParams(c)
 
-	usr := user.Get("id", param.UserID)
-	if usr == nil || !usr.HasReadPermision("Audit log") {
+	usr := user.Get(param.UserID)
+	if usr == nil {
 		c.JSON(http.StatusForbidden, "")
 		return
 	}

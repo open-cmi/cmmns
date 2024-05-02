@@ -29,6 +29,7 @@ type OrderOption struct {
 // Option model option
 type Option struct {
 	UserID      string
+	Role        string
 	DevID       string
 	PageOption  PageOption
 	OrderOption OrderOption

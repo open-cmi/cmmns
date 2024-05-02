@@ -1,6 +1,8 @@
 package rbac
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/pkg/goparam"
@@ -10,10 +12,10 @@ import (
 func RoleNameList(c *gin.Context) {
 	count, results, err := rbac.RoleNameList()
 	if err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
 		"data": map[string]interface{}{
@@ -28,10 +30,10 @@ func RoleList(c *gin.Context) {
 
 	count, results, err := rbac.RoleList(param)
 	if err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
 		"data": map[string]interface{}{
@@ -41,28 +43,28 @@ func RoleList(c *gin.Context) {
 	})
 }
 
-func ModuleList(c *gin.Context) {
-	param := goparam.ParseParams(c)
+func DeleteRole(c *gin.Context) {
+	ID := c.Param("id")
 
-	count, results, err := rbac.ModuleList(param)
+	user := goparam.GetUser(c)
+	userID, _ := user["id"].(string)
+	err := rbac.DeleteRole(&goparam.Option{
+		UserID: userID,
+	}, ID)
 	if err != nil {
-		c.JSON(200, gin.H{"ret": -1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
-		"data": map[string]interface{}{
-			"count":   count,
-			"results": results,
-		},
 	})
 }
 
 func init() {
 	webserver.RegisterAuthRouter("rbac", "/api/rbac/v1")
 	webserver.RegisterAuthAPI("rbac", "GET", "/role/", RoleList)
+	webserver.RegisterAuthAPI("rbac", "DELETE", "/role/:id", DeleteRole)
 	webserver.RegisterAuthAPI("rbac", "GET", "/role/name-list/", RoleNameList)
-	webserver.RegisterAuthAPI("rbac", "GET", "/module/", ModuleList)
 }

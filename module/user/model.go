@@ -9,7 +9,6 @@ import (
 	"github.com/jameskeane/bcrypt"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
@@ -58,32 +57,26 @@ func (u *User) Save() error {
 	return nil
 }
 
-func (u *User) HasReadPermision(m string) bool {
-	r := rbac.GetRole(u.Role)
-	if r == nil {
-		return false
+func (m *User) Remove() error {
+	deleteClause := "delete from users where id=$1"
+	db := sqldb.GetConfDB()
+	_, err := db.Exec(deleteClause, m.ID)
+	if err != nil {
+		return errors.New("del user failed")
 	}
-	return r.HasReadPermision(m)
-}
-
-func (u *User) HasWritePermision(m string) bool {
-	r := rbac.GetRole(u.Role)
-	if r == nil {
-		return false
-	}
-	return r.HasWritePermision(m)
+	return err
 }
 
 // Get get id
-func Get(field string, value string) (user *User) {
-	queryClause := fmt.Sprintf(`select * from users where %s=$1`, field)
+func Get(id string) (user *User) {
+	queryClause := fmt.Sprintf(`select * from users where id=$1`)
 	db := sqldb.GetConfDB()
-	row := db.QueryRowx(queryClause, value)
+	row := db.QueryRowx(queryClause, id)
 
 	var mdl User
 	err := row.StructScan(&mdl)
 	if err != nil {
-		logger.Errorf("user %s by %s not found: %s\n", value, field, err.Error())
+		logger.Errorf("user %s not found: %s\n", id, err.Error())
 		return nil
 	}
 
@@ -124,16 +117,6 @@ func DeleteByName(username string) error {
 	deleteClause := "delete from users where username=$1"
 	db := sqldb.GetConfDB()
 	_, err := db.Exec(deleteClause, username)
-	if err != nil {
-		return errors.New("del user failed")
-	}
-	return err
-}
-
-func Delete(id string) error {
-	deleteClause := "delete from users where id=$1"
-	db := sqldb.GetConfDB()
-	_, err := db.Exec(deleteClause, id)
 	if err != nil {
 		return errors.New("del user failed")
 	}

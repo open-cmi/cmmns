@@ -49,43 +49,36 @@ func (r *Role) Save() error {
 	return nil
 }
 
-func (r *Role) HasReadPermision(m string) bool {
-	return r.hasPermision(m, "read")
-}
-
-func (r *Role) HasWritePermision(m string) bool {
-	return r.hasPermision(m, "write")
-}
-
-func (r *Role) hasPermision(m string, perm string) bool {
-	if r.Permisions == "*" {
-		return true
+func (r *Role) Remove() error {
+	deleteClause := "delete from roles where id=$1"
+	db := sqldb.GetConfDB()
+	_, err := db.Exec(deleteClause, r.ID)
+	if err != nil {
+		return errors.New("remove role failed")
 	}
-
-	var hasPerm bool
-	mperms := strings.Split(r.Permisions, ";")
-	for _, mperm := range mperms {
-		s := strings.Split(mperm, ":")
-		mod := s[0]
-		permision := s[1]
-		if mod != m {
-			continue
-		}
-		perms := strings.Split(permision, ",")
-		for _, p := range perms {
-			if perm == p {
-				hasPerm = true
-				break
-			}
-		}
-	}
-	return hasPerm
+	return err
 }
 
-func GetRole(name string) *Role {
+func GetByName(name string) *Role {
 	queryClause := `select * from roles where name=$1`
 	db := sqldb.GetConfDB()
 	row := db.QueryRowx(queryClause, name)
+	if row == nil {
+		return nil
+	}
+	var r Role
+	err := row.StructScan(&r)
+	if err != nil {
+		logger.Errorf("struct scan role %s\n", err.Error())
+		return nil
+	}
+	return &r
+}
+
+func Get(id string) *Role {
+	queryClause := `select * from roles where id=$1`
+	db := sqldb.GetConfDB()
+	row := db.QueryRowx(queryClause, id)
 	if row == nil {
 		return nil
 	}

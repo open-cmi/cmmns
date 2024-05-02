@@ -83,42 +83,22 @@ func RoleList(option *goparam.Option) (int, []Role, error) {
 	return count, roles, err
 }
 
-func ModuleList(option *goparam.Option) (int, []Module, error) {
-	db := sqldb.GetConfDB()
-
-	var modules []Module = []Module{}
-	countClause := "select count(*) from modules"
-
-	whereClause, args := goparam.BuildWhereClause(option)
-
-	countClause += whereClause
-	row := db.QueryRow(countClause, args...)
-
-	var count int
-	err := row.Scan(&count)
-	if err != nil {
-		logger.Errorf("modules list count failed, %s\n", err.Error())
-		return 0, modules, errors.New("list count failed")
+func DeleteRole(option *goparam.Option, id string) error {
+	role := Get(id)
+	if role == nil {
+		return errors.New("role not exist")
 	}
-
-	queryClause := `select * from modules`
-	finalClause := goparam.BuildFinalClause(option)
-	queryClause += (whereClause + finalClause)
-	rows, err := db.Queryx(queryClause, args...)
-	if err != nil {
-		// 没有的话，也不需要报错
-		return count, modules, nil
+	if role.Name == "admin" {
+		return errors.New("admin should not be deleted")
 	}
+	err := role.Remove()
+	return err
+}
 
-	for rows.Next() {
-		var item Module
-		err := rows.StructScan(&item)
-		if err != nil {
-			logger.Errorf("module struct scan failed %s\n", err.Error())
-			break
-		}
-
-		modules = append(modules, item)
+func GetPermisions(roleName string) (string, error) {
+	role := GetByName(roleName)
+	if role == nil {
+		return "", errors.New("role not exist")
 	}
-	return count, modules, err
+	return role.Permisions, nil
 }

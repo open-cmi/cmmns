@@ -29,12 +29,14 @@ func GetUser(c *gin.Context) map[string]interface{} {
 func ParseParams(c *gin.Context) *Option {
 	var option Option
 
-	var userID string = ""
 	user := GetUser(c)
 	if user != nil {
-		userID = user["id"].(string)
+		userID := user["id"].(string)
+		option.UserID = userID
+
+		role := user["role"].(string)
+		option.Role = role
 	}
-	option.UserID = userID
 
 	devID := c.DefaultQuery("dev_id", "")
 	option.DevID = devID

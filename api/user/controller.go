@@ -157,7 +157,7 @@ func List(c *gin.Context) {
 func Get(c *gin.Context) {
 
 	id := c.Param("id")
-	user := user.Get("id", id)
+	user := user.Get(id)
 	if user == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": -1,
