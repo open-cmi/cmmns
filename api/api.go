@@ -9,6 +9,7 @@ import (
 	_ "github.com/open-cmi/cmmns/api/rbac"
 	_ "github.com/open-cmi/cmmns/api/secretkey"
 	_ "github.com/open-cmi/cmmns/api/system"
+	_ "github.com/open-cmi/cmmns/api/tools"
 	_ "github.com/open-cmi/cmmns/api/user"
 	_ "github.com/open-cmi/cmmns/api/user2"
 	_ "github.com/open-cmi/cmmns/api/wac"
