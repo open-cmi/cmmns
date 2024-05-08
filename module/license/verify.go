@@ -8,7 +8,6 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"errors"
-	"fmt"
 	"os"
 
 	"github.com/open-cmi/cmmns/essential/logger"
@@ -16,7 +15,6 @@ import (
 
 func Verify(origin string, signed string) error {
 	if gConf.PublicFile != "" {
-		fmt.Println(origin, signed)
 		return verify(origin, signed, gConf.PublicFile)
 	}
 	return nil

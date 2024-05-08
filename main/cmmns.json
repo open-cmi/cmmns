@@ -42,6 +42,12 @@
   "user2": {
     "activate_url": ""
   },
+  "license": {
+    "public_file": ""
+  },
+  "licmng": {
+    "private_file": ""
+  },
   "webserver": {
     "server": [
       {
@@ -118,6 +124,10 @@
           {
             "path": "/main/system/license",
             "name": "license"
+          },
+          {
+            "path": "/main/system/license-manager",
+            "name": "license manager"
           }
         ]
       },

@@ -9,11 +9,12 @@ import (
 	"os"
 	"strings"
 
+	"github.com/open-cmi/cmmns/module/licmng"
 	"github.com/open-cmi/cmmns/pkg/path"
 )
 
-func GetLicenseInfo() (LicenseInfo, error) {
-	var mess LicenseInfo
+func GetLicenseInfo() (licmng.LicenseInfo, error) {
+	var mess licmng.LicenseInfo
 	mess.Version = "none"
 	workDir := path.GetRootPath()
 
