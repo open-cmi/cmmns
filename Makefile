@@ -1,14 +1,17 @@
 ROOT := $(shell pwd)
 
-ifdef BUILD_DIR
-TARGET=$(BUILD_DIR)/bin/
-else
-TARGET=$(ROOT)/
-endif
+TARGET=$(ROOT)/main/cmmns
 
 .PHONY:build
 build:
-	cd main && go build -ldflags "-s -w" -o $(TARGET)/cmmns main.go
+	cd main && go build -ldflags "-s -w" -o $(TARGET) main.go
 
+PREFIX?=/usr/local
+.PHONY:install
+install:
+	mkdir -p ${PREFIX}/bin
+	cp -rfp ${TARGET} ${PREFIX}/bin/
+
+.PHONY:clean
 clean:
 	rm -r build/*
