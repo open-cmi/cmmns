@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/open-cmi/cmmns/essential/logger"
 )
@@ -76,7 +77,7 @@ func CreateLicenseContent(id string) (string, error) {
 	}
 
 	var lic LicenseInfo
-	lic.Modules = m.Modules
+	lic.Modules = strings.Split(m.Modules, ",")
 	lic.Version = m.Version
 	lic.ExpireTime = m.ExpireTime
 	lic.Machine = m.Machine
