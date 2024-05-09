@@ -2,6 +2,7 @@ package system
 
 import (
 	_ "github.com/open-cmi/cmmns/api/system/license"
+	_ "github.com/open-cmi/cmmns/api/system/licmng"
 	_ "github.com/open-cmi/cmmns/api/system/prod"
 	_ "github.com/open-cmi/cmmns/api/system/setting"
 	_ "github.com/open-cmi/cmmns/api/system/sysinfo"

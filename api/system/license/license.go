@@ -80,5 +80,5 @@ func UploadLicenseFile(c *gin.Context) {
 
 func init() {
 	webserver.RegisterAuthAPI("system", "GET", "/license/", GetLicenseInfo)
-	webserver.RegisterAuthAPI("system", "POST", "/license/", UploadLicenseFile)
+	webserver.RegisterAuthAPI("system", "POST", "/license/upload/", UploadLicenseFile)
 }
