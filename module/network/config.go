@@ -2,6 +2,7 @@ package network
 
 import (
 	"encoding/json"
+	"runtime"
 
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/service/business"
@@ -40,5 +41,7 @@ func Init() error {
 
 func init() {
 	config.RegisterConfig("network", Parse, Save)
-	business.Register("network", business.DefaultPriority, Init)
+	if runtime.GOOS == "linux" {
+		business.Register("network", business.DefaultPriority, Init)
+	}
 }

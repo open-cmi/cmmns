@@ -11,13 +11,14 @@ import (
 )
 
 type Setting struct {
+	TimeZone   string `json:"timezone"`
 	NtpServer  string `json:"ntp_server"`
 	AutoAdjust bool   `json:"auto_adjust"`
 	isNew      bool
 }
 
 func (s *Setting) Key() string {
-	return "ntp-time-setting"
+	return "time-setting"
 }
 
 func (s *Setting) Value() string {

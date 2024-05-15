@@ -28,9 +28,11 @@ func GetLocale() string {
 
 func Init() error {
 	m := Get()
-	if m != nil {
-		i18n.SetLang(m.Lang)
+	if m == nil {
+		i18n.SetLang("zh-CN")
+		return nil
 	}
+	i18n.SetLang(m.Lang)
 	return nil
 }
 
