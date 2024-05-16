@@ -8,7 +8,7 @@ import (
 	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
-func ListLicense(query *goparam.Option) (int, []Model, error) {
+func ListLicense(query *goparam.Param) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var lics []Model = []Model{}

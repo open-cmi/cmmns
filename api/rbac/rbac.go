@@ -48,7 +48,7 @@ func DeleteRole(c *gin.Context) {
 
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	err := rbac.DeleteRole(&goparam.Option{
+	err := rbac.DeleteRole(&goparam.Param{
 		UserID: userID,
 	}, ID)
 	if err != nil {

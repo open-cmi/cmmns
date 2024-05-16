@@ -91,7 +91,7 @@ func GetBasicSystemInfo() (si SystemInfo, err error) {
 	return si, nil
 }
 
-func Get(mo *goparam.Option, field string, value string) *Model {
+func Get(mo *goparam.Param, field string, value string) *Model {
 	columns := goparam.GetColumn(Model{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from system_status where %s=$1`, strings.Join(columns, ","), field)
@@ -109,7 +109,7 @@ func Get(mo *goparam.Option, field string, value string) *Model {
 }
 
 // List list
-func List(option *goparam.Option) (int, []Model, error) {
+func List(option *goparam.Param) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var results []Model = []Model{}

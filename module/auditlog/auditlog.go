@@ -19,7 +19,7 @@ type Model struct {
 }
 
 // List list
-func List(p *goparam.Option) (int, []Model, error) {
+func List(p *goparam.Param) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var logs []Model = []Model{}

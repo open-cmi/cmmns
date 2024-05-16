@@ -10,7 +10,7 @@ import (
 	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
-func Get(mo *goparam.Option, field string, value string) *Model {
+func Get(mo *goparam.Param, field string, value string) *Model {
 	columns := goparam.GetColumn(Model{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from manhour where %s=$1`, strings.Join(columns, ","), field)
@@ -28,7 +28,7 @@ func Get(mo *goparam.Option, field string, value string) *Model {
 }
 
 // List list
-func List(option *goparam.Option) (int, []Model, error) {
+func List(option *goparam.Param) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var results []Model = []Model{}
@@ -70,7 +70,7 @@ func List(option *goparam.Option) (int, []Model, error) {
 }
 
 // List list
-func MultiDelete(mo *goparam.Option, ids []string) error {
+func MultiDelete(mo *goparam.Param, ids []string) error {
 	db := sqldb.GetConfDB()
 
 	if len(ids) == 0 {
@@ -100,7 +100,7 @@ func MultiDelete(mo *goparam.Option, ids []string) error {
 	return nil
 }
 
-func Create(mo *goparam.Option, reqMsg *CreateMsg) (m *Model, err error) {
+func Create(mo *goparam.Param, reqMsg *CreateMsg) (m *Model, err error) {
 	m = New()
 	m.Date = reqMsg.Date
 	m.StartTime = reqMsg.StartTime
@@ -111,7 +111,7 @@ func Create(mo *goparam.Option, reqMsg *CreateMsg) (m *Model, err error) {
 	return m, err
 }
 
-func Edit(mo *goparam.Option, id string, reqMsg *EditMsg) error {
+func Edit(mo *goparam.Param, id string, reqMsg *EditMsg) error {
 	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")
@@ -125,7 +125,7 @@ func Edit(mo *goparam.Option, id string, reqMsg *EditMsg) error {
 	return err
 }
 
-func Delete(mo *goparam.Option, id string) error {
+func Delete(mo *goparam.Param, id string) error {
 	m := Get(mo, "id", id)
 	if m == nil {
 		return errors.New("item not exist")

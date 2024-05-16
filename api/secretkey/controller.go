@@ -59,7 +59,7 @@ func MultiDelete(c *gin.Context) {
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	var option goparam.Option
+	var option goparam.Param
 	option.UserID = userID
 	err := secretkey.MultiDelete(&option, reqMsg.Name)
 	if err != nil {
@@ -87,7 +87,7 @@ func Create(c *gin.Context) {
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	_, err := secretkey.Create(&goparam.Option{
+	_, err := secretkey.Create(&goparam.Param{
 		UserID: userID,
 	}, &reqMsg)
 	if err != nil {
@@ -118,7 +118,7 @@ func Delete(c *gin.Context) {
 
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	err := secretkey.Delete(&goparam.Option{
+	err := secretkey.Delete(&goparam.Param{
 		UserID: userID,
 	}, identify)
 	if err != nil {
@@ -144,7 +144,7 @@ func Edit(c *gin.Context) {
 
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	err := secretkey.Edit(&goparam.Option{
+	err := secretkey.Edit(&goparam.Param{
 		UserID: userID,
 	}, identify, &reqMsg)
 	if err != nil {

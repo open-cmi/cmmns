@@ -11,7 +11,7 @@ import (
 )
 
 // List list
-func TokenList(option *goparam.Option) (int, []TokenRecord, error) {
+func TokenList(option *goparam.Param) (int, []TokenRecord, error) {
 	db := sqldb.GetConfDB()
 
 	var results []TokenRecord = []TokenRecord{}

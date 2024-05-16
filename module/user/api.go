@@ -18,7 +18,7 @@ import (
 const UserLoginMaxTried = 5
 
 // List list func
-func List(query *goparam.Option) (int, []User, error) {
+func List(query *goparam.Param) (int, []User, error) {
 	db := sqldb.GetConfDB()
 
 	var users []User = []User{}

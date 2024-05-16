@@ -43,7 +43,7 @@ func RoleNameList() (int, []string, error) {
 	return count, roles, err
 }
 
-func RoleList(option *goparam.Option) (int, []Role, error) {
+func RoleList(option *goparam.Param) (int, []Role, error) {
 	db := sqldb.GetConfDB()
 
 	var roles []Role = []Role{}
@@ -83,7 +83,7 @@ func RoleList(option *goparam.Option) (int, []Role, error) {
 	return count, roles, err
 }
 
-func DeleteRole(option *goparam.Option, id string) error {
+func DeleteRole(option *goparam.Param, id string) error {
 	role := Get(id)
 	if role == nil {
 		return errors.New("role not exist")

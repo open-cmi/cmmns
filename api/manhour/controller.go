@@ -38,7 +38,7 @@ func MultiDelete(c *gin.Context) {
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	var option goparam.Option
+	var option goparam.Param
 	option.UserID = userID
 	err := manhour.MultiDelete(&option, reqMsg.ID)
 	if err != nil {
@@ -65,7 +65,7 @@ func Create(c *gin.Context) {
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	var option goparam.Option
+	var option goparam.Param
 	option.UserID = userID
 
 	_, err := manhour.Create(&option, &reqMsg)
@@ -85,7 +85,7 @@ func Get(c *gin.Context) {
 
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	var option goparam.Option
+	var option goparam.Param
 	option.UserID = userID
 
 	m := manhour.Get(&option, "id", identify)
@@ -102,7 +102,7 @@ func Delete(c *gin.Context) {
 
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	var option goparam.Option
+	var option goparam.Param
 	option.UserID = userID
 
 	err := manhour.Delete(&option, identify)
@@ -129,7 +129,7 @@ func Edit(c *gin.Context) {
 
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	var option goparam.Option
+	var option goparam.Param
 	option.UserID = userID
 
 	err := manhour.Edit(&option, identify, &reqMsg)

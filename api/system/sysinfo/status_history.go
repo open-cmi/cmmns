@@ -34,7 +34,7 @@ func StatusHistoryGet(c *gin.Context) {
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
 
-	var option goparam.Option
+	var option goparam.Param
 	option.UserID = userID
 	mdl := system.Get(&option, "id", id)
 	if mdl == nil {

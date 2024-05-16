@@ -26,8 +26,8 @@ func GetUser(c *gin.Context) map[string]interface{} {
 }
 
 // ParseParams parse param
-func ParseParams(c *gin.Context) *Option {
-	var option Option
+func ParseParams(c *gin.Context) *Param {
+	var option Param
 
 	user := GetUser(c)
 	if user != nil {
@@ -51,7 +51,7 @@ func ParseParams(c *gin.Context) *Option {
 		page = 1
 	}
 
-	option.PageOption.Page = page - 1
+	option.PageParam.Page = page - 1
 
 	// page size
 	pagesizestr := c.DefaultQuery("page_size", "25")
@@ -59,10 +59,10 @@ func ParseParams(c *gin.Context) *Option {
 	if err != nil {
 		pagesize = 25
 	}
-	option.PageOption.PageSize = pagesize
+	option.PageParam.PageSize = pagesize
 
-	option.OrderOption.Order = c.Query("order")
-	option.OrderOption.OrderBy = c.Query("order_by")
+	option.OrderParam.Order = c.Query("order")
+	option.OrderParam.OrderBy = c.Query("order_by")
 
 	return &option
 }

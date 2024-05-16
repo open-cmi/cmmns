@@ -76,7 +76,7 @@ func NameList() (int, []string, error) {
 }
 
 // List list
-func List(mo *goparam.Option) (int, []Model, error) {
+func List(mo *goparam.Param) (int, []Model, error) {
 	db := sqldb.GetConfDB()
 
 	var results []Model = []Model{}
@@ -114,7 +114,7 @@ func List(mo *goparam.Option) (int, []Model, error) {
 }
 
 // List list
-func MultiDelete(mo *goparam.Option, ids []string) error {
+func MultiDelete(mo *goparam.Param, ids []string) error {
 	db := sqldb.GetConfDB()
 
 	if len(ids) == 0 {
@@ -143,7 +143,7 @@ func MultiDelete(mo *goparam.Option, ids []string) error {
 	return nil
 }
 
-func Create(mo *goparam.Option, reqMsg *CreateMsg) (m *Model, err error) {
+func Create(mo *goparam.Param, reqMsg *CreateMsg) (m *Model, err error) {
 	// 先检查用户名是否存在
 	model := Get(reqMsg.Name)
 	if model != nil {
@@ -157,7 +157,7 @@ func Create(mo *goparam.Option, reqMsg *CreateMsg) (m *Model, err error) {
 	return m, err
 }
 
-func Edit(mo *goparam.Option, id string, reqMsg *EditMsg) error {
+func Edit(mo *goparam.Param, id string, reqMsg *EditMsg) error {
 	m := Get(id)
 	if m == nil {
 		return errors.New("item not exist")
@@ -168,7 +168,7 @@ func Edit(mo *goparam.Option, id string, reqMsg *EditMsg) error {
 	return err
 }
 
-func Delete(mo *goparam.Option, id string) error {
+func Delete(mo *goparam.Param, id string) error {
 	m := Get(id)
 	if m == nil {
 		return errors.New("item not exist")

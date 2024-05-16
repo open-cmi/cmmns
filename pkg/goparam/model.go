@@ -7,33 +7,33 @@ import (
 )
 
 // 条件比较
-type FilterOption struct {
+type FilterParam struct {
 	Type      string      `json:"type"`
 	Name      string      `json:"name"`
 	Value     interface{} `json:"value"`
 	Condition string      `json:"condition"`
 }
 
-// PageOption page param
-type PageOption struct {
+// PageParam page param
+type PageParam struct {
 	Page     int `json:"page"`
 	PageSize int `json:"page_size"`
 }
 
-// OrderOption order option
-type OrderOption struct {
+// OrderParam order option
+type OrderParam struct {
 	Order   string `json:"order"`
-	OrderBy string `json:"orderby"`
+	OrderBy string `json:"order_by"`
 }
 
-// Option model option
-type Option struct {
-	UserID      string
-	Role        string
-	DevID       string
-	PageOption  PageOption
-	OrderOption OrderOption
-	Filters     []FilterOption
+// Param model option
+type Param struct {
+	UserID     string
+	Role       string
+	DevID      string
+	PageParam  PageParam
+	OrderParam OrderParam
+	Filters    []FilterParam
 }
 
 func GetColumn(v interface{}, skipColumn []string) []string {
@@ -71,7 +71,7 @@ func GetColumnInsertNamed(columns []string) []string {
 }
 
 // BuildWhereClause build where clause
-func BuildWhereClause(opt *Option) (format string, args []interface{}) {
+func BuildWhereClause(opt *Param) (format string, args []interface{}) {
 	if opt == nil {
 		return "", []interface{}{}
 	}
@@ -94,7 +94,7 @@ func BuildWhereClause(opt *Option) (format string, args []interface{}) {
 				clause += fmt.Sprintf(" %s = $%d", filter.Name, index+1)
 				args = append(args, value)
 			}
-		} else if filter.Type == "number" {
+		} else if filter.Type == "number" || filter.Type == "integer" {
 			value := filter.Value.(int)
 			if filter.Condition == "eq" {
 				clause += fmt.Sprintf(" %s = $%d", filter.Name, index+1)
@@ -105,6 +105,12 @@ func BuildWhereClause(opt *Option) (format string, args []interface{}) {
 			} else if filter.Condition == "gt" {
 				clause += fmt.Sprintf(" %s > $%d", filter.Name, index+1)
 				args = append(args, value)
+			} else if filter.Condition == "le" {
+				clause += fmt.Sprintf(" %s <= $%d", filter.Name, index+1)
+				args = append(args, value)
+			} else if filter.Condition == "ge" {
+				clause += fmt.Sprintf(" %s >= $%d", filter.Name, index+1)
+				args = append(args, value)
 			}
 		}
 	}
@@ -113,24 +119,24 @@ func BuildWhereClause(opt *Option) (format string, args []interface{}) {
 }
 
 // BuildFinalClause build final clause
-func BuildFinalClause(opt *Option) string {
+func BuildFinalClause(opt *Param) string {
 	if opt == nil {
 		return ""
 	}
 
 	var clause string = ""
 
-	if opt.OrderOption.OrderBy != "" {
-		if opt.OrderOption.Order == "" {
-			opt.OrderOption.Order = "asc"
+	if opt.OrderParam.OrderBy != "" {
+		if opt.OrderParam.Order == "" {
+			opt.OrderParam.Order = "asc"
 		}
-		clause += fmt.Sprintf(` ORDER BY %s %s`, opt.OrderOption.OrderBy, opt.OrderOption.Order)
+		clause += fmt.Sprintf(` ORDER BY %s %s`, opt.OrderParam.OrderBy, opt.OrderParam.Order)
 	}
 
 	// limit must before offset
-	if opt.PageOption.PageSize != 0 {
-		offset := opt.PageOption.Page * opt.PageOption.PageSize
-		clause += fmt.Sprintf(" LIMIT %d OFFSET %d", opt.PageOption.PageSize, offset)
+	if opt.PageParam.PageSize != 0 {
+		offset := opt.PageParam.Page * opt.PageParam.PageSize
+		clause += fmt.Sprintf(" LIMIT %d OFFSET %d", opt.PageParam.PageSize, offset)
 	}
 
 	return clause
