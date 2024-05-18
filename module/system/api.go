@@ -35,11 +35,14 @@ func InitDevID() {
 	}
 }
 
-type SystemInfo struct {
-	DevID           string  `json:"dev_id"`
-	Hostname        string  `json:"hostname"`
-	CPUCores        int     `json:"cpu_cores"`
-	CPUThreads      int     `json:"cpu_threads"`
+type SystemHostInfo struct {
+	DevID      string `json:"dev_id"`
+	Hostname   string `json:"hostname"`
+	CPUCores   int    `json:"cpu_cores"`
+	CPUThreads int    `json:"cpu_threads"`
+}
+
+type SystemStatusInfo struct {
 	CPUUsage        float64 `json:"cpu_usage"`
 	DiskUsed        uint64  `json:"disk_used"`
 	DiskTotal       uint64  `json:"disk_total"`
@@ -65,14 +68,20 @@ func GetNetLoadInfo() NetLoadInfo {
 	return ns
 }
 
-func GetBasicSystemInfo() (si SystemInfo, err error) {
+func GetBasicHostInfo() (si SystemHostInfo, err error) {
 	si.DevID = dev.GetDeviceID()
 	si.Hostname, err = os.Hostname()
 	if err != nil {
 		return si, err
 	}
 
-	si.CPUCores, si.CPUThreads, si.CPUUsage = CPUSummary()
+	si.CPUCores, si.CPUThreads, _ = CPUSummary()
+	return si, nil
+}
+
+func GetSystemStatusInfo() (si SystemStatusInfo, err error) {
+
+	_, _, si.CPUUsage = CPUSummary()
 
 	diskUsed, diskTotal, diskUsedPercent := DiskSummary()
 	si.DiskTotal = diskTotal

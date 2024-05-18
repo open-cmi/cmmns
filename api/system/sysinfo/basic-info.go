@@ -8,8 +8,8 @@ import (
 	"github.com/open-cmi/cmmns/service/webserver"
 )
 
-func GetSystemStatusInfo(c *gin.Context) {
-	sysinfo, err := system.GetSystemStatusInfo()
+func GetBasicHostInfo(c *gin.Context) {
+	sysinfo, err := system.GetBasicHostInfo()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": err.Error()})
 		return
@@ -18,5 +18,5 @@ func GetSystemStatusInfo(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "GET", "/system-status/", GetSystemStatusInfo)
+	webserver.RegisterAuthAPI("system", "GET", "/basic-info/", GetBasicHostInfo)
 }
