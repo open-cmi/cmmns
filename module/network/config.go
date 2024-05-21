@@ -5,7 +5,7 @@ import (
 	"runtime"
 
 	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/cmmns/service/business"
+	"github.com/open-cmi/cmmns/service/initial"
 )
 
 var gConf Config
@@ -42,6 +42,6 @@ func Init() error {
 func init() {
 	config.RegisterConfig("network", Parse, Save)
 	if runtime.GOOS == "linux" {
-		business.Register("network", business.DefaultPriority, Init)
+		initial.Register("network", initial.DefaultPriority, Init)
 	}
 }

@@ -1,4 +1,4 @@
-package business
+package initial
 
 import (
 	"errors"
@@ -7,6 +7,9 @@ import (
 )
 
 const (
+	PhaseZero       = 0
+	PhaseOne        = 1
+	PhaseTwo        = 2
 	DefaultPriority = 5
 )
 
@@ -16,22 +19,22 @@ type Business struct {
 	Name     string
 }
 
-var businesses []Business
+var initiales []Business
 
 func Init() error {
 	var err error
 
-	sort.SliceStable(businesses, func(i int, j int) bool {
-		bz1 := businesses[i]
-		bz2 := businesses[j]
+	sort.SliceStable(initiales, func(i int, j int) bool {
+		bz1 := initiales[i]
+		bz2 := initiales[j]
 		return bz1.Priority < bz2.Priority
 	})
 
-	for i := range businesses {
-		bz := &businesses[i]
+	for i := range initiales {
+		bz := &initiales[i]
 		err = bz.Init()
 		if err != nil {
-			errmsg := fmt.Sprintf("business %s init failed: %s", bz.Name, err.Error())
+			errmsg := fmt.Sprintf("initial %s init failed: %s", bz.Name, err.Error())
 			return errors.New(errmsg)
 		}
 	}
@@ -40,15 +43,15 @@ func Init() error {
 }
 
 func Register(name string, priority int, fn func() error) error {
-	for i := range businesses {
-		bz := &businesses[i]
+	for i := range initiales {
+		bz := &initiales[i]
 		if bz.Name == name {
-			errmsg := fmt.Sprintf("business %s has been registered", name)
+			errmsg := fmt.Sprintf("initial %s has been registered", name)
 			return errors.New(errmsg)
 		}
 	}
 
-	businesses = append(businesses, Business{
+	initiales = append(initiales, Business{
 		Init:     fn,
 		Name:     name,
 		Priority: priority,

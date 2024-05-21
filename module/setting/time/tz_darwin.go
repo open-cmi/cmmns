@@ -1,7 +1,7 @@
 package time
 
 import (
-	"github.com/open-cmi/cmmns/service/business"
+	"github.com/open-cmi/cmmns/service/initial"
 )
 
 func GetTimeZoneList() ([]string, error) {
@@ -25,5 +25,5 @@ func Init() error {
 }
 
 func init() {
-	business.Register("time-setting", business.DefaultPriority, Init)
+	initial.Register("time-setting", initial.DefaultPriority, Init)
 }

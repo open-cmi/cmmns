@@ -10,7 +10,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/subcommands"
-	"github.com/open-cmi/cmmns/service/business"
+	"github.com/open-cmi/cmmns/service/initial"
 	"github.com/open-cmi/cmmns/service/ticker"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
@@ -66,7 +66,7 @@ func (c *RunCommand) Run() error {
 		return err
 	}
 
-	err = business.Init()
+	err = initial.Init()
 	if err != nil {
 		logger.Errorf("%s\n", err.Error())
 		return err

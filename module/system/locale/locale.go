@@ -2,7 +2,7 @@ package locale
 
 import (
 	"github.com/open-cmi/cmmns/essential/i18n"
-	"github.com/open-cmi/cmmns/service/business"
+	"github.com/open-cmi/cmmns/service/initial"
 )
 
 func SetLocale(lang string) error {
@@ -37,5 +37,5 @@ func Init() error {
 }
 
 func init() {
-	business.Register("locale", business.DefaultPriority, Init)
+	initial.Register("locale", initial.DefaultPriority, Init)
 }
