@@ -1,4 +1,4 @@
-package wac
+package nginxconf
 
 import (
 	"encoding/json"
@@ -9,8 +9,8 @@ import (
 var gConf Config
 
 type Config struct {
-	NginxPath string `json:"nginx_conf_path"`
-	Reload    string `json:"reload"`
+	Path   string `json:"conf_path"`
+	Reload string `json:"reload"`
 }
 
 func Parse(mess json.RawMessage) error {
@@ -24,5 +24,5 @@ func Save() json.RawMessage {
 }
 
 func init() {
-	config.RegisterConfig("wac", Parse, Save)
+	config.RegisterConfig("nginx", Parse, Save)
 }

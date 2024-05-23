@@ -22,8 +22,8 @@
     "engine": "netplan",
     "devices": []
   },
-  "wac": {
-    "nginx_conf_path": "",
+  "nginx": {
+    "conf_path": "",
     "reload": ""
   },
   "process": {
@@ -104,6 +104,10 @@
           {
             "path": "/main/system/notify-setting",
             "name": "notify setting"
+          },
+          {
+            "path": "/main/system/service-setting",
+            "name": "service setting"
           },
           {
             "path": "/main/system/network-setting",
