@@ -1,14 +1,17 @@
 package setting
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/license"
+	"github.com/open-cmi/cmmns/module/licmng"
 	"github.com/open-cmi/cmmns/pkg/path"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
@@ -53,6 +56,18 @@ func UploadLicenseFile(c *gin.Context) {
 	err = license.Verify(licBase64, signed)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license signed string verified failed"})
+		return
+	}
+	var lic licmng.LicenseInfo
+	err = json.Unmarshal([]byte(licBase64), &lic)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license unmarshal failed"})
+		return
+	}
+
+	ts := time.Now().Unix()
+	if lic.ExpireTime < ts {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license is expired"})
 		return
 	}
 

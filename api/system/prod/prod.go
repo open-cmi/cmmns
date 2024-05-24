@@ -16,6 +16,9 @@ func GetProdInfo(c *gin.Context) {
 	// 普通用户获取授权菜单
 	info := prod.GetProdInfo()
 	m := time.Get()
+	if m == nil {
+		m = time.New()
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
