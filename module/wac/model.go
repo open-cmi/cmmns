@@ -13,12 +13,9 @@ import (
 var globalModel *Model
 
 type Model struct {
-	Enable       bool   `json:"enable" db:"enable"`
-	Seq          int    `json:"seq" db:"seq"`
-	Mode         string `json:"mode" db:"mode"` // blacklist or whitelist
-	RawWhitelist string `json:"raw_whitelist" db:"raw_whitelist"`
-	RawBlacklist string `json:"raw_blacklist" db:"raw_blacklist"`
-	isNew        bool
+	Enable bool   `json:"enable" db:"enable"`
+	Mode   string `json:"mode" db:"mode"` // blacklist or whitelist
+	isNew  bool
 }
 
 func (m *Model) Key() string {

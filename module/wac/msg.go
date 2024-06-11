@@ -1,8 +1,10 @@
 package wac
 
 type SetRequest struct {
-	Enable       bool   `json:"enable"`
-	Mode         string `json:"mode"`
-	RawWhitelist string `json:"raw_whitelist"`
-	RawBlacklist string `json:"raw_blacklist"`
+	Enable bool   `json:"enable"`
+	Mode   string `json:"mode"`
+}
+
+type AddressRequest struct {
+	Address string `json:"address"`
 }

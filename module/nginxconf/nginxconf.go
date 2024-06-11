@@ -13,7 +13,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/logger"
 )
 
-func ApplyNginxBlackConf(rawBlackString string) error {
+func ApplyNginxBlackConf(blacklists []string) error {
 	blkConf := path.Join(gConf.Path, "ngx_blacklist.conf")
 	wf, err := os.OpenFile(blkConf, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 	if err != nil {
@@ -21,8 +21,7 @@ func ApplyNginxBlackConf(rawBlackString string) error {
 		return err
 	}
 	defer wf.Close()
-	lines := strings.Split(rawBlackString, "\n")
-	for _, line := range lines {
+	for _, line := range blacklists {
 		line = strings.Trim(line, "\t ")
 		if line == "" {
 			continue
@@ -30,10 +29,14 @@ func ApplyNginxBlackConf(rawBlackString string) error {
 		content := fmt.Sprintf("deny %s;\n", line)
 		_, err = wf.WriteString(content)
 	}
+	if gConf.Reload != "" {
+		cmd := exec.Command("bash", "-c", gConf.Reload)
+		err = cmd.Run()
+	}
 	return err
 }
 
-func ApplyNginxWhiteConf(rawWhiteString string) error {
+func ApplyNginxWhiteConf(whitelists []string) error {
 	whiteConf := path.Join(gConf.Path, "ngx_whitelist.conf")
 	wf, err := os.OpenFile(whiteConf, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 	if err != nil {
@@ -41,8 +44,7 @@ func ApplyNginxWhiteConf(rawWhiteString string) error {
 		return err
 	}
 	defer wf.Close()
-	lines := strings.Split(rawWhiteString, "\n")
-	for _, line := range lines {
+	for _, line := range whitelists {
 		line = strings.Trim(line, "\t ")
 		if line == "" {
 			continue
@@ -50,25 +52,18 @@ func ApplyNginxWhiteConf(rawWhiteString string) error {
 		content := fmt.Sprintf("allow %s;\n", line)
 		_, err = wf.WriteString(content)
 	}
+	if gConf.Reload != "" {
+		cmd := exec.Command("bash", "-c", gConf.Reload)
+		err = cmd.Run()
+	}
 	return err
 }
 
-func applyAccessControl(mode string, rawBlack string, rawWhite string) error {
+func applyAccessControl(mode string) error {
 	var err error
 
 	if gConf.Path == "" {
 		return errors.New("nginx path is not set, please set it in config file first")
-	}
-
-	err = ApplyNginxBlackConf(rawBlack)
-	if err != nil {
-		logger.Errorf("apply blacklist failed: %s\n", rawBlack)
-		return err
-	}
-	err = ApplyNginxWhiteConf(rawWhite)
-	if err != nil {
-		logger.Errorf("apply whitelist failed: %s\n", rawWhite)
-		return err
 	}
 
 	nginxConf := filepath.Join(gConf.Path, "nginx.conf")
@@ -149,9 +144,8 @@ func applyAccessControl(mode string, rawBlack string, rawWhite string) error {
 	return err
 }
 
-func ApplyNginxAccessControl(mode string, rawBlack string, rawWhite string) error {
-
-	err := applyAccessControl(mode, rawBlack, rawWhite)
+func ApplyNginxAccessControl(mode string) error {
+	err := applyAccessControl(mode)
 	if err != nil {
 		return err
 	}
@@ -184,7 +178,7 @@ func CancelNginxAccessControl() error {
 		return err
 	}
 	newContent := strings.Replace(string(content), "    include ngx_blacklist.conf;\n    allow all;\n", "", -1)
-	newContent = strings.Replace(newContent, "    include ngx_blacklist.conf;\n    allow all;\n", "", -1)
+	newContent = strings.Replace(newContent, "    include ngx_whitelist.conf;\n    deny all;\n", "", -1)
 	// 写文件
 	wf, err := os.OpenFile(nginxConf, os.O_RDWR|os.O_TRUNC, 0644)
 	if err != nil {

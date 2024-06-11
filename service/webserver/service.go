@@ -29,7 +29,7 @@ func (s *Service) Init() error {
 	// init webserver
 
 	middleware.DefaultMiddleware(s.Engine)
-	middleware.WACMiddleware(s.Engine)
+	//middleware.WACMiddleware(s.Engine)
 
 	workDir := path.GetRootPath()
 	dir := fmt.Sprintf("%s/static/", workDir)
