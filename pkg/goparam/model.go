@@ -2,6 +2,7 @@ package goparam
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/open-cmi/cmmns/pkg/structure"
 )
@@ -45,7 +46,9 @@ func GetColumn(v interface{}, skipColumn []string) []string {
 
 	var fields []string
 	dbFields := structure.GetStructFields(v, "db")
-	for _, field := range dbFields {
+	for _, fullField := range dbFields {
+		arr := strings.SplitN(fullField, ",", 2)
+		field := arr[0]
 		if !skipmap[field] {
 			fields = append(fields, field)
 		}
