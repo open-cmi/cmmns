@@ -1,6 +1,7 @@
 package setting
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -58,8 +59,13 @@ func UploadLicenseFile(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license signed string verified failed"})
 		return
 	}
+	data, err := base64.StdEncoding.DecodeString(licBase64)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "base64 decode failed"})
+		return
+	}
 	var lic licmng.LicenseInfo
-	err = json.Unmarshal([]byte(licBase64), &lic)
+	err = json.Unmarshal(data, &lic)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license unmarshal failed"})
 		return
