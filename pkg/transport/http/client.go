@@ -1,22 +1,64 @@
-package transport
+package http
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"net"
 	"net/http"
 	"net/url"
+	"time"
 )
 
-// Cookies resp cookies
-var Cookies []*http.Cookie
+type HTTPClient struct {
+	Client  http.Client
+	Cookies []*http.Cookie
+}
+
+func NewHTTPClient(insecureSkipVerify bool) *HTTPClient {
+	var tp = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: insecureSkipVerify,
+		},
+		Proxy:             http.ProxyFromEnvironment,
+		DisableKeepAlives: true,
+		DialContext: (&net.Dialer{
+			Timeout:   3 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       30 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	}
+
+	return &HTTPClient{
+		Client: http.Client{
+			Transport: tp,
+		},
+	}
+}
+
+func (t *HTTPClient) LoadCert(certFile string, keyFile string) error {
+	cliCrt, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		return err
+	}
+	tp, ok := t.Client.Transport.(*http.Transport)
+	if !ok {
+		return errors.New("trans to http.Transport failed")
+	}
+	tp.TLSClientConfig.Certificates = []tls.Certificate{cliCrt}
+	return nil
+}
 
 // ReqAPI func
-func ReqAPI(api string, params map[string]string, payload interface{}) (respmsg Response, err error) {
-
-	requrl := gConf.Server + api
+func (t *HTTPClient) ReqAPI(requrl string, params map[string]string, headers map[string]string, payload interface{}) (respmsg string, err error) {
 	urlObj, err := url.Parse(requrl)
 	if err != nil {
 		return respmsg, err
@@ -36,45 +78,41 @@ func ReqAPI(api string, params map[string]string, payload interface{}) (respmsg 
 	}
 	// 通过 http 请求
 	req, _ := http.NewRequest("GET", connurl, bytes.NewReader(reqbody))
-	for _, cookie := range Cookies {
+	for _, cookie := range t.Cookies {
 		req.AddCookie(cookie)
 	}
 
-	resp, err := DefaultClient.Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
+	for key, value := range headers {
+		req.Header.Set(key, value)
 	}
 
+	resp, err := t.Client.Do(req)
 	if err != nil {
-		return respmsg, err
+		return "", err
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
 		errmsg := fmt.Sprintf("api not available, status code: %d", resp.StatusCode)
-		return respmsg, errors.New(errmsg)
+		return "", errors.New(errmsg)
 	}
 
-	Cookies = resp.Cookies()
+	t.Cookies = resp.Cookies()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return respmsg, err
-	}
-	err = json.Unmarshal(body, &respmsg)
-	if err != nil {
-		return respmsg, err
+		return "", err
 	}
 
-	return respmsg, nil
+	return string(body), nil
 }
 
 // PostAPI func
-func PostAPI(api string, params map[string]string, payload interface{}) (respmsg Response, err error) {
+func (t *HTTPClient) PostAPI(requrl string, params map[string]string, headers map[string]string, payload interface{}) (respmsg string, err error) {
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return respmsg, err
 	}
-	requrl := gConf.Server + api
 	// post api
 	querys := url.Values{}
 
@@ -94,12 +132,14 @@ func PostAPI(api string, params map[string]string, payload interface{}) (respmsg
 	if err != nil {
 		return respmsg, err
 	}
-	for _, cookie := range Cookies {
+	for _, cookie := range t.Cookies {
 		request.AddCookie(cookie)
 	}
+	for key, value := range headers {
+		request.Header.Set(key, value)
+	}
 
-	request.Header.Set("Content-Type", "application/json;charset=UTF-8")
-	resp, err := DefaultClient.Do(request)
+	resp, err := t.Client.Do(request)
 	// 这里需要处理出错机制，比如上传失败，需要重新上传等，这里后续完善
 	if resp != nil {
 		defer resp.Body.Close()
@@ -113,25 +153,18 @@ func PostAPI(api string, params map[string]string, payload interface{}) (respmsg
 		errmsg := fmt.Sprintf("api not available, status code: %d", resp.StatusCode)
 		return respmsg, errors.New(errmsg)
 	}
-	Cookies = resp.Cookies()
+	t.Cookies = resp.Cookies()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return respmsg, err
 	}
 
-	err = json.Unmarshal(body, &respmsg)
-	if err != nil {
-		return respmsg, err
-	}
-
-	return respmsg, nil
+	return string(body), nil
 }
 
 // DelAPI func
-func DelAPI(api string, params map[string]string) (respmsg Response, err error) {
-
-	requrl := gConf.Server + api
+func (t *HTTPClient) DelAPI(requrl string, params map[string]string, headers map[string]string) (respmsg string, err error) {
 	// post api
 	querys := url.Values{}
 
@@ -152,11 +185,11 @@ func DelAPI(api string, params map[string]string) (respmsg Response, err error) 
 		return respmsg, err
 	}
 
-	for _, cookie := range Cookies {
+	for _, cookie := range t.Cookies {
 		request.AddCookie(cookie)
 	}
 
-	resp, err := DefaultClient.Do(request)
+	resp, err := t.Client.Do(request)
 	// 这里需要处理出错机制，比如上传失败，需要重新上传等，这里后续完善
 	if resp != nil {
 		defer resp.Body.Close()
@@ -170,17 +203,12 @@ func DelAPI(api string, params map[string]string) (respmsg Response, err error) 
 		errmsg := fmt.Sprintf("api not available, status code: %d", resp.StatusCode)
 		return respmsg, errors.New(errmsg)
 	}
-	Cookies = resp.Cookies()
+	t.Cookies = resp.Cookies()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return respmsg, err
 	}
 
-	err = json.Unmarshal(body, &respmsg)
-	if err != nil {
-		return respmsg, err
-	}
-
-	return respmsg, nil
+	return string(body), nil
 }
