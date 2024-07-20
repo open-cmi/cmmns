@@ -46,6 +46,7 @@ func UploadLicenseFile(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+
 	arr := strings.Split(string(content), "\n")
 	if len(arr) < 2 {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license format is invalid"})
