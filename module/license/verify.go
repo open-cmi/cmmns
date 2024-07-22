@@ -9,15 +9,16 @@ import (
 	"encoding/pem"
 	"errors"
 	"os"
+	"path"
 
+	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 )
 
 func Verify(origin string, signed string) error {
-	if gConf.PublicFile != "" {
-		return verify(origin, signed, gConf.PublicFile)
-	}
-	return nil
+	publicFile := path.Join(config.GetConfDir(), "public.pem")
+
+	return verify(origin, signed, publicFile)
 }
 
 func verify(origin string, signed string, pubfile string) error {
