@@ -3,6 +3,7 @@ package confparser
 import (
 	"encoding/json"
 	"errors"
+	"path"
 )
 
 type Option struct {
@@ -81,4 +82,8 @@ func (c *Context) Save() {
 	if c.parser != nil {
 		c.parser.Save(c.Conf)
 	}
+}
+
+func (c *Context) GetConfDir() string {
+	return path.Dir(c.parser.path)
 }

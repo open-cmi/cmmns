@@ -10,9 +10,12 @@ var gConfCtx *confparser.Context
 
 // Init config init
 func Init(configfile string) error {
-
 	err := gConfCtx.Load(configfile)
 	return err
+}
+
+func GetConfDir() string {
+	return gConfCtx.GetConfDir()
 }
 
 func Save() {
