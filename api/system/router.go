@@ -1,6 +1,7 @@
 package system
 
 import (
+	_ "github.com/open-cmi/cmmns/api/system/hostname"
 	_ "github.com/open-cmi/cmmns/api/system/license"
 	_ "github.com/open-cmi/cmmns/api/system/licmng"
 	_ "github.com/open-cmi/cmmns/api/system/prod"
