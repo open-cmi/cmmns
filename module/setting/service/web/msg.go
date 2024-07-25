@@ -1,4 +1,4 @@
-package service
+package web
 
 type SetServicePortRequest struct {
 	HTTPPort  int `json:"http_port"`

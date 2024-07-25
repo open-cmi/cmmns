@@ -4,12 +4,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/module/setting/service/web"
+	"github.com/open-cmi/cmmns/module/setting/service/ssh"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
 
-func GetServicePort(c *gin.Context) {
-	m := web.GetServicePort()
+func GetSSHService(c *gin.Context) {
+	m := ssh.GetSSHServiceSetting()
 	if m == nil {
 		c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 		return
@@ -17,14 +17,14 @@ func GetServicePort(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": *m})
 }
 
-func SetServicePort(c *gin.Context) {
-	var req web.SetServicePortRequest
+func SetSSHService(c *gin.Context) {
+	var req ssh.SetSSHServiceRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	err := web.SetServicePort(&req)
+	err := ssh.SetSSHServiceSetting(&req)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -33,6 +33,6 @@ func SetServicePort(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "POST", "/service/web-setting/", SetServicePort)
-	webserver.RegisterAuthAPI("system", "GET", "/service/web-setting/", GetServicePort)
+	webserver.RegisterAuthAPI("system", "POST", "/service/ssh-setting/", SetSSHService)
+	webserver.RegisterAuthAPI("system", "GET", "/service/ssh-setting/", GetSSHService)
 }

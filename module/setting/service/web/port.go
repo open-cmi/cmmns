@@ -1,4 +1,4 @@
-package service
+package web
 
 import (
 	"github.com/open-cmi/cmmns/essential/logger"
