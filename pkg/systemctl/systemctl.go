@@ -3,34 +3,40 @@ package systemctl
 import "os/exec"
 
 func StartService(service string) error {
-	cmd := exec.Command("systemctl", "enable", service)
+	args := []string{"enable", service}
+	cmd := exec.Command("systemctl", args...)
 	err := cmd.Run()
 	if err != nil {
 		return err
 	}
-	cmd = exec.Command("systemctl", "start", service)
+	args = []string{"start", service}
+	cmd = exec.Command("systemctl", args...)
 	return cmd.Run()
 }
 
 func StopService(service string) error {
-	cmd := exec.Command("systemctl", "stop", service)
+	args := []string{"stop", service}
+	cmd := exec.Command("systemctl", args...)
 	err := cmd.Run()
 	if err != nil {
 		return err
 	}
 
-	cmd = exec.Command("systemctl", "disable", service)
+	args = []string{"disable", service}
+	cmd = exec.Command("systemctl", args...)
 	return cmd.Run()
 }
 
 func StatusService(service string) bool {
-	cmd := exec.Command("systemctl", "is-active", service)
+	args := []string{"is-active", service}
+	cmd := exec.Command("systemctl", args...)
 	err := cmd.Run()
 	return err == nil
 }
 
 func RestartService(service string) error {
-	cmd := exec.Command("systemctl", "restart", service)
+	args := []string{"restart", service}
+	cmd := exec.Command("systemctl", args...)
 	err := cmd.Run()
 	return err
 }
