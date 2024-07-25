@@ -118,7 +118,7 @@ func SetSSHServiceSetting(req *SetSSHServiceRequest) error {
 	if oen && req.Enable {
 		err = systemctl.RestartService("sshd")
 	} else if oen && !req.Enable {
-		err = systemctl.RestartService("sshd")
+		err = systemctl.StopService("sshd")
 	} else if !oen && req.Enable {
 		err = systemctl.StartService("sshd")
 	}
