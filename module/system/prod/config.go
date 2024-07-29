@@ -6,16 +6,11 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 )
 
-type SubMenu struct {
-	Path string `json:"path"`
-	Name string `json:"name"`
-}
-
 type Menu struct {
-	Path     string    `json:"path"`
-	Name     string    `json:"name"`
-	Icon     string    `json:"icon"`
-	Children []SubMenu `json:"children"`
+	Path     string `json:"path"`
+	Name     string `json:"name"`
+	Icon     string `json:"icon,omitempty"`
+	Children []Menu `json:"children,omitempty"`
 }
 
 type ProdBriefInfo struct {
