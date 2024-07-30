@@ -8,7 +8,7 @@ import (
 	"path"
 
 	"github.com/open-cmi/cmmns/essential/logger"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 var NetPlanDir string = "/etc/netplan/"

@@ -3,11 +3,11 @@ package confparser
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // Parser parser struct
@@ -46,7 +46,7 @@ func NewParser(file string) *Parser {
 func (p *Parser) Load(v interface{}) (err error) {
 	p.fd.Seek(0, 0)
 
-	content, err := ioutil.ReadAll(p.fd)
+	content, err := io.ReadAll(p.fd)
 	if err != nil {
 		return err
 	}
