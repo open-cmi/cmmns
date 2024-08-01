@@ -10,6 +10,7 @@ type Menu struct {
 	Path     string `json:"path"`
 	Name     string `json:"name"`
 	Icon     string `json:"icon,omitempty"`
+	Hidden   bool   `json:"hidden,omitempty"`
 	Children []Menu `json:"children,omitempty"`
 }
 
