@@ -42,7 +42,8 @@ func UploadLicenseFile(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	err = license.VerifyLicenseContent(string(content))
+	os.Remove(file.Filename)
+	err = license.VerifyLicenseContent(string(content), true)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -63,7 +64,6 @@ func UploadLicenseFile(c *gin.Context) {
 		return
 	}
 
-	os.Remove(file.Filename)
 	events.Notify("check-license-valid", nil)
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,

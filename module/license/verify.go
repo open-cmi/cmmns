@@ -19,6 +19,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/events"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/module/licmng"
+	"github.com/open-cmi/cmmns/service/initial"
 	"github.com/open-cmi/cmmns/service/ticker"
 )
 
@@ -83,7 +84,7 @@ func verifySigned(origin string, signed string, pubfile string) error {
 	return nil
 }
 
-func VerifyLicenseContent(content string) error {
+func VerifyLicenseContent(content string, importVerify bool) error {
 	arr := strings.Split(content, "\n")
 	if len(arr) < 2 {
 		return errors.New("license format is invalid")
@@ -106,9 +107,15 @@ func VerifyLicenseContent(content string) error {
 	}
 
 	ts := time.Now().Unix()
-	if lic.ExpireTime < ts {
+	// 导入校验，不区分版本，只区分时间
+	if importVerify {
+		if lic.ExpireTime < ts {
+			return errors.New("license is expired")
+		}
+	} else if lic.Version != "enterprise" && lic.ExpireTime < ts {
 		return errors.New("license is expired")
 	}
+
 	return nil
 }
 
@@ -118,7 +125,7 @@ func LicenseIsValid() bool {
 	return gLicenseValid
 }
 
-func VerifyLicenseFile() error {
+func checkLocalLicenseFile() error {
 	confDir := config.GetConfDir()
 
 	licFile := path.Join(confDir, "xsnos.lic")
@@ -130,7 +137,7 @@ func VerifyLicenseFile() error {
 	if err != nil {
 		return err
 	}
-	err = VerifyLicenseContent(string(content))
+	err = VerifyLicenseContent(string(content), false)
 	if err != nil {
 		return err
 	}
@@ -139,7 +146,7 @@ func VerifyLicenseFile() error {
 }
 
 func CheckLicenseValid() {
-	err := VerifyLicenseFile()
+	err := checkLocalLicenseFile()
 	if err != nil {
 		gLicenseValid = false
 	} else {
@@ -155,4 +162,9 @@ func init() {
 	ticker.Register("license-verify-ticker", "* */5 * * * *", func(name string, data interface{}) {
 		CheckLicenseValid()
 	}, nil)
+
+	initial.Register("license", initial.DefaultPriority, func() error {
+		CheckLicenseValid()
+		return nil
+	})
 }
