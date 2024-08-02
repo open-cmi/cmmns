@@ -83,7 +83,8 @@
         "children": [
           {
             "path": "/main/system/sysinfo",
-            "name": "system info"
+            "name": "system info",
+            "require": true
           },
           {
             "path": "/main/system/security-setting",
@@ -127,7 +128,8 @@
           },
           {
             "path": "/main/system/license",
-            "name": "license"
+            "name": "license",
+            "require": true
           },
           {
             "path": "/main/system/license-manager",

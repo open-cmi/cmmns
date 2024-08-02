@@ -4,21 +4,20 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"os"
+	"path"
 	"strings"
 
+	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/module/licmng"
-	"github.com/open-cmi/cmmns/pkg/path"
 )
 
 func GetLicenseInfo() (licmng.LicenseInfo, error) {
 	var mess licmng.LicenseInfo
 	mess.Version = "none"
-	workDir := path.GetRootPath()
-
-	licFile := fmt.Sprintf("%s/etc/xsnos.lic", workDir)
+	confDir := config.GetConfDir()
+	licFile := path.Join(confDir, "xsnos.lic")
 	rd, err := os.Open(licFile)
 	if err != nil {
 		return mess, err

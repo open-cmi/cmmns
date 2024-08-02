@@ -1,19 +1,15 @@
 package setting
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/essential/events"
 	"github.com/open-cmi/cmmns/module/license"
-	"github.com/open-cmi/cmmns/module/licmng"
-	"github.com/open-cmi/cmmns/pkg/path"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
 
@@ -46,40 +42,14 @@ func UploadLicenseFile(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-
-	arr := strings.Split(string(content), "\n")
-	if len(arr) < 2 {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license format is invalid"})
-		return
-	}
-
-	licBase64 := arr[0]
-	signed := arr[1]
-	err = license.Verify(licBase64, signed)
+	err = license.VerifyLicenseContent(string(content))
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license signed string verified failed"})
-		return
-	}
-	data, err := base64.StdEncoding.DecodeString(licBase64)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "base64 decode failed"})
-		return
-	}
-	var lic licmng.LicenseInfo
-	err = json.Unmarshal(data, &lic)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license unmarshal failed"})
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 
-	ts := time.Now().Unix()
-	if lic.ExpireTime < ts {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license is expired"})
-		return
-	}
-
-	rootdir := path.GetRootPath()
-	dst := filepath.Join(rootdir, "etc", "xsnos.lic")
+	confDir := config.GetConfDir()
+	dst := filepath.Join(confDir, "xsnos.lic")
 	out, err := os.OpenFile(dst, os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
@@ -94,6 +64,7 @@ func UploadLicenseFile(c *gin.Context) {
 	}
 
 	os.Remove(file.Filename)
+	events.Notify("check-license-valid", nil)
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",

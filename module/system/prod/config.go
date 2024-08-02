@@ -11,6 +11,7 @@ type Menu struct {
 	Name     string `json:"name"`
 	Icon     string `json:"icon,omitempty"`
 	Hidden   bool   `json:"hidden,omitempty"`
+	Require  bool   `json:"require,omitempty"`
 	Children []Menu `json:"children,omitempty"`
 }
 
@@ -29,6 +30,7 @@ var gProdConf ProdConfig
 
 func Parse(mess json.RawMessage) error {
 	err := json.Unmarshal(mess, &gProdConf)
+
 	return err
 }
 
