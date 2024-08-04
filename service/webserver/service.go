@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/module/middleware"
-	"github.com/open-cmi/cmmns/pkg/path"
+	"github.com/open-cmi/cmmns/pkg/pathutil"
 )
 
 type Service struct {
@@ -31,7 +31,7 @@ func (s *Service) Init() error {
 	middleware.DefaultMiddleware(s.Engine)
 	//middleware.WACMiddleware(s.Engine)
 
-	workDir := path.GetRootPath()
+	workDir := pathutil.GetRootPath()
 	dir := fmt.Sprintf("%s/static/", workDir)
 	s.Engine.Static("/api-static/", dir)
 	middleware.SessionMiddleware(s.Engine)
@@ -64,7 +64,7 @@ func (s *Service) Run() error {
 		} else if srv.Proto == "http" {
 			go s.Engine.Run(srv.Address + ":" + strconv.Itoa(srv.Port))
 		} else if srv.Proto == "https" {
-			rp := path.GetRootPath()
+			rp := pathutil.GetRootPath()
 			var certFile string
 			if strings.HasPrefix(srv.CertFile, ".") {
 				certFile = filepath.Join(rp, srv.CertFile)
