@@ -17,7 +17,7 @@ type Blacklist struct {
 }
 
 func (u *Blacklist) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if u.isNew {
 		columns := goparam.GetColumn(Blacklist{}, []string{})
@@ -48,7 +48,7 @@ func (u *Blacklist) Save() error {
 
 func (m *Blacklist) Remove() error {
 	deleteClause := "delete from wac_blacklist where address=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	_, err := db.Exec(deleteClause, m.Address)
 	if err != nil {
 		return errors.New("del blacklist failed")
@@ -59,7 +59,7 @@ func (m *Blacklist) Remove() error {
 // Get address
 func Get(address string) (blacklist *Blacklist) {
 	queryClause := `select * from wac_blacklist where address=$1`
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, address)
 
 	var mdl Blacklist
@@ -79,7 +79,7 @@ func New() *Blacklist {
 }
 
 func List(query *goparam.Param) (int, []Blacklist, error) {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	var users []Blacklist = []Blacklist{}
 	countClause := "select count(*) from wac_blacklist"

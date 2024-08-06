@@ -1,4 +1,4 @@
-package relationdb
+package sqlitedb
 
 import (
 	"os"
@@ -9,6 +9,13 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
 )
+
+type Config struct {
+	File     string
+	User     string
+	Password string
+	Database string
+}
 
 // SQLite3Init init
 func SQLite3Init(conf *Config) (db *sqlx.DB, err error) {

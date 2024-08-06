@@ -21,7 +21,7 @@ type Role struct {
 }
 
 func (r *Role) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if r.isNew {
 		columns := goparam.GetColumn(Role{}, []string{})
@@ -51,7 +51,7 @@ func (r *Role) Save() error {
 
 func (r *Role) Remove() error {
 	deleteClause := "delete from roles where id=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	_, err := db.Exec(deleteClause, r.ID)
 	if err != nil {
 		return errors.New("remove role failed")
@@ -61,7 +61,7 @@ func (r *Role) Remove() error {
 
 func GetByName(name string) *Role {
 	queryClause := `select * from roles where name=$1`
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, name)
 	if row == nil {
 		return nil
@@ -77,7 +77,7 @@ func GetByName(name string) *Role {
 
 func Get(id string) *Role {
 	queryClause := `select * from roles where id=$1`
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, id)
 	if row == nil {
 		return nil

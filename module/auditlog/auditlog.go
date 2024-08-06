@@ -20,7 +20,7 @@ type Model struct {
 
 // List list
 func List(p *goparam.Param) (int, []Model, error) {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	var logs []Model = []Model{}
 

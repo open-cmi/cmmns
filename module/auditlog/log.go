@@ -23,7 +23,7 @@ func InsertLog(ip string, username string, logtype int, action string) error {
 	insertClause := `insert into audit_log(id, type, ip, username, action, timestamp) 
 		values($1, $2, $3, $4, $5, $6)`
 
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	_, err := db.Exec(insertClause, id, logtype, ip, username, action, timestamp)
 	return err
 }

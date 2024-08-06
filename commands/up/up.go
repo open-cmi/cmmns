@@ -46,7 +46,7 @@ func (c *UpCommand) Run() error {
 		return err
 	}
 
-	opt := migrate.NewUpOpt(sqldb.GetConfDB(), format, input, count)
+	opt := migrate.NewUpOpt(sqldb.GetDB(), format, input, count)
 	err = opt.Run()
 	return err
 }

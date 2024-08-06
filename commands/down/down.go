@@ -46,7 +46,7 @@ func (c *DownCommand) Run() error {
 		fmt.Printf("init config failed: %s\n", err.Error())
 		return err
 	}
-	downopt := migrate.NewDownOpt(sqldb.GetConfDB(), format, input, count)
+	downopt := migrate.NewDownOpt(sqldb.GetDB(), format, input, count)
 	err = downopt.Run()
 	return err
 }

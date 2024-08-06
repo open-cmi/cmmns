@@ -28,7 +28,7 @@ func (m *SSHServiceModel) Value() string {
 }
 
 func (m *SSHServiceModel) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if m.isNew {
 		// 存储到数据库
@@ -59,7 +59,7 @@ func (m *SSHServiceModel) Save() error {
 
 func GetSSHServiceModel() *SSHServiceModel {
 	queryClause := "select value from k_v_table where key=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	s := &SSHServiceModel{}
 	row := db.QueryRowx(queryClause, s.Key())
 	if row == nil {

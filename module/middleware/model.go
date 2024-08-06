@@ -18,7 +18,7 @@ type TokenRecord struct {
 }
 
 func (t *TokenRecord) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if t.isNew {
 		columns := goparam.GetColumn(*t, []string{})

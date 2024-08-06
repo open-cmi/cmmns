@@ -29,7 +29,7 @@ func (m *PublicNet) Value() string {
 }
 
 func (m *PublicNet) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if m.isNew {
 		// 存储到数据库
@@ -60,7 +60,7 @@ func (m *PublicNet) Save() error {
 
 func Get() *PublicNet {
 	queryClause := "select value from k_v_table where key=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, PublicNetKey)
 	if row == nil {
 		return nil

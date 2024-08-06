@@ -9,7 +9,7 @@ import (
 )
 
 func ListLicense(query *goparam.Param) (int, []Model, error) {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	var lics []Model = []Model{}
 	countClause := "select count(*) from license"

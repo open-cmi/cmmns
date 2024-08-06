@@ -1,4 +1,4 @@
-package relationdb
+package postgresdb
 
 import (
 	"fmt"
@@ -7,6 +7,16 @@ import (
 
 	"github.com/jmoiron/sqlx"
 )
+
+var maxConnections int = 50
+
+type Config struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	Database string
+}
 
 // PostgresqlInit init
 func PostgresqlInit(conf *Config) (db *sqlx.DB, err error) {

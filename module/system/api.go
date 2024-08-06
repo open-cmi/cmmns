@@ -28,7 +28,7 @@ func InitDevID() {
 		NOTHING`,
 		utime, deviceid, true)
 
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	_, err := db.Exec(sqlquery)
 	if err != nil {
 		logger.Errorf("update system si failed: %s\n", err.Error())
@@ -104,7 +104,7 @@ func Get(mo *goparam.Param, field string, value string) *Model {
 	columns := goparam.GetColumn(Model{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from system_status where %s=$1`, strings.Join(columns, ","), field)
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, value)
 
 	var mdl Model
@@ -119,7 +119,7 @@ func Get(mo *goparam.Param, field string, value string) *Model {
 
 // List list
 func List(option *goparam.Param) (int, []Model, error) {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	var results []Model = []Model{}
 

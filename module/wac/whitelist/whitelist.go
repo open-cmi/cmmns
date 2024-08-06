@@ -17,7 +17,7 @@ type Whitelist struct {
 }
 
 func (u *Whitelist) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if u.isNew {
 		columns := goparam.GetColumn(Whitelist{}, []string{})
@@ -48,7 +48,7 @@ func (u *Whitelist) Save() error {
 
 func (m *Whitelist) Remove() error {
 	deleteClause := "delete from wac_whitelist where address=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	_, err := db.Exec(deleteClause, m.Address)
 	if err != nil {
 		return errors.New("del whitelist failed")
@@ -59,7 +59,7 @@ func (m *Whitelist) Remove() error {
 // Get address
 func Get(address string) (whitelist *Whitelist) {
 	queryClause := `select * from wac_whitelist where address=$1`
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, address)
 
 	var mdl Whitelist
@@ -79,7 +79,7 @@ func New() *Whitelist {
 }
 
 func List(query *goparam.Param) (int, []Whitelist, error) {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	var users []Whitelist = []Whitelist{}
 	countClause := "select count(*) from wac_whitelist"

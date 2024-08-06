@@ -31,7 +31,7 @@ func (m *DevModel) Value() string {
 }
 
 func (m *DevModel) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if m.isNew {
 		// 存储到数据库
@@ -62,7 +62,7 @@ func (m *DevModel) Save() error {
 
 func (m *DevModel) Remove() error {
 	deleteClause := "delete from k_v_table where key=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	_, err := db.Exec(deleteClause, m.Key())
 	if err != nil {
 		return errors.New("del net config failed")
@@ -78,7 +78,7 @@ func New() *DevModel {
 
 func GetNetConfig(dev string) *DevModel {
 	queryClause := "select value from k_v_table where key=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	key := fmt.Sprintf("net-config-%s", dev)
 	row := db.QueryRowx(queryClause, key)
 	if row == nil {

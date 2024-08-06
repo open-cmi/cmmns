@@ -28,7 +28,7 @@ func (m *Model) Value() string {
 }
 
 func (m *Model) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if m.isNew {
 		// 存储到数据库
@@ -65,7 +65,7 @@ func New() *Model {
 }
 
 func Get() *Model {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	var m Model
 	queryClause := `select value from k_v_table where key=$1`
 	row := db.QueryRowx(queryClause, m.Key())

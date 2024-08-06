@@ -28,7 +28,7 @@ func (m *ServicePortModel) Value() string {
 }
 
 func (m *ServicePortModel) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if m.isNew {
 		// 存储到数据库
@@ -59,7 +59,7 @@ func (m *ServicePortModel) Save() error {
 
 func GetServicePortModel() *ServicePortModel {
 	queryClause := "select value from k_v_table where key=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, ServicePortModelKey)
 	if row == nil {
 		return nil

@@ -12,7 +12,7 @@ import (
 
 // List list
 func TokenList(option *goparam.Param) (int, []TokenRecord, error) {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	var results []TokenRecord = []TokenRecord{}
 

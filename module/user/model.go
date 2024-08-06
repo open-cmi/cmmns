@@ -28,7 +28,7 @@ type User struct {
 }
 
 func (u *User) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if u.isNew {
 		columns := goparam.GetColumn(User{}, []string{})
@@ -59,7 +59,7 @@ func (u *User) Save() error {
 
 func (m *User) Remove() error {
 	deleteClause := "delete from users where id=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	_, err := db.Exec(deleteClause, m.ID)
 	if err != nil {
 		return errors.New("del user failed")
@@ -70,7 +70,7 @@ func (m *User) Remove() error {
 // Get get id
 func Get(id string) (user *User) {
 	queryClause := fmt.Sprintf(`select * from users where id=$1`)
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, id)
 
 	var mdl User
@@ -87,7 +87,7 @@ func VerifyPasswordByID(userid string, password string) bool {
 	queryclause := "select password from users where id=$1"
 
 	var pass string
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRow(queryclause, userid)
 	err := row.Scan(&pass)
 	if err != nil {
@@ -104,7 +104,7 @@ func VerifyPasswordByID(userid string, password string) bool {
 // Activate activate user
 func Activate(username string) error {
 	updateClause := "update users set status=1 where username=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	_, err := db.Exec(updateClause, username)
 	if err != nil {
 		return errors.New("activate user failed")
@@ -115,7 +115,7 @@ func Activate(username string) error {
 // Delete delete user
 func DeleteByName(username string) error {
 	deleteClause := "delete from users where username=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	_, err := db.Exec(deleteClause, username)
 	if err != nil {
 		return errors.New("del user failed")

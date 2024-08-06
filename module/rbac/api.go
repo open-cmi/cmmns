@@ -9,7 +9,7 @@ import (
 )
 
 func RoleNameList() (int, []string, error) {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	var roles []string = []string{}
 	countClause := "select count(*) from roles"
@@ -44,7 +44,7 @@ func RoleNameList() (int, []string, error) {
 }
 
 func RoleList(option *goparam.Param) (int, []Role, error) {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	var roles []Role = []Role{}
 	countClause := "select count(*) from roles"

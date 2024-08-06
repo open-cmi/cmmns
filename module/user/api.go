@@ -19,7 +19,7 @@ const UserLoginMaxTried = 5
 
 // List list func
 func List(query *goparam.Param) (int, []User, error) {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	var users []User = []User{}
 	countClause := "select count(*) from users"
@@ -73,7 +73,7 @@ func Login(m *LoginMsg) (authuser *User, err error) {
 	queryclause := `select * from users where username=$1`
 
 	var user User
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryclause, m.UserName)
 	err = row.StructScan(&user)
 	if err != nil {
@@ -128,7 +128,7 @@ func Create(m *CreateMsg) (err error) {
 	queryclause := "select username from users where username=$1 or email=$2"
 
 	var un string
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRow(queryclause, m.UserName, m.Email)
 	err = row.Scan(&un)
 	if err == nil {
@@ -163,7 +163,7 @@ func Register(m *RegisterMsg) (err error) {
 	queryclause := "select username from users where username=$1"
 
 	var un string
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRow(queryclause, m.UserName)
 	err = row.Scan(&un)
 	if err == nil {
@@ -230,7 +230,7 @@ func ResetPasswd(req *ResetPasswdRequest) error {
 	salt, _ := bcrypt.Salt(10)
 	hash, _ := bcrypt.Hash(req.Password, salt)
 	updateClause := `update users set password=$1 where id=$2`
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	_, err := db.Exec(updateClause, hash, req.ID)
 	return err
 }

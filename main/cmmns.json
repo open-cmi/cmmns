@@ -10,7 +10,7 @@
   "middleware": {
     "store": "redis"
   },
-  "model": {
+  "sqldb": {
     "type": "sqlite3",
     "file": "/tmp/cmmns.sqlite3",
     "host": "127.0.0.1",

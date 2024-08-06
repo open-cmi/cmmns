@@ -20,7 +20,7 @@ type CPUUsageModel struct {
 }
 
 func (m *CPUUsageModel) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	// 存储到数据库
 	columns := goparam.GetColumn(*m, []string{})
@@ -46,7 +46,7 @@ var round int = 60 / 15 * 60
 
 func GetMaxStepCpuUsageModel() *CPUUsageModel {
 	queryClause := "select * from system_cpu_usage order by step desc"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause)
 	if row == nil {
 		return nil

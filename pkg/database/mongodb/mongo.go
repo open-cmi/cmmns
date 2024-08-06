@@ -1,4 +1,4 @@
-package dbmongo
+package mongodb
 
 import (
 	"context"
@@ -10,8 +10,6 @@ import (
 )
 
 type Config struct {
-	Type     string
-	File     string
 	Host     string
 	Port     int
 	User     string

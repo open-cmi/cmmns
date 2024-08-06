@@ -40,7 +40,7 @@ func (c *CurrentCommand) Run() error {
 		return err
 	}
 
-	opt := migrate.NewCurrentOpt(sqldb.GetConfDB())
+	opt := migrate.NewCurrentOpt(sqldb.GetDB())
 
 	err = opt.Run()
 	return err

@@ -20,7 +20,7 @@ type MemUsageModel struct {
 }
 
 func (m *MemUsageModel) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	// 存储到数据库
 	columns := goparam.GetColumn(*m, []string{})
@@ -46,7 +46,7 @@ var memRound int = 60 / 15 * 60
 
 func GetMaxStepMemUsageModel() *MemUsageModel {
 	queryClause := "select * from system_mem_usage order by step desc"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause)
 	if row == nil {
 		return nil
