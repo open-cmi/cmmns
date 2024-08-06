@@ -9,6 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+type Mongo struct {
+	Client *mongo.Client
+	DB     *mongo.Database
+}
+
 type Config struct {
 	Host     string
 	Port     int
@@ -18,7 +23,7 @@ type Config struct {
 }
 
 // MongoInit db use mongo
-func MongoInit(conf *Config) (client *mongo.Client, err error) {
+func MongoInit(conf *Config) (mongoc *Mongo, err error) {
 	host := conf.Host
 	port := conf.Port
 	user := conf.User
@@ -30,7 +35,7 @@ func MongoInit(conf *Config) (client *mongo.Client, err error) {
 		uri = "mongodb://" + user + ":" + password + "@" + host + ":" + strconv.Itoa(port) + "/" + dbname
 	}
 
-	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
 		return nil, err
 	}
@@ -39,5 +44,7 @@ func MongoInit(conf *Config) (client *mongo.Client, err error) {
 		return nil, err
 	}
 
-	return client, nil
+	db := client.Database(dbname)
+
+	return &Mongo{DB: db, Client: client}, nil
 }

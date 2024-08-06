@@ -5,11 +5,10 @@ import (
 
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/pkg/database/mongodb"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // mdb mongo db
-var mdb *mongo.Client
+var mdb *mongodb.Mongo
 
 // DBConfig database model
 type Config struct {
@@ -23,7 +22,7 @@ type Config struct {
 var gConf Config
 
 // GetDB get db
-func GetDB() *mongo.Client {
+func GetDB() *mongodb.Mongo {
 	return mdb
 }
 
