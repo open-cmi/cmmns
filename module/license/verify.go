@@ -159,7 +159,7 @@ func init() {
 		CheckLicenseValid()
 	})
 
-	ticker.Register("license-verify-ticker", "* */5 * * * *", func(name string, data interface{}) {
+	ticker.Register("license-verify-ticker", "0 */5 * * * *", func(name string, data interface{}) {
 		CheckLicenseValid()
 	}, nil)
 
