@@ -25,14 +25,14 @@ func SQLite3Init(conf *Config) (db *sqlx.DB, err error) {
 	}
 
 	// if filename is absolute path, use file name directly
-
-	var file *os.File
 	if !pathutil.IsExist(dbfile) {
+		var file *os.File
+		// 如果文件不存在，先创建一个
 		file, err = os.OpenFile(dbfile, os.O_CREATE|os.O_RDWR, 0755)
 		if err != nil {
 			return
 		}
-		defer file.Close()
+		file.Close()
 	}
 
 	db, err = sqlx.Open("sqlite3", dbfile)
