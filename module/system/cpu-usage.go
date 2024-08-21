@@ -25,10 +25,12 @@ func (m *CPUUsageModel) Save() error {
 	// 存储到数据库
 	columns := goparam.GetColumn(*m, []string{})
 	values := goparam.GetColumnInsertNamed(columns)
-	updateColumns := goparam.GetColumnUpdateNamed(columns)
 
-	insertClause := fmt.Sprintf("insert into system_cpu_usage(%s) values(%s) on conflict(dev_id,step) do update set %s where dev_id=:dev_id and step=:step",
-		strings.Join(columns, ","), strings.Join(values, ","), strings.Join(updateColumns, ","))
+	updateColumns := goparam.GetColumn(*m, []string{})
+	updateValues := goparam.GetColumnUpdateNamed(updateColumns)
+
+	insertClause := fmt.Sprintf("insert into system_cpu_usage(%s) values(%s) on conflict(dev_id,step) do update set %s",
+		strings.Join(columns, ","), strings.Join(values, ","), strings.Join(updateValues, ","))
 
 	logger.Debugf("start to exec sql clause: %s", insertClause)
 

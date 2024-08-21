@@ -25,13 +25,14 @@ func (m *MemUsageModel) Save() error {
 	// 存储到数据库
 	columns := goparam.GetColumn(*m, []string{})
 	values := goparam.GetColumnInsertNamed(columns)
-	updateColumns := goparam.GetColumnUpdateNamed(columns)
 
-	insertClause := fmt.Sprintf("insert into system_mem_usage(%s) values(%s) on conflict(dev_id,step) do update set %s where dev_id=:dev_id and step=:step",
-		strings.Join(columns, ","), strings.Join(values, ","), strings.Join(updateColumns, ","))
+	updateColumns := goparam.GetColumn(*m, []string{"dev_id", "step"})
+	updateNames := goparam.GetColumnUpdateNamed(updateColumns)
+
+	insertClause := fmt.Sprintf("insert into system_mem_usage(%s) values(%s) on conflict(dev_id,step) do update set %s",
+		strings.Join(columns, ","), strings.Join(values, ","), strings.Join(updateNames, ","))
 
 	logger.Debugf("start to exec sql clause: %s", insertClause)
-
 	_, err := db.NamedExec(insertClause, m)
 	if err != nil {
 		logger.Errorf("create or update model failed: %s", err.Error())
