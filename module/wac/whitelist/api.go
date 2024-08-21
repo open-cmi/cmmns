@@ -50,6 +50,6 @@ func DelWhitelist(address string) error {
 	for _, b := range lists {
 		whitelist = append(whitelist, b.Address)
 	}
-	err = nginxconf.ApplyNginxBlackConf(whitelist)
+	err = nginxconf.ApplyNginxWhiteConf(whitelist)
 	return err
 }

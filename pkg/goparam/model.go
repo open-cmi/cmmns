@@ -56,6 +56,14 @@ func GetColumn(v interface{}, skipColumn []string) []string {
 	return fields
 }
 
+func GetColumnUpsertNamed(columns []string) []string {
+	var updates []string = []string{}
+	for _, column := range columns {
+		updates = append(updates, fmt.Sprintf(`%s=excluded.%s`, column, column))
+	}
+	return updates
+}
+
 func GetColumnUpdateNamed(columns []string) []string {
 	var updates []string = []string{}
 	for _, column := range columns {

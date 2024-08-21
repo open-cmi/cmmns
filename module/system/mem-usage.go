@@ -23,14 +23,26 @@ func (m *MemUsageModel) Save() error {
 	db := sqldb.GetDB()
 
 	// 存储到数据库
-	columns := goparam.GetColumn(*m, []string{})
-	values := goparam.GetColumnInsertNamed(columns)
+	var insertClause string
+	if db.DriverName() == "postgres" {
+		columns := goparam.GetColumn(*m, []string{})
+		values := goparam.GetColumnInsertNamed(columns)
 
-	updateColumns := goparam.GetColumn(*m, []string{"dev_id", "step"})
-	updateNames := goparam.GetColumnUpdateNamed(updateColumns)
+		upsertColumns := goparam.GetColumn(*m, []string{"dev_id", "step"})
+		upsertNames := goparam.GetColumnUpsertNamed(upsertColumns)
 
-	insertClause := fmt.Sprintf("insert into system_mem_usage(%s) values(%s) on conflict(dev_id,step) do update set %s",
-		strings.Join(columns, ","), strings.Join(values, ","), strings.Join(updateNames, ","))
+		insertClause = fmt.Sprintf("insert into system_mem_usage(%s) values(%s) on conflict(dev_id,step) do update set %s",
+			strings.Join(columns, ","), strings.Join(values, ","), strings.Join(upsertNames, ","))
+	} else {
+		columns := goparam.GetColumn(*m, []string{})
+		values := goparam.GetColumnInsertNamed(columns)
+
+		updateColumns := goparam.GetColumn(*m, []string{"dev_id", "step"})
+		updateNames := goparam.GetColumnUpdateNamed(updateColumns)
+
+		insertClause = fmt.Sprintf("insert into system_mem_usage(%s) values(%s) on conflict(dev_id,step) do update set %s",
+			strings.Join(columns, ","), strings.Join(values, ","), strings.Join(updateNames, ","))
+	}
 
 	logger.Debugf("start to exec sql clause: %s", insertClause)
 	_, err := db.NamedExec(insertClause, m)
