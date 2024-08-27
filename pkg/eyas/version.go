@@ -1,11 +1,9 @@
-package upgrademng
+package eyas
 
 import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/open-cmi/cmmns/pkg/eyas"
 )
 
 type SoftwareVersion struct {
@@ -15,7 +13,7 @@ type SoftwareVersion struct {
 }
 
 func CurrentVersion() (v *SoftwareVersion, err error) {
-	buildfile := filepath.Join(eyas.GetRootPath(), "BUILDINFO")
+	buildfile := filepath.Join(GetRootPath(), "BUILDINFO")
 	contentByte, err := os.ReadFile(buildfile)
 	if err != nil {
 		return nil, err

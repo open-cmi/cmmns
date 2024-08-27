@@ -4,12 +4,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/module/system/upgrademng"
+	"github.com/open-cmi/cmmns/pkg/eyas"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func GetCurrentVersion(c *gin.Context) {
-	v, err := upgrademng.CurrentVersion()
+	v, err := eyas.CurrentVersion()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
