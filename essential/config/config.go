@@ -14,10 +14,6 @@ func Init(configfile string) error {
 	return err
 }
 
-func GetConfDir() string {
-	return gConfCtx.GetConfDir()
-}
-
 func Save() {
 	if gConfCtx != nil {
 		gConfCtx.Save()

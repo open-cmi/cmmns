@@ -7,6 +7,7 @@ import (
 	_ "github.com/open-cmi/cmmns/api/system/prod"
 	_ "github.com/open-cmi/cmmns/api/system/setting"
 	_ "github.com/open-cmi/cmmns/api/system/sysinfo"
+	_ "github.com/open-cmi/cmmns/api/system/upgrademng"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
 

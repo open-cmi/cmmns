@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/events"
 	"github.com/open-cmi/cmmns/module/license"
+	"github.com/open-cmi/cmmns/pkg/eyas"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
 
@@ -49,7 +49,7 @@ func UploadLicenseFile(c *gin.Context) {
 		return
 	}
 
-	confDir := config.GetConfDir()
+	confDir := eyas.GetConfDir()
 	dst := filepath.Join(confDir, "xsnos.lic")
 	out, err := os.OpenFile(dst, os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {

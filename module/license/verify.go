@@ -15,10 +15,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/events"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/module/licmng"
+	"github.com/open-cmi/cmmns/pkg/eyas"
 	"github.com/open-cmi/cmmns/service/initial"
 	"github.com/open-cmi/cmmns/service/ticker"
 )
@@ -126,7 +126,7 @@ func LicenseIsValid() bool {
 }
 
 func checkLocalLicenseFile() error {
-	confDir := config.GetConfDir()
+	confDir := eyas.GetConfDir()
 
 	licFile := path.Join(confDir, "xsnos.lic")
 	rd, err := os.Open(licFile)

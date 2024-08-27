@@ -5,6 +5,7 @@ import (
 	"path"
 
 	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/pkg/eyas"
 )
 
 var gConf Config
@@ -16,7 +17,7 @@ type Config struct {
 
 func GetLicensePath() string {
 	if gConf.Lic != "" {
-		confDir := config.GetConfDir()
+		confDir := eyas.GetConfDir()
 		return path.Join(confDir, "xsnos.lic")
 	}
 	return gConf.Lic
@@ -26,7 +27,7 @@ func GetPublicPemPath() string {
 	if gConf.PublicFile != "" {
 		return gConf.PublicFile
 	}
-	return path.Join(config.GetConfDir(), "public.pem")
+	return path.Join(eyas.GetConfDir(), "public.pem")
 }
 
 func Parse(mess json.RawMessage) error {

@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/pkg/eyas"
 	"github.com/open-cmi/cmmns/pkg/logger"
-	"github.com/open-cmi/cmmns/pkg/pathutil"
 )
 
 type Feature interface {
@@ -118,7 +118,7 @@ func Parse(raw json.RawMessage) error {
 	}
 	logPath := gConf.Path
 	if logPath == "" {
-		rp := pathutil.GetRootPath()
+		rp := eyas.GetRootPath()
 		logPath = filepath.Join(rp, "data")
 	}
 

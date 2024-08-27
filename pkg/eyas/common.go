@@ -1,4 +1,4 @@
-package pathutil
+package eyas
 
 import (
 	"os"
@@ -13,6 +13,22 @@ func GetRootPath() string {
 		return path.Dir(p)
 	}
 	return p
+}
+
+func GetConfDir() string {
+	p := GetExecutePath()
+	if p != "" {
+		return path.Join(path.Dir(p), "etc")
+	}
+	return ""
+}
+
+func GetDataDir() string {
+	p := GetExecutePath()
+	if p != "" {
+		return path.Join(path.Dir(p), "data")
+	}
+	return ""
 }
 
 // Getwd get pwd

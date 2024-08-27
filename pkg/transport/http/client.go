@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"errors"
@@ -13,23 +14,42 @@ import (
 	"time"
 )
 
+type UnixSockOption struct {
+	UnixSock string // unix sock 地址
+}
+
+type TLSOption struct {
+	InsecureSkipVerify bool
+}
+
 type HTTPClient struct {
 	Client  http.Client
 	Cookies []*http.Cookie
 }
 
-func NewHTTPClient(insecureSkipVerify bool) *HTTPClient {
+func NewHTTPClient(sockopt *UnixSockOption, tlsopt *TLSOption) *HTTPClient {
+	var insecureSkipVerify bool = false
+	if tlsopt != nil {
+		insecureSkipVerify = tlsopt.InsecureSkipVerify
+	}
+	dialContext := (&net.Dialer{
+		Timeout:   3 * time.Second,
+		KeepAlive: 30 * time.Second,
+		DualStack: true,
+	}).DialContext
+	if sockopt != nil {
+		dialContext = func(ctx context.Context, network, address string) (net.Conn, error) {
+			return net.Dial("unix", sockopt.UnixSock)
+		}
+	}
+
 	var tp = &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: insecureSkipVerify,
 		},
-		Proxy:             http.ProxyFromEnvironment,
-		DisableKeepAlives: true,
-		DialContext: (&net.Dialer{
-			Timeout:   3 * time.Second,
-			KeepAlive: 30 * time.Second,
-			DualStack: true,
-		}).DialContext,
+		Proxy:                 http.ProxyFromEnvironment,
+		DisableKeepAlives:     true,
+		DialContext:           dialContext,
 		ForceAttemptHTTP2:     true,
 		MaxIdleConns:          100,
 		IdleConnTimeout:       30 * time.Second,
@@ -58,7 +78,7 @@ func (t *HTTPClient) LoadCert(certFile string, keyFile string) error {
 }
 
 // ReqAPI func
-func (t *HTTPClient) ReqAPI(requrl string, params map[string]string, headers map[string]string, payload interface{}) (respmsg string, err error) {
+func (t *HTTPClient) ReqAPI(requrl string, params map[string]string, headers map[string]string, payload interface{}) (respmsg []byte, err error) {
 	urlObj, err := url.Parse(requrl)
 	if err != nil {
 		return respmsg, err
@@ -88,27 +108,27 @@ func (t *HTTPClient) ReqAPI(requrl string, params map[string]string, headers map
 
 	resp, err := t.Client.Do(req)
 	if err != nil {
-		return "", err
+		return respmsg, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
 		errmsg := fmt.Sprintf("api not available, status code: %d", resp.StatusCode)
-		return "", errors.New(errmsg)
+		return respmsg, errors.New(errmsg)
 	}
 
 	t.Cookies = resp.Cookies()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return respmsg, err
 	}
 
-	return string(body), nil
+	return body, nil
 }
 
 // PostAPI func
-func (t *HTTPClient) PostAPI(requrl string, params map[string]string, headers map[string]string, payload interface{}) (respmsg string, err error) {
+func (t *HTTPClient) PostAPI(requrl string, params map[string]string, headers map[string]string, payload interface{}) (respmsg []byte, err error) {
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return respmsg, err
@@ -160,11 +180,11 @@ func (t *HTTPClient) PostAPI(requrl string, params map[string]string, headers ma
 		return respmsg, err
 	}
 
-	return string(body), nil
+	return body, nil
 }
 
 // DelAPI func
-func (t *HTTPClient) DelAPI(requrl string, params map[string]string, headers map[string]string) (respmsg string, err error) {
+func (t *HTTPClient) DelAPI(requrl string, params map[string]string, headers map[string]string) (respmsg []byte, err error) {
 	// post api
 	querys := url.Values{}
 
@@ -210,5 +230,5 @@ func (t *HTTPClient) DelAPI(requrl string, params map[string]string, headers map
 		return respmsg, err
 	}
 
-	return string(body), nil
+	return body, nil
 }
