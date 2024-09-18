@@ -157,7 +157,7 @@ func GenerateAuthToken(name string, username string, id string, email string, ro
 	return token, err
 }
 
-func DeleteToken(name string) error {
+func DeleteAuthToken(name string) error {
 	t := GetTokenRecord(name)
 	if t == nil {
 		return errors.New("token not existed")
