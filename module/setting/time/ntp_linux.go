@@ -7,15 +7,17 @@ import (
 )
 
 func ChangeNTPServer(server string) error {
-	wf, err := os.OpenFile("/etc/systemd/timesyncd.conf", os.O_RDWR|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
+	if server != "" {
+		wf, err := os.OpenFile("/etc/systemd/timesyncd.conf", os.O_RDWR|os.O_TRUNC, 0644)
+		if err != nil {
+			return err
+		}
+		wf.WriteString("[Time]\n")
+		line := fmt.Sprintf("NTP=%s\n", server)
+		wf.WriteString(line)
 	}
-	wf.WriteString("[Time]\n")
-	line := fmt.Sprintf("NTP=%s\n", server)
-	wf.WriteString(line)
 	cmd := exec.Command("bash", "-c", "systemctl restart systemd-timesyncd")
-	err = cmd.Run()
+	err := cmd.Run()
 	return err
 }
 

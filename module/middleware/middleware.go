@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -113,6 +114,10 @@ func ParseAuthToken(token string) (*UserClaims, error) {
 
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*UserClaims); ok && tokenClaims.Valid {
+			r := GetTokenRecordByToken(token)
+			if r == nil {
+				return nil, errors.New("token not exist")
+			}
 			return claims, nil
 		}
 	}
@@ -143,6 +148,7 @@ func GenerateAuthToken(name string, username string, id string, email string, ro
 
 	t := NewTokenRecord()
 	t.ExpireDay = expireDay
+	t.Token = token
 	t.Name = name
 	err = t.Save()
 	if err != nil {
