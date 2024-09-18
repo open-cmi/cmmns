@@ -157,6 +157,18 @@ func GenerateAuthToken(name string, username string, id string, email string, ro
 	return token, err
 }
 
+func DeleteToken(name string) error {
+	t := GetTokenRecord(name)
+	if t == nil {
+		return errors.New("token not existed")
+	}
+	err := t.Remove()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // // Web Access Control middleware
 // func WACMiddleware(r *gin.Engine) {
 // 	r.Use(func(c *gin.Context) {

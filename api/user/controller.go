@@ -346,6 +346,21 @@ func CreateToken(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "token": tk})
 }
 
+func DeleteToken(c *gin.Context) {
+	var req middleware.DeleteTokenRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	err := middleware.DeleteAuthToken(req.Name)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "delete token failed"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+}
+
 func Edit(c *gin.Context) {
 	var req user.EditMsg
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -426,6 +441,7 @@ func init() {
 	webserver.RegisterAuthAPI("user", "PUT", "/:id", Edit)
 	webserver.RegisterAuthAPI("user", "DELETE", "/:id", Delete)
 	webserver.RegisterAuthAPI("user", "POST", "/jwt-token/", CreateToken)
+	webserver.RegisterAuthAPI("user", "POST", "/jwt-token/delete/", DeleteToken)
 	webserver.RegisterAuthAPI("user", "GET", "/jwt-token/", TokenList)
 
 	webserver.RegisterUnauthRouter("user", "/api/user/v1")

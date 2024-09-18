@@ -48,6 +48,17 @@ func (t *TokenRecord) Save() error {
 	return nil
 }
 
+func (m *TokenRecord) Remove() error {
+	deleteClause := "delete from token_record where name=$1"
+	db := sqldb.GetDB()
+	_, err := db.Exec(deleteClause, m.Name)
+	if err != nil {
+		logger.Errorf("token remove failed: %s\n", err.Error())
+		return errors.New("delete token failed")
+	}
+	return err
+}
+
 func GetTokenRecordByToken(token string) *TokenRecord {
 	queryClause := `select * from token_record where token=$1`
 	db := sqldb.GetDB()
@@ -57,6 +68,21 @@ func GetTokenRecordByToken(token string) *TokenRecord {
 	err := row.StructScan(&mdl)
 	if err != nil {
 		logger.Errorf("token %s not found: %s\n", token, err.Error())
+		return nil
+	}
+
+	return &mdl
+}
+
+func GetTokenRecord(name string) *TokenRecord {
+	queryClause := `select * from token_record where name=$1`
+	db := sqldb.GetDB()
+	row := db.QueryRowx(queryClause, name)
+
+	var mdl TokenRecord
+	err := row.StructScan(&mdl)
+	if err != nil {
+		logger.Errorf("token %s not found: %s\n", name, err.Error())
 		return nil
 	}
 
