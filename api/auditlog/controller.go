@@ -18,6 +18,16 @@ func List(c *gin.Context) {
 		return
 	}
 
+	addr := c.Query("ip")
+	if addr != "" {
+		param.Filters = append(param.Filters, goparam.FilterParam{
+			Type:      "string",
+			Name:      "ip",
+			Value:     addr,
+			Condition: "contains",
+		})
+	}
+
 	count, list, err := auditlog.List(param)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})

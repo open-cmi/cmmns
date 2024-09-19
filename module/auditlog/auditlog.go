@@ -1,9 +1,6 @@
 package auditlog
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 	"github.com/open-cmi/cmmns/pkg/goparam"
@@ -37,9 +34,7 @@ func List(p *goparam.Param) (int, []Model, error) {
 		return 0, logs, nil
 	}
 
-	columns := goparam.GetColumn(Model{}, []string{})
-
-	queryClause := fmt.Sprintf(`select %s from audit_log`, strings.Join(columns, ","))
+	queryClause := `select * from audit_log`
 	queryClause += whereClause
 	finalClause := goparam.BuildFinalClause(p)
 	queryClause += finalClause
