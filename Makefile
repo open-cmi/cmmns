@@ -6,11 +6,11 @@ TARGET=$(ROOT)/main/cmmns
 build:
 	cd main && go build -ldflags "-s -w" -o $(TARGET) main.go
 
-PREFIX?=/usr/local
+BUILDDIR?=/usr/local
 .PHONY:install
 install:
-	mkdir -p ${PREFIX}/bin
-	cp -rfp ${TARGET} ${PREFIX}/bin/
+	mkdir -p ${BUILDDIR}/bin
+	cp -rfp ${TARGET} ${BUILDDIR}/bin/
 
 .PHONY:clean
 clean:
