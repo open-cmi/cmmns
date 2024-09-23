@@ -15,30 +15,23 @@ type Menu struct {
 	Children []Menu `json:"children,omitempty"`
 }
 
-type ProdBriefInfo struct {
-	Name   string `json:"name"`
-	Footer string `json:"footer"`
+type NavConfig struct {
+	Menus []Menu `json:"menus"`
 }
 
-type ProdConfig struct {
-	Name   string `json:"name"`
-	Footer string `json:"footer"`
-	Nav    []Menu `json:"nav"`
-}
-
-var gProdConf ProdConfig
+var gNavConf NavConfig
 
 func Parse(mess json.RawMessage) error {
-	err := json.Unmarshal(mess, &gProdConf)
+	err := json.Unmarshal(mess, &gNavConf)
 
 	return err
 }
 
 func Save() json.RawMessage {
-	v, _ := json.Marshal(gProdConf)
+	v, _ := json.Marshal(gNavConf)
 	return v
 }
 
 func init() {
-	config.RegisterConfig("prod", Parse, Save)
+	config.RegisterConfig("nav", Parse, Save)
 }

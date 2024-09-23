@@ -61,10 +61,8 @@
       }
     ]
   },
-  "prod": {
-    "name": "cmmns",
-    "footer": "cmmns",
-    "nav": [
+  "nav": {
+    "menus": [
       {
         "path": "/main/system-log",
         "name": "system log",

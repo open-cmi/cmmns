@@ -15,16 +15,9 @@ func RequireNav(menus []Menu) []Menu {
 }
 
 func GetRequireNav() []Menu {
-	return RequireNav(gProdConf.Nav)
+	return RequireNav(gNavConf.Menus)
 }
 
 func GetNav() []Menu {
-	return gProdConf.Nav
-}
-
-func GetProdInfo() ProdBriefInfo {
-	return ProdBriefInfo{
-		Name:   gProdConf.Name,
-		Footer: gProdConf.Footer,
-	}
+	return gNavConf.Menus
 }

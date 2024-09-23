@@ -10,11 +10,27 @@ import (
 	"github.com/open-cmi/cmmns/service/webserver"
 )
 
-func GetProdInfo(c *gin.Context) {
+func SetProdBasisInfo(c *gin.Context) {
+	var req prod.ProdInfoSetRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	err := prod.SetProdBasisInfo(&req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+}
+
+func GetProdBasisInfo(c *gin.Context) {
 
 	// todo, 管理员用户获取配置菜单
 	// 普通用户获取授权菜单
-	info := prod.GetProdInfo()
+	info := prod.GetProdBasisInfo()
 	m := time.Get()
 	if m == nil {
 		m = time.New()
@@ -33,5 +49,6 @@ func GetProdInfo(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterUnauthAPI("system", "GET", "/prod/brief-info/", GetProdInfo)
+	webserver.RegisterUnauthAPI("system", "GET", "/prod/basis/", GetProdBasisInfo)
+	webserver.RegisterUnauthAPI("system", "POST", "/prod/basis/", SetProdBasisInfo)
 }
