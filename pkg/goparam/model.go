@@ -99,10 +99,10 @@ func BuildWhereClause(opt *Param) (format string, args []interface{}) {
 		if filter.Type == "string" {
 			value := filter.Value.(string)
 			if filter.Condition == "contains" {
-				clause += fmt.Sprintf(` %s like '%%' || $%d || '%%'`, filter.Name, index+1)
+				clause += fmt.Sprintf(` UPPER(%s) like UPPER('%%' || $%d || '%%')`, filter.Name, index+1)
 				args = append(args, value)
 			} else if filter.Condition == "eq" {
-				clause += fmt.Sprintf(" %s = $%d", filter.Name, index+1)
+				clause += fmt.Sprintf(" UPPER(%s) = UPPER($%d)", filter.Name, index+1)
 				args = append(args, value)
 			}
 		} else if filter.Type == "number" || filter.Type == "integer" {
