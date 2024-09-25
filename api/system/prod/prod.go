@@ -48,7 +48,18 @@ func GetProdBasisInfo(c *gin.Context) {
 	})
 }
 
+func ToggleExperimentalSetting(c *gin.Context) {
+
+	prod.ToggleExperimentalSetting()
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
+	})
+}
+
 func init() {
 	webserver.RegisterUnauthAPI("system", "GET", "/prod/basis/", GetProdBasisInfo)
 	webserver.RegisterUnauthAPI("system", "POST", "/prod/basis/", SetProdBasisInfo)
+	webserver.RegisterAuthAPI("system", "POST", "/prod/experimental-setting/", ToggleExperimentalSetting)
 }

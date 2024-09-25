@@ -110,3 +110,7 @@ func SetProdBasisInfo(req *ProdInfoSetRequest) error {
 	m.Footer = req.Footer
 	return m.Save()
 }
+
+func ToggleExperimentalSetting() {
+	gNavConf.Experimental = !gNavConf.Experimental
+}
