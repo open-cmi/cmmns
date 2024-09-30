@@ -69,7 +69,7 @@ func GetProdModel() *ProdModel {
 	var v string
 	err := row.Scan(&v)
 	if err != nil {
-		logger.Errorf("Prod model row scan failed: %s\n", err.Error())
+		logger.Errorf("prod model row scan failed: %s\n", err.Error())
 		return nil
 	}
 
@@ -122,6 +122,7 @@ func Init() error {
 	m = &ProdModel{
 		Name:   "xsnos",
 		Footer: "xsnos",
+		isNew:  true,
 	}
 	return m.Save()
 }
