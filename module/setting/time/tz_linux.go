@@ -35,11 +35,11 @@ func SetTimeZone(tz string) error {
 func Init() error {
 	m := Get()
 	if m == nil {
-		m = New()
-		m.AutoAdjust = true
-		m.NtpServer = ""
-		m.TimeZone = "Asia/Shanghai"
-		return m.Save()
+		var req SettingRequest
+		req.AutoAdjust = true
+		req.NtpServer = "cn.ntp.org.cn"
+		req.TimeZone = "Asia/Shanghai"
+		SetTimeSetting(&req)
 	}
 	return nil
 }

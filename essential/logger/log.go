@@ -139,6 +139,5 @@ func Save() json.RawMessage {
 
 func init() {
 	gConf.Level = "debug"
-	gConf.Path = "/tmp/"
 	config.RegisterConfig("log", Parse, Save)
 }
