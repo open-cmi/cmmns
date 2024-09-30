@@ -8,6 +8,7 @@ import (
 
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
+	"github.com/open-cmi/cmmns/service/initial"
 )
 
 type ProdModel struct {
@@ -88,10 +89,7 @@ func NewProdModel() *ProdModel {
 func GetProdBasisInfo() ProdModel {
 	m := GetProdModel()
 	if m == nil {
-		return ProdModel{
-			Name:   "xsnos",
-			Footer: "xsnos",
-		}
+		return ProdModel{}
 	}
 	return *m
 }
@@ -113,4 +111,21 @@ func SetProdBasisInfo(req *ProdInfoSetRequest) error {
 
 func ToggleExperimentalSetting() {
 	gNavConf.Experimental = !gNavConf.Experimental
+}
+
+func Init() error {
+	m := GetProdModel()
+	if m != nil {
+		return nil
+	}
+
+	m = &ProdModel{
+		Name:   "xsnos",
+		Footer: "xsnos",
+	}
+	return m.Save()
+}
+
+func init() {
+	initial.Register("prod-model", initial.DefaultPriority, Init)
 }
