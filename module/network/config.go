@@ -35,6 +35,10 @@ func Save() json.RawMessage {
 }
 
 func Init() error {
+	// 如果配置文件不包含管理口，则从数据库中获取
+	if len(gConf.Devices) == 0 {
+		gConf.Devices = LoadNetworkManagementInterface()
+	}
 	err := NetworkApply()
 	return err
 }

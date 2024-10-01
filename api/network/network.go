@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/network"
+	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func SetNetwork(c *gin.Context) {
@@ -61,4 +62,43 @@ func BlinkingNetworkInterface(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+}
+
+func SetManagementInterface(c *gin.Context) {
+	var req network.SetManagementInterfaceRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	err := network.SetManagementInterface(&req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+}
+
+func GetAvailableManagementInterface(c *gin.Context) {
+	devices, err := network.GetAvailableManagementInterface()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"ret":  0,
+		"msg":  "",
+		"data": devices,
+	})
+}
+
+func init() {
+	webserver.RegisterAuthRouter("network", "/api/network/v1/")
+	webserver.RegisterAuthAPI("network", "GET", "/", GetNetwork)
+	webserver.RegisterAuthAPI("network", "PUT", "/", SetNetwork)
+	webserver.RegisterAuthAPI("network", "GET", "/status/", GetNetworkStatus)
+	webserver.RegisterAuthAPI("network", "POST", "/blinking/", BlinkingNetworkInterface)
+	webserver.RegisterAuthAPI("network", "POST", "/management-interface/", SetManagementInterface)
+	webserver.RegisterAuthAPI("network", "GET", "/available-management-interface/", GetAvailableManagementInterface)
 }
