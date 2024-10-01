@@ -222,3 +222,12 @@ func GetAvailableManagementInterface() ([]string, error) {
 	}
 	return devices, nil
 }
+
+func IsManagementInterface(dev string) bool {
+	for _, device := range gConf.Devices {
+		if device == dev {
+			return true
+		}
+	}
+	return false
+}
