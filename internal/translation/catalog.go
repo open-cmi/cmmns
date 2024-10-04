@@ -39,47 +39,43 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"change password failed":                           7,
-	"change password sussessfully":                     8,
-	"create agent failed":                              0,
-	"create agent successfully":                        1,
-	"create user sussessfully":                         12,
-	"delete agent failed":                              2,
-	"delete agent successfully":                        3,
-	"delete user sussessfully":                         13,
-	"list users failed":                                9,
-	"login successfully":                               10,
-	"logout successfully":                              11,
-	"password confirmation doesn't match the password": 5,
-	"user not exist":                                   4,
-	"user password verify failed":                      6,
+	"change password failed":                           4,
+	"change password sussessfully":                     5,
+	"create user %s sussessfully":                      9,
+	"delete user sussessfully":                         10,
+	"list license failed":                              0,
+	"list tokens failed":                               11,
+	"list users failed":                                6,
+	"login successfully":                               7,
+	"logout successfully":                              8,
+	"password confirmation doesn't match the password": 2,
+	"user does not exist":                              1,
+	"user password verify failed":                      3,
 }
 
-var en_USIndex = []uint32{ // 15 elements
-	0x00000000, 0x00000014, 0x0000002e, 0x00000042,
-	0x0000005c, 0x0000006b, 0x0000009c, 0x000000b8,
-	0x000000cf, 0x000000ec, 0x000000fe, 0x00000111,
-	0x00000125, 0x0000013e, 0x00000157,
-} // Size: 84 bytes
+var en_USIndex = []uint32{ // 13 elements
+	0x00000000, 0x00000014, 0x00000028, 0x00000059,
+	0x00000075, 0x0000008c, 0x000000a9, 0x000000bb,
+	0x000000ce, 0x000000e2, 0x00000101, 0x0000011a,
+	0x0000012d,
+} // Size: 76 bytes
 
-const en_USData string = "" + // Size: 343 bytes
-	"\x02create agent failed\x02create agent successfully\x02delete agent fai" +
-	"led\x02delete agent successfully\x02user not exist\x02password confirmat" +
-	"ion doesn't match the password\x02user password verify failed\x02change " +
-	"password failed\x02change password sussessfully\x02list users failed\x02" +
-	"login successfully\x02logout successfully\x02create user sussessfully" +
-	"\x02delete user sussessfully"
+const en_USData string = "" + // Size: 301 bytes
+	"\x02list license failed\x02user does not exist\x02password confirmation " +
+	"doesn't match the password\x02user password verify failed\x02change pass" +
+	"word failed\x02change password sussessfully\x02list users failed\x02logi" +
+	"n successfully\x02logout successfully\x02create user %[1]s sussessfully" +
+	"\x02delete user sussessfully\x02list tokens failed"
 
-var zh_CNIndex = []uint32{ // 15 elements
-	0x00000000, 0x00000012, 0x00000024, 0x00000036,
-	0x00000048, 0x00000058, 0x0000006b, 0x00000084,
-	0x00000097, 0x000000aa, 0x000000c3, 0x000000d0,
-	0x000000dd, 0x000000f0, 0x00000103,
-} // Size: 84 bytes
+var zh_CNIndex = []uint32{ // 13 elements
+	0x00000000, 0x0000001a, 0x0000002a, 0x00000049,
+	0x00000062, 0x00000075, 0x00000088, 0x000000a1,
+	0x000000ae, 0x000000c1, 0x000000d9, 0x000000ec,
+	0x00000104,
+} // Size: 76 bytes
 
-const zh_CNData string = "" + // Size: 259 bytes
-	"\x02创建agent失败\x02创建agent成功\x02删除agent失败\x02删除agent成功\x02用户不存在\x02新密码不匹配" +
-	"\x02用户密码校验失败\x02修改密码失败\x02修改密码成功\x02获取用户列表失败\x02登陆成功\x02登出成功\x02创建用户成功" +
-	"\x02删除用户成功"
+const zh_CNData string = "" + // Size: 260 bytes
+	"\x02获取license列表失败\x02用户不存在\x02确认密码与密码不相同\x02用户密码验证失败\x02修改密码失败\x02修改密码成功" +
+	"\x02获取用户列表失败\x02登陆成功\x02退出登陆成功\x02创建用户%[1]s成功\x02删除用户成功\x02获取token列表失败"
 
-	// Total table size 770 bytes (0KiB); checksum: D6A58ED
+	// Total table size 713 bytes (0KiB); checksum: EF310BDB

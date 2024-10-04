@@ -2,39 +2,24 @@
     "language": "zh-CN",
     "messages": [
         {
-            "id": "create agent failed",
-            "message": "create agent failed",
-            "translation": "创建agent失败"
+            "id": "list license failed",
+            "message": "list license failed",
+            "translation": "获取license列表失败"
         },
         {
-            "id": "create agent successfully",
-            "message": "create agent successfully",
-            "translation": "创建agent成功"
-        },
-        {
-            "id": "delete agent failed",
-            "message": "delete agent failed",
-            "translation": "删除agent失败"
-        },
-        {
-            "id": "delete agent successfully",
-            "message": "delete agent successfully",
-            "translation": "删除agent成功"
-        },
-        {
-            "id": "user not exist",
-            "message": "user not exist",
+            "id": "user does not exist",
+            "message": "user does not exist",
             "translation": "用户不存在"
         },
         {
             "id": "password confirmation doesn't match the password",
             "message": "password confirmation doesn't match the password",
-            "translation": "新密码不匹配"
+            "translation": "确认密码与密码不相同"
         },
         {
             "id": "user password verify failed",
             "message": "user password verify failed",
-            "translation": "用户密码校验失败"
+            "translation": "用户密码验证失败"
         },
         {
             "id": "change password failed",
@@ -59,17 +44,31 @@
         {
             "id": "logout successfully",
             "message": "logout successfully",
-            "translation": "登出成功"
+            "translation": "退出登陆成功"
         },
         {
-            "id": "create user sussessfully",
-            "message": "create user sussessfully",
-            "translation": "创建用户成功"
+            "id": "create user {Arg_1} sussessfully",
+            "message": "create user {Arg_1} sussessfully",
+            "translation": "创建用户{Arg_1}成功",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                }
+            ]
         },
         {
             "id": "delete user sussessfully",
             "message": "delete user sussessfully",
             "translation": "删除用户成功"
+        },
+        {
+            "id": "list tokens failed",
+            "message": "list tokens failed",
+            "translation": "获取token列表失败"
         }
     ]
 }

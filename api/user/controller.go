@@ -77,7 +77,7 @@ func ChangePassword(c *gin.Context) {
 	if usermap == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
-			"msg": i18n.Sprintf("user not exist"),
+			"msg": i18n.Sprintf("user does not exist"),
 		})
 		return
 	}
@@ -161,7 +161,7 @@ func Get(c *gin.Context) {
 	if user == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": -1,
-			"msg": i18n.Sprintf("user not exist"),
+			"msg": i18n.Sprintf("user does not exist"),
 		})
 		return
 	}
@@ -385,7 +385,7 @@ func ResetPassword(c *gin.Context) {
 	if usermap == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
-			"msg": i18n.Sprintf("user not exist"),
+			"msg": i18n.Sprintf("user does not exist"),
 		})
 		return
 	}
