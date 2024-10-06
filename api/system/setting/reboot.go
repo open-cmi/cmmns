@@ -4,11 +4,14 @@ import (
 	"os/exec"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func Reboot(c *gin.Context) {
-
+	ah := auditlog.NewAuditHandler(c)
+	ah.InsertOperationLog(i18n.Sprintf("reboot system"), true)
 	exec.Command("/bin/sh", "-c", "reboot -f").Output()
 	c.JSON(200, gin.H{
 		"ret": 0,
@@ -17,6 +20,9 @@ func Reboot(c *gin.Context) {
 }
 
 func ShutDown(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
+	ah.InsertOperationLog(i18n.Sprintf("shutdown system"), true)
+
 	exec.Command("/bin/sh", "-c", "shutdown -h now").Output()
 	c.JSON(200, gin.H{
 		"ret": 0,

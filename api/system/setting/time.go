@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/setting/time"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
@@ -23,16 +25,22 @@ func GetTimeZoneList(c *gin.Context) {
 }
 
 func SetTimeSetting(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
+
 	var req time.SettingRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("set ntp setting"), false)
 		return
 	}
 	err := time.SetTimeSetting(&req)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("set ntp setting"), false)
 		return
 	}
+
+	ah.InsertOperationLog(i18n.Sprintf("set ntp setting"), true)
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 

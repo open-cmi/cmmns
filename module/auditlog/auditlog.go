@@ -1,6 +1,12 @@
 package auditlog
 
 import (
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/open-cmi/cmmns/essential/i18n"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 	"github.com/open-cmi/cmmns/pkg/goparam"
@@ -12,7 +18,45 @@ type Model struct {
 	Type      int    `json:"type" db:"type"`
 	Username  string `json:"username" db:"username"`
 	Action    string `json:"action" db:"action"`
-	Timestamp int    `json:"timestamp" db:"timestamp"`
+	Result    string `json:"result" db:"result"`
+	Timestamp int64  `json:"timestamp" db:"timestamp"`
+}
+
+func (m *Model) Save() error {
+	db := sqldb.GetDB()
+
+	columns := goparam.GetColumn(*m, []string{})
+	values := goparam.GetColumnInsertNamed(columns)
+
+	insertClause := fmt.Sprintf("insert into audit_log(%s) values(%s)",
+		strings.Join(columns, ","), strings.Join(values, ","))
+
+	logger.Debugf("start to exec sql clause: %s\n", insertClause)
+
+	_, err := db.NamedExec(insertClause, m)
+	if err != nil {
+		logger.Errorf("insert log failed: %s\n", err.Error())
+	}
+	return err
+}
+
+func NewLogRecord(ip string, logtype int, username string, action string, success bool) *Model {
+	var result string
+	if success {
+		result = i18n.Sprintf("success")
+	} else {
+		result = i18n.Sprintf("fail")
+	}
+
+	return &Model{
+		ID:        uuid.New().String(),
+		Timestamp: time.Now().Unix(),
+		IP:        ip,
+		Type:      logtype,
+		Username:  username,
+		Action:    action,
+		Result:    result,
+	}
 }
 
 // List list

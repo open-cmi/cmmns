@@ -67,6 +67,7 @@ func VerifyPasswordRule(str string, minLen, maxLen int) error {
 }
 
 func ChangePassword(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
 	var apimsg user.ChangePasswordMsg
 	if err := c.ShouldBindJSON(&apimsg); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
@@ -79,6 +80,7 @@ func ChangePassword(c *gin.Context) {
 			"ret": 1,
 			"msg": i18n.Sprintf("user does not exist"),
 		})
+		ah.InsertOperationLog(i18n.Sprintf("change password"), false)
 		return
 	}
 
@@ -87,6 +89,8 @@ func ChangePassword(c *gin.Context) {
 			"ret": 1,
 			"msg": i18n.Sprintf("password confirmation doesn't match the password"),
 		})
+
+		ah.InsertOperationLog(i18n.Sprintf("change password"), false)
 		return
 	}
 
@@ -96,6 +100,8 @@ func ChangePassword(c *gin.Context) {
 			"ret": 1,
 			"msg": i18n.Sprintf("user password verify failed"),
 		})
+
+		ah.InsertOperationLog(i18n.Sprintf("change password"), false)
 		return
 	}
 	err := VerifyPasswordRule(apimsg.NewPassword, 8, 30)
@@ -104,6 +110,8 @@ func ChangePassword(c *gin.Context) {
 			"ret": 1,
 			"msg": i18n.Sprintf(err.Error()),
 		})
+
+		ah.InsertOperationLog(i18n.Sprintf("change password"), false)
 		return
 	}
 	err = user.ChangePassword(userID, apimsg.NewPassword)
@@ -112,17 +120,12 @@ func ChangePassword(c *gin.Context) {
 			"ret": 1,
 			"msg": i18n.Sprintf("change password failed"),
 		})
+
+		ah.InsertOperationLog(i18n.Sprintf("change password"), false)
 		return
 	}
 
-	ip := c.ClientIP()
-	username, _ := usermap["username"].(string)
-	auditlog.InsertLog(ip,
-		username,
-		auditlog.OperationType,
-		i18n.Sprintf("change password sussessfully"),
-	)
-
+	ah.InsertOperationLog(i18n.Sprintf("change password"), true)
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
@@ -182,10 +185,12 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "captcha is incorrect"})
 		return
 	}
+	ah := auditlog.NewAuditHandler(c)
 
 	user, err := user.Login(&apimsg)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertLoginLog(apimsg.UserName, i18n.Sprintf("login"), false)
 		return
 	}
 
@@ -200,10 +205,9 @@ func Login(c *gin.Context) {
 			"role":     user.Role,
 		}
 	}
-	ip := c.ClientIP()
 
 	// 写日志操作
-	auditlog.InsertLog(ip, user.UserName, auditlog.LoginType, i18n.Sprintf("login successfully"))
+	ah.InsertLoginLog(user.UserName, i18n.Sprintf("login"), true)
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": *user})
 
@@ -237,13 +241,8 @@ func Logout(c *gin.Context) {
 	sess, _ := c.Get("session")
 	session := sess.(*sessions.Session)
 
-	ip := c.ClientIP()
-	user := goparam.GetUser(c)
-	if user != nil {
-		username, _ := user["username"].(string)
-		// 写日志操作
-		auditlog.InsertLog(ip, username, auditlog.LoginType, i18n.Sprintf("logout successfully"))
-	}
+	ah := auditlog.NewAuditHandler(c)
+	ah.InsertOperationLog(i18n.Sprintf("logout"), true)
 
 	session.Options.MaxAge = -1 // aged
 	delete(session.Values, "user")
@@ -253,39 +252,37 @@ func Logout(c *gin.Context) {
 
 // Create create user
 func Create(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
+
 	var apimsg user.CreateMsg
 	if err := c.ShouldBindJSON(&apimsg); err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("create user"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 
 	// 验证邮箱格式
 	if !verify.EmailIsValid(apimsg.Email) {
+		ah.InsertOperationLog(i18n.Sprintf("create user %s", apimsg.UserName), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email is not valid"})
 		return
 	}
 
 	err := user.Create(&apimsg)
 	if err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("create user %s", apimsg.UserName), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
 	}
 
-	ip := c.ClientIP()
-	user := goparam.GetUser(c)
-	if user != nil {
-		username, _ := user["username"].(string)
-		auditlog.InsertLog(ip,
-			username,
-			auditlog.OperationType,
-			i18n.Sprintf("create user %s sussessfully", apimsg.UserName),
-		)
-	}
+	ah.InsertOperationLog(i18n.Sprintf("create user %s", apimsg.UserName), true)
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
 // Delete delete user
 func Delete(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
 	u := goparam.GetUser(c)
 	id := c.Param("id")
 	userID := u["id"].(string)
@@ -294,6 +291,7 @@ func Delete(c *gin.Context) {
 			"ret": -1,
 			"msg": "can't delete youself",
 		})
+		ah.InsertOperationLog(i18n.Sprintf("delete user"), false)
 		return
 	}
 
@@ -303,33 +301,27 @@ func Delete(c *gin.Context) {
 			"ret": -1,
 			"msg": err.Error(),
 		})
+		ah.InsertOperationLog(i18n.Sprintf("delete user"), false)
 		return
 	}
 
-	ip := c.ClientIP()
-	if u != nil {
-		username, _ := u["username"].(string)
-		// 写日志操作
-		auditlog.InsertLog(ip,
-			username,
-			auditlog.OperationType,
-			i18n.Sprintf("delete user sussessfully"),
-		)
-	}
-
+	ah.InsertOperationLog(i18n.Sprintf("delete user"), true)
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
 func CreateToken(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
 	var req middleware.CreateTokenRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("create token"), false)
 		return
 	}
 
 	user := goparam.GetUser(c)
 	if user == nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "user data is empty"})
+		ah.InsertOperationLog(i18n.Sprintf("create token"), false)
 		return
 	}
 
@@ -341,44 +333,59 @@ func CreateToken(c *gin.Context) {
 	tk, err := middleware.GenerateAuthToken(req.Name, username, userid, email, role, status, req.ExpireDay)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "create token failed"})
+		ah.InsertOperationLog(i18n.Sprintf("create token"), false)
 		return
 	}
+	ah.InsertOperationLog(i18n.Sprintf("create token"), true)
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "token": tk})
 }
 
 func DeleteToken(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
+
 	var req middleware.DeleteTokenRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("delete token"), false)
 		return
 	}
 
 	err := middleware.DeleteAuthToken(req.Name)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "delete token failed"})
+		ah.InsertOperationLog(i18n.Sprintf("delete token"), false)
 		return
 	}
+	ah.InsertOperationLog(i18n.Sprintf("delete token"), true)
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
 func Edit(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
+
 	var req user.EditMsg
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("edit user"), false)
 		return
 	}
 	err := user.Edit(&req)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("edit user %s", req.Username), false)
 		return
 	}
+	ah.InsertOperationLog(i18n.Sprintf("edit user %s", req.Username), true)
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
 func ResetPassword(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
+
 	var req user.ResetPasswdRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("reset password"), false)
 		return
 	}
 	usermap := goparam.GetUser(c)
@@ -387,6 +394,7 @@ func ResetPassword(c *gin.Context) {
 			"ret": 1,
 			"msg": i18n.Sprintf("user does not exist"),
 		})
+		ah.InsertOperationLog(i18n.Sprintf("reset password"), false)
 		return
 	}
 
@@ -395,14 +403,17 @@ func ResetPassword(c *gin.Context) {
 			"ret": 1,
 			"msg": i18n.Sprintf("password confirmation doesn't match the password"),
 		})
+		ah.InsertOperationLog(i18n.Sprintf("reset password"), false)
 		return
 	}
 
 	err := user.ResetPasswd(&req)
 	if err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("reset password"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+	ah.InsertOperationLog(i18n.Sprintf("reset password"), true)
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/licmng"
 	"github.com/open-cmi/cmmns/pkg/goparam"
 	"github.com/open-cmi/cmmns/service/webserver"
@@ -36,18 +37,23 @@ func ListLicense(c *gin.Context) {
 }
 
 func CreateLicense(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
 	var req licmng.CreateLicenseRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("create license"), false)
 		return
 	}
 	err := licmng.CreateLicense(&req)
 	if err != nil {
+
+		ah.InsertOperationLog(i18n.Sprintf("create license"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 
+	ah.InsertOperationLog(i18n.Sprintf("create license"), true)
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
@@ -55,17 +61,23 @@ func CreateLicense(c *gin.Context) {
 }
 
 func DeleteLicense(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
 	id := c.Param("id")
 	if id == "" {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license should not be empty"})
+		ah.InsertOperationLog(i18n.Sprintf("delete license"), false)
 		return
 	}
 
 	err := licmng.DeleteLicense(id)
 	if err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("delete license"), false)
+
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+	ah.InsertOperationLog(i18n.Sprintf("delete license"), true)
+
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
@@ -73,10 +85,11 @@ func DeleteLicense(c *gin.Context) {
 }
 
 func DownloadLicense(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
 	id := c.Query("id")
-
 	content, err := licmng.CreateLicenseContent(id)
 	if err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("download license"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
@@ -87,9 +100,13 @@ func DownloadLicense(c *gin.Context) {
 	c.Writer.Header().Add("Content-Type", "application/octet-stream")
 	_, err = c.Writer.Write([]byte(content))
 	if err != nil {
+
+		ah.InsertOperationLog(i18n.Sprintf("download license"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+
+	ah.InsertOperationLog(i18n.Sprintf("download license"), true)
 }
 
 func init() {

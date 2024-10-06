@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/wac"
 	"github.com/open-cmi/cmmns/module/wac/blacklist"
 	"github.com/open-cmi/cmmns/module/wac/whitelist"
@@ -21,29 +23,35 @@ func GetWAC(c *gin.Context) {
 }
 
 func SetWAC(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
 	var req wac.SetRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("set web access control"), false)
 		return
 	}
 	if req.Enable {
 		if req.Mode == "blacklist" {
 			count, _, err := blacklist.List(nil)
 			if err != nil {
+				ah.InsertOperationLog(i18n.Sprintf("set web access control"), false)
 				c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 				return
 			}
 			if count == 0 {
+				ah.InsertOperationLog(i18n.Sprintf("set web access control"), false)
 				c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "blacklist must contains one address at least"})
 				return
 			}
 		} else {
 			count, _, err := whitelist.List(nil)
 			if err != nil {
+				ah.InsertOperationLog(i18n.Sprintf("set web access control"), false)
 				c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 				return
 			}
 			if count == 0 {
+				ah.InsertOperationLog(i18n.Sprintf("set web access control"), false)
 				c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "whitelist must contains one address at least"})
 				return
 			}
@@ -51,24 +59,32 @@ func SetWAC(c *gin.Context) {
 	}
 	err := wac.SetWAC(&req)
 	if err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("set web access control"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+	ah.InsertOperationLog(i18n.Sprintf("set web access control"), true)
+
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
 func AddWhitelist(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
+
 	var req wac.AddressRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("web access control add whitelist"), false)
 		return
 	}
 	err := whitelist.AddWhitelist(req.Address)
 	if err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("web access control add whitelist"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 
+	ah.InsertOperationLog(i18n.Sprintf("web access control add whitelist"), true)
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
@@ -76,17 +92,22 @@ func AddWhitelist(c *gin.Context) {
 }
 
 func DelWhitelist(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
+
 	var req wac.AddressRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("web access control delete whitelist"), false)
 		return
 	}
 	err := whitelist.DelWhitelist(req.Address)
 	if err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("web access control delete whitelist"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 
+	ah.InsertOperationLog(i18n.Sprintf("web access control delete whitelist"), true)
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
@@ -113,17 +134,21 @@ func ListWhitelist(c *gin.Context) {
 }
 
 func AddBlacklist(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
+
 	var req wac.AddressRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("web access control add blacklist"), false)
 		return
 	}
 	err := blacklist.AddBlacklist(req.Address)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("web access control add blacklist"), false)
 		return
 	}
-
+	ah.InsertOperationLog(i18n.Sprintf("web access control add blacklist"), true)
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",
@@ -131,17 +156,23 @@ func AddBlacklist(c *gin.Context) {
 }
 
 func DelBlacklist(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
+
 	var req wac.AddressRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("web access control delete blacklist"), false)
 		return
 	}
+
 	err := blacklist.DelBlacklist(req.Address)
 	if err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("web access control delete blacklist"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 
+	ah.InsertOperationLog(i18n.Sprintf("web access control delete blacklist"), true)
 	c.JSON(http.StatusOK, gin.H{
 		"ret": 0,
 		"msg": "",

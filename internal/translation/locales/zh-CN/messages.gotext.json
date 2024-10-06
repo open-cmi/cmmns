@@ -2,14 +2,104 @@
     "language": "zh-CN",
     "messages": [
         {
+            "id": "set network",
+            "message": "set network",
+            "translation": "设置网络"
+        },
+        {
+            "id": "set management interface",
+            "message": "set management interface",
+            "translation": "设置管理口"
+        },
+        {
+            "id": "set host name",
+            "message": "set host name",
+            "translation": "设置主机名"
+        },
+        {
+            "id": "upload license file",
+            "message": "upload license file",
+            "translation": "上传license文件"
+        },
+        {
             "id": "list license failed",
             "message": "list license failed",
             "translation": "获取license列表失败"
         },
         {
+            "id": "create license",
+            "message": "create license",
+            "translation": "创建license"
+        },
+        {
+            "id": "delete license",
+            "message": "delete license",
+            "translation": "删除license"
+        },
+        {
+            "id": "download license",
+            "message": "download license",
+            "translation": "下载license"
+        },
+        {
+            "id": "set prod basis info",
+            "message": "set prod basis info",
+            "translation": "设置产品基本信息"
+        },
+        {
+            "id": "toggle experimental setting",
+            "message": "toggle experimental setting",
+            "translation": "变更实验性设置"
+        },
+        {
+            "id": "set email setting",
+            "message": "set email setting",
+            "translation": "设置邮件配置"
+        },
+        {
+            "id": "set language",
+            "message": "set language",
+            "translation": "设置语言"
+        },
+        {
+            "id": "set web service port",
+            "message": "set web service port",
+            "translation": "设置web服务端口"
+        },
+        {
+            "id": "reboot system",
+            "message": "reboot system",
+            "translation": "重启系统"
+        },
+        {
+            "id": "shutdown system",
+            "message": "shutdown system",
+            "translation": "关闭系统"
+        },
+        {
+            "id": "set ssh service",
+            "message": "set ssh service",
+            "translation": "设置SSH服务"
+        },
+        {
+            "id": "set ntp setting",
+            "message": "set ntp setting",
+            "translation": "设置NTP服务"
+        },
+        {
+            "id": "set upgrade setting",
+            "message": "set upgrade setting",
+            "translation": "设置升级配置"
+        },
+        {
             "id": "user does not exist",
             "message": "user does not exist",
             "translation": "用户不存在"
+        },
+        {
+            "id": "change password",
+            "message": "change password",
+            "translation": "变更密码"
         },
         {
             "id": "password confirmation doesn't match the password",
@@ -19,17 +109,12 @@
         {
             "id": "user password verify failed",
             "message": "user password verify failed",
-            "translation": "用户密码验证失败"
+            "translation": "用户名密码校验失败"
         },
         {
             "id": "change password failed",
             "message": "change password failed",
-            "translation": "修改密码失败"
-        },
-        {
-            "id": "change password sussessfully",
-            "message": "change password sussessfully",
-            "translation": "修改密码成功"
+            "translation": "变更密码失败"
         },
         {
             "id": "list users failed",
@@ -37,19 +122,24 @@
             "translation": "获取用户列表失败"
         },
         {
-            "id": "login successfully",
-            "message": "login successfully",
-            "translation": "登陆成功"
+            "id": "login",
+            "message": "login",
+            "translation": "登陆"
         },
         {
-            "id": "logout successfully",
-            "message": "logout successfully",
-            "translation": "退出登陆成功"
+            "id": "logout",
+            "message": "logout",
+            "translation": "退出"
         },
         {
-            "id": "create user {Arg_1} sussessfully",
-            "message": "create user {Arg_1} sussessfully",
-            "translation": "创建用户{Arg_1}成功",
+            "id": "create user",
+            "message": "create user",
+            "translation": "创建用户"
+        },
+        {
+            "id": "create user {Arg_1}",
+            "message": "create user {Arg_1}",
+            "translation": "创建用户{Arg_1}",
             "placeholders": [
                 {
                     "id": "Arg_1",
@@ -61,14 +151,83 @@
             ]
         },
         {
-            "id": "delete user sussessfully",
-            "message": "delete user sussessfully",
-            "translation": "删除用户成功"
+            "id": "delete user",
+            "message": "delete user",
+            "translation": "删除用户"
+        },
+        {
+            "id": "create token",
+            "message": "create token",
+            "translation": "创建token"
+        },
+        {
+            "id": "delete token",
+            "message": "delete token",
+            "translation": "删除token"
+        },
+        {
+            "id": "edit user",
+            "message": "edit user",
+            "translation": "编辑用户"
+        },
+        {
+            "id": "edit user {Arg_1}",
+            "message": "edit user {Arg_1}",
+            "translation": "编辑用户{Arg_1}",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                }
+            ]
+        },
+        {
+            "id": "reset password",
+            "message": "reset password",
+            "translation": "重置密码"
         },
         {
             "id": "list tokens failed",
             "message": "list tokens failed",
             "translation": "获取token列表失败"
+        },
+        {
+            "id": "set web access control",
+            "message": "set web access control",
+            "translation": "设置web访问控制"
+        },
+        {
+            "id": "web access control add whitelist",
+            "message": "web access control add whitelist",
+            "translation": "web访问控制添加白名单"
+        },
+        {
+            "id": "web access control delete whitelist",
+            "message": "web access control delete whitelist",
+            "translation": "web访问控制删除白名单"
+        },
+        {
+            "id": "web access control add blacklist",
+            "message": "web access control add blacklist",
+            "translation": "web访问控制添加黑名单"
+        },
+        {
+            "id": "web access control delete blacklist",
+            "message": "web access control delete blacklist",
+            "translation": "web访问控制删除黑名单"
+        },
+        {
+            "id": "success",
+            "message": "success",
+            "translation": "成功"
+        },
+        {
+            "id": "fail",
+            "message": "fail",
+            "translation": "失败"
         }
     ]
 }

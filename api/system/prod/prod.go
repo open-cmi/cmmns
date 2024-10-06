@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/setting/time"
 	"github.com/open-cmi/cmmns/module/system/locale"
 	"github.com/open-cmi/cmmns/module/system/prod"
@@ -11,18 +13,24 @@ import (
 )
 
 func SetProdBasisInfo(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
 	var req prod.ProdInfoSetRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("set prod basis info"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 
 	err := prod.SetProdBasisInfo(&req)
 	if err != nil {
+
+		ah.InsertOperationLog(i18n.Sprintf("set prod basis info"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
+
+	ah.InsertOperationLog(i18n.Sprintf("set prod basis info"), true)
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
@@ -50,6 +58,8 @@ func GetProdBasisInfo(c *gin.Context) {
 
 func ToggleExperimentalSetting(c *gin.Context) {
 
+	ah := auditlog.NewAuditHandler(c)
+	ah.InsertOperationLog(i18n.Sprintf("toggle experimental setting"), true)
 	prod.ToggleExperimentalSetting()
 
 	c.JSON(http.StatusOK, gin.H{
