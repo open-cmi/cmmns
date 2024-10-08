@@ -3,8 +3,6 @@ package upgrademng
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/open-cmi/cmmns/essential/logger"
@@ -20,24 +18,13 @@ type EyasAPICommand struct {
 }
 
 type UpgradeRequest struct {
-	Prod string `json:"prod"`
+	UpgradePackage string `json:"upgrade_package"`
 }
 
 func StartUpgrade(req *UpgradeRequest) error {
-	jsfile := fmt.Sprintf("%s.meta.json", req.Prod)
-	metaFile := filepath.Join(eyas.GetDataDir(), "upgrades", jsfile)
-	contentByte, err := os.ReadFile(metaFile)
-	if err != nil {
-		return err
-	}
-	var meta UpgradeMetaInfo
-	err = json.Unmarshal(contentByte, &meta)
-	if err != nil {
-		return err
-	}
 	var mess EyasAPICommand
-	mess.Prod = meta.Prod
-	mess.Package = filepath.Join(eyas.GetDataDir(), "upgrades", meta.Package)
+	mess.Prod = "xsnos"
+	mess.Package = filepath.Join(eyas.GetDataDir(), "upgrades", req.UpgradePackage)
 	mess.Command = "upgrade"
 	body, err := client.PostAPI("http://unix/api/eyas-upgrader/upgrade/", nil, nil, mess)
 	if err != nil {

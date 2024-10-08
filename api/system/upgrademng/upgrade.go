@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/module/system/upgrademng"
-	"github.com/open-cmi/cmmns/pkg/crypto/sha256"
 	"github.com/open-cmi/cmmns/pkg/eyas"
 	"github.com/open-cmi/cmmns/service/webserver"
 )
@@ -67,12 +66,6 @@ func UploadMetaFile(c *gin.Context) {
 }
 
 func UploadPackage(c *gin.Context) {
-	prod := c.PostForm("prod")
-	if prod == "" {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "prod name should not be empty"})
-		return
-	}
-
 	file, _ := c.FormFile("file")
 	src, err := file.Open()
 	if err != nil {
@@ -82,26 +75,11 @@ func UploadPackage(c *gin.Context) {
 	defer src.Close()
 
 	// 打开meta文件，根据meta文件来保存package
-	metaName := fmt.Sprintf("%s.meta.json", prod)
-	metaFile := filepath.Join(eyas.GetDataDir(), "upgrades", metaName)
-	// 校验名称和md5
-	fileByte, err := os.ReadFile(metaFile)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
-		return
-	}
-	var umi upgrademng.UpgradeMetaInfo
-	err = json.Unmarshal(fileByte, &umi)
-	if err != nil {
-		logger.Errorf("%s\n", err.Error())
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "meta info file format invalid"})
-		return
-	}
 	// 保存
 	upgradeDir := filepath.Join(eyas.GetDataDir(), "upgrades")
 	os.MkdirAll(upgradeDir, 0644)
 
-	dst := filepath.Join(upgradeDir, umi.Package)
+	dst := filepath.Join(upgradeDir, file.Filename)
 	out, err := os.OpenFile(dst, os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
@@ -114,19 +92,11 @@ func UploadPackage(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	sum, err := sha256.SHA256Sum(dst)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
-		return
-	}
-	if sum != umi.SHA256 {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "package file sha256sum check failed"})
-		return
-	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"ret": 0,
-		"msg": "",
+		"ret":  0,
+		"msg":  "",
+		"data": file.Filename,
 	})
 }
 
