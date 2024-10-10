@@ -13,12 +13,9 @@ import (
 var globalModel *Model
 
 type Model struct {
-	Enable       bool   `json:"enable" db:"enable"`
-	Seq          int    `json:"seq" db:"seq"`
-	Mode         string `json:"mode" db:"mode"` // blacklist or whitelist
-	RawWhitelist string `json:"raw_whitelist" db:"raw_whitelist"`
-	RawBlacklist string `json:"raw_blacklist" db:"raw_blacklist"`
-	isNew        bool
+	Enable bool   `json:"enable" db:"enable"`
+	Mode   string `json:"mode" db:"mode"` // blacklist or whitelist
+	isNew  bool
 }
 
 func (m *Model) Key() string {
@@ -31,7 +28,7 @@ func (m *Model) Value() string {
 }
 
 func (m *Model) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if m.isNew {
 		// 存储到数据库
@@ -68,7 +65,7 @@ func New() *Model {
 }
 
 func Get() *Model {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	var m Model
 	queryClause := `select value from k_v_table where key=$1`
 	row := db.QueryRowx(queryClause, m.Key())

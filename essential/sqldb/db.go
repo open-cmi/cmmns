@@ -2,9 +2,11 @@ package sqldb
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/cmmns/pkg/database/relationdb"
+	"github.com/open-cmi/cmmns/pkg/database/postgresdb"
+	"github.com/open-cmi/cmmns/pkg/database/sqlitedb"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -23,42 +25,57 @@ type Config struct {
 	Password string `json:"password,omitempty"`
 }
 
-var gConfModel Config
+var gConf Config
 
 // GetDB get db
-func GetConfDB() *sqlx.DB {
+func GetDB() *sqlx.DB {
 	return gConfDB
 }
 
 // Parse db init
 func Parse(raw json.RawMessage) error {
-	err := json.Unmarshal(raw, &gConfModel)
+	err := json.Unmarshal(raw, &gConf)
 	if err != nil {
 		return err
 	}
-	var dbconf relationdb.Config
-	dbconf.Type = gConfModel.Type
-	dbconf.File = gConfModel.File
-	dbconf.Host = gConfModel.Host
-	dbconf.Port = gConfModel.Port
-	dbconf.User = gConfModel.User
-	dbconf.Password = gConfModel.Password
-	dbconf.Database = gConfModel.Database
 
-	dbi, err := relationdb.SQLInit(&dbconf)
-	if err != nil {
-		return err
+	if gConf.Type == "postgresql" || gConf.Type == "pg" {
+		var dbconf postgresdb.Config
+		dbconf.Host = gConf.Host
+		dbconf.Port = gConf.Port
+		dbconf.User = gConf.User
+		dbconf.Password = gConf.Password
+		dbconf.Database = gConf.Database
+
+		dbi, err := postgresdb.PostgresqlInit(&dbconf)
+		if err != nil {
+			return err
+		}
+		gConfDB = dbi
+	} else if gConf.Type == "sqlite3" {
+		var dbconf sqlitedb.Config
+		dbconf.File = gConf.File
+		dbconf.User = gConf.User
+		dbconf.Password = gConf.Password
+		dbconf.Database = gConf.Database
+
+		dbi, err := sqlitedb.SQLite3Init(&dbconf)
+		if err != nil {
+			return err
+		}
+		gConfDB = dbi
+	} else {
+		return errors.New("db is not supported")
 	}
-	gConfDB = dbi
 
 	return nil
 }
 
 func Save() json.RawMessage {
-	raw, _ := json.Marshal(&gConfModel)
+	raw, _ := json.Marshal(&gConf)
 	return raw
 }
 
 func init() {
-	config.RegisterConfig("model", Parse, Save)
+	config.RegisterConfig("sqldb", Parse, Save)
 }

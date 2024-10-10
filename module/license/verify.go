@@ -6,21 +6,31 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/json"
 	"encoding/pem"
 	"errors"
+	"io"
 	"os"
+	"path"
+	"strings"
+	"time"
 
+	"github.com/open-cmi/cmmns/essential/events"
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/module/licmng"
+	"github.com/open-cmi/cmmns/pkg/eyas"
+	"github.com/open-cmi/cmmns/service/initial"
+	"github.com/open-cmi/cmmns/service/ticker"
 )
 
-func Verify(origin string, signed string) error {
-	if gConf.PublicFile != "" {
-		return verify(origin, signed, gConf.PublicFile)
-	}
-	return nil
+func VerifySigned(origin string, signed string) error {
+
+	publicFile := GetPublicPemPath()
+
+	return verifySigned(origin, signed, publicFile)
 }
 
-func verify(origin string, signed string, pubfile string) error {
+func verifySigned(origin string, signed string, pubfile string) error {
 	pub, err := os.ReadFile(pubfile)
 	if err != nil {
 		logger.Errorf("No RSA private key found")
@@ -67,9 +77,94 @@ func verify(origin string, signed string, pubfile string) error {
 	}
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, msgHashSum, data)
 	if err != nil {
-		logger.Errorf("could not verify signature: %s", err.Error())
+		logger.Errorf("could not verifySigned signature: %s", err.Error())
 		return err
 	}
-	logger.Infof("Verify license origin and signed string success\n")
+	logger.Infof("VerifySigned license origin and signed string success\n")
 	return nil
+}
+
+func VerifyLicenseContent(content string, importVerify bool) error {
+	arr := strings.Split(content, "\n")
+	if len(arr) < 2 {
+		return errors.New("license format is invalid")
+	}
+
+	licBase64 := arr[0]
+	signed := arr[1]
+	err := VerifySigned(licBase64, signed)
+	if err != nil {
+		return errors.New("license signed string verified failed")
+	}
+	data, err := base64.StdEncoding.DecodeString(licBase64)
+	if err != nil {
+		return errors.New("base64 decode failed")
+	}
+	var lic licmng.LicenseInfo
+	err = json.Unmarshal(data, &lic)
+	if err != nil {
+		return errors.New("license unmarshal failed")
+	}
+
+	ts := time.Now().Unix()
+	// 导入校验，不区分版本，只区分时间
+	if importVerify {
+		if lic.ExpireTime < ts {
+			return errors.New("license is expired")
+		}
+	} else if lic.Version != "enterprise" && lic.ExpireTime < ts {
+		return errors.New("license is expired")
+	}
+
+	return nil
+}
+
+var gLicenseValid = false
+
+func LicenseIsValid() bool {
+	return gLicenseValid
+}
+
+func checkLocalLicenseFile() error {
+	confDir := eyas.GetConfDir()
+
+	licFile := path.Join(confDir, "xsnos.lic")
+	rd, err := os.Open(licFile)
+	if err != nil {
+		return err
+	}
+	content, err := io.ReadAll(rd)
+	if err != nil {
+		return err
+	}
+	err = VerifyLicenseContent(string(content), false)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CheckLicenseValid() {
+	err := checkLocalLicenseFile()
+	if err != nil {
+		gLicenseValid = false
+	} else {
+		gLicenseValid = true
+	}
+}
+
+func init() {
+	events.Register("check-license-valid", func(string, interface{}) {
+		CheckLicenseValid()
+	})
+
+	ticker.Register("license-verify-ticker", "0 */5 * * * *", func(name string, data interface{}) {
+		CheckLicenseValid()
+	}, nil)
+
+	initial.Register("license", initial.DefaultPriority, func() error {
+		CheckLicenseValid()
+		return nil
+	})
 }

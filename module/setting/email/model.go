@@ -31,7 +31,7 @@ func (em *EmailModel) Value() string {
 }
 
 func (m *EmailModel) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if m.isNew {
 		// 存储到数据库
@@ -68,7 +68,7 @@ func New() *EmailModel {
 
 func Get() *EmailModel {
 	queryClause := "select value from k_v_table where key=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, NotifyEmailSettingKey)
 	if row == nil {
 		return nil

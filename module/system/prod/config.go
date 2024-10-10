@@ -6,41 +6,33 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 )
 
-type SubMenu struct {
-	Path string `json:"path"`
-	Name string `json:"name"`
-}
-
 type Menu struct {
-	Path     string    `json:"path"`
-	Name     string    `json:"name"`
-	Icon     string    `json:"icon"`
-	Children []SubMenu `json:"children"`
+	Path         string `json:"path"`
+	Name         string `json:"name"`
+	Icon         string `json:"icon,omitempty"`
+	Require      bool   `json:"require,omitempty"`
+	Experimental bool   `json:"experimental,omitempty"`
+	Children     []Menu `json:"children,omitempty"`
 }
 
-type ProdBriefInfo struct {
-	Name   string `json:"name"`
-	Footer string `json:"footer"`
+type NavConfig struct {
+	Experimental bool   `json:"experimental"`
+	Menus        []Menu `json:"menus"`
 }
 
-type ProdConfig struct {
-	Name   string `json:"name"`
-	Footer string `json:"footer"`
-	Nav    []Menu `json:"nav"`
-}
-
-var gProdConf ProdConfig
+var gNavConf NavConfig
 
 func Parse(mess json.RawMessage) error {
-	err := json.Unmarshal(mess, &gProdConf)
+	err := json.Unmarshal(mess, &gNavConf)
+
 	return err
 }
 
 func Save() json.RawMessage {
-	v, _ := json.Marshal(gProdConf)
+	v, _ := json.Marshal(gNavConf)
 	return v
 }
 
 func init() {
-	config.RegisterConfig("prod", Parse, Save)
+	config.RegisterConfig("nav", Parse, Save)
 }

@@ -28,18 +28,21 @@ func InitDevID() {
 		NOTHING`,
 		utime, deviceid, true)
 
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	_, err := db.Exec(sqlquery)
 	if err != nil {
 		logger.Errorf("update system si failed: %s\n", err.Error())
 	}
 }
 
-type SystemInfo struct {
-	DevID           string  `json:"dev_id"`
-	Hostname        string  `json:"hostname"`
-	CPUCores        int     `json:"cpu_cores"`
-	CPUThreads      int     `json:"cpu_threads"`
+type SystemHostInfo struct {
+	DevID      string `json:"dev_id"`
+	Hostname   string `json:"hostname"`
+	CPUCores   int    `json:"cpu_cores"`
+	CPUThreads int    `json:"cpu_threads"`
+}
+
+type SystemStatusInfo struct {
 	CPUUsage        float64 `json:"cpu_usage"`
 	DiskUsed        uint64  `json:"disk_used"`
 	DiskTotal       uint64  `json:"disk_total"`
@@ -65,14 +68,20 @@ func GetNetLoadInfo() NetLoadInfo {
 	return ns
 }
 
-func GetBasicSystemInfo() (si SystemInfo, err error) {
+func GetBasicHostInfo() (si SystemHostInfo, err error) {
 	si.DevID = dev.GetDeviceID()
 	si.Hostname, err = os.Hostname()
 	if err != nil {
 		return si, err
 	}
 
-	si.CPUCores, si.CPUThreads, si.CPUUsage = CPUSummary()
+	si.CPUCores, si.CPUThreads, _ = CPUSummary()
+	return si, nil
+}
+
+func GetSystemStatusInfo() (si SystemStatusInfo, err error) {
+
+	_, _, si.CPUUsage = CPUSummary()
 
 	diskUsed, diskTotal, diskUsedPercent := DiskSummary()
 	si.DiskTotal = diskTotal
@@ -91,11 +100,11 @@ func GetBasicSystemInfo() (si SystemInfo, err error) {
 	return si, nil
 }
 
-func Get(mo *goparam.Option, field string, value string) *Model {
+func Get(mo *goparam.Param, field string, value string) *Model {
 	columns := goparam.GetColumn(Model{}, []string{})
 
 	queryClause := fmt.Sprintf(`select %s from system_status where %s=$1`, strings.Join(columns, ","), field)
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, value)
 
 	var mdl Model
@@ -109,8 +118,8 @@ func Get(mo *goparam.Option, field string, value string) *Model {
 }
 
 // List list
-func List(option *goparam.Option) (int, []Model, error) {
-	db := sqldb.GetConfDB()
+func List(option *goparam.Param) (int, []Model, error) {
+	db := sqldb.GetDB()
 
 	var results []Model = []Model{}
 

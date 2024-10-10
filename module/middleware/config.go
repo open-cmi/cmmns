@@ -8,7 +8,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/rdb"
-	"github.com/open-cmi/cmmns/service/business"
+	"github.com/open-cmi/cmmns/service/initial"
 	"github.com/open-cmi/memstore"
 	"github.com/topmyself/redistore"
 )
@@ -66,5 +66,5 @@ func init() {
 	gConf.Store = "memory"
 
 	config.RegisterConfig("middleware", Parse, Save)
-	business.Register("middleware", business.DefaultPriority, Init)
+	initial.Register("middleware", initial.DefaultPriority, Init)
 }

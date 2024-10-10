@@ -7,7 +7,6 @@ import (
 
 // AuditLogInstance migrate
 type AuditLogInstance struct {
-	Name string
 }
 
 // Up up migrate
@@ -19,6 +18,7 @@ func (mi AuditLogInstance) Up(db *sqlx.DB) error {
 			ip varchar(64) NOT NULL default '',
 			username varchar(100) NOT NULL default '',
 			action text NOT NULL default '',
+			result varchar(16) not null default '',
 			timestamp integer NOT NULL default 0
 		);
 	`

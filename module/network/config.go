@@ -2,9 +2,10 @@ package network
 
 import (
 	"encoding/json"
+	"runtime"
 
 	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/cmmns/service/business"
+	"github.com/open-cmi/cmmns/service/initial"
 )
 
 var gConf Config
@@ -34,11 +35,17 @@ func Save() json.RawMessage {
 }
 
 func Init() error {
+	// 如果配置文件不包含管理口，则从数据库中获取
+	if len(gConf.Devices) == 0 {
+		gConf.Devices = LoadNetworkManagementInterface()
+	}
 	err := NetworkApply()
 	return err
 }
 
 func init() {
 	config.RegisterConfig("network", Parse, Save)
-	business.Register("network", business.DefaultPriority, Init)
+	if runtime.GOOS == "linux" {
+		initial.Register("network", initial.DefaultPriority, Init)
+	}
 }

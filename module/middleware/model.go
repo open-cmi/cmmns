@@ -6,19 +6,21 @@ import (
 	"strings"
 	"time"
 
+	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
 type TokenRecord struct {
 	Name        string `json:"name" db:"name"`
+	Token       string `json:"token" db:"token"`
 	ExpireDay   int    `json:"expire_day" db:"expire_day"`
 	CreatedTime int64  `json:"created_time" db:"created_time"`
 	isNew       bool
 }
 
 func (t *TokenRecord) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if t.isNew {
 		columns := goparam.GetColumn(*t, []string{})
@@ -44,6 +46,47 @@ func (t *TokenRecord) Save() error {
 		}
 	}
 	return nil
+}
+
+func (m *TokenRecord) Remove() error {
+	deleteClause := "delete from token_record where name=$1"
+	db := sqldb.GetDB()
+	_, err := db.Exec(deleteClause, m.Name)
+	if err != nil {
+		logger.Errorf("token remove failed: %s\n", err.Error())
+		return errors.New("delete token failed")
+	}
+	return err
+}
+
+func GetTokenRecordByToken(token string) *TokenRecord {
+	queryClause := `select * from token_record where token=$1`
+	db := sqldb.GetDB()
+	row := db.QueryRowx(queryClause, token)
+
+	var mdl TokenRecord
+	err := row.StructScan(&mdl)
+	if err != nil {
+		logger.Errorf("token %s not found: %s\n", token, err.Error())
+		return nil
+	}
+
+	return &mdl
+}
+
+func GetTokenRecord(name string) *TokenRecord {
+	queryClause := `select * from token_record where name=$1`
+	db := sqldb.GetDB()
+	row := db.QueryRowx(queryClause, name)
+
+	var mdl TokenRecord
+	err := row.StructScan(&mdl)
+	if err != nil {
+		logger.Errorf("token %s not found: %s\n", name, err.Error())
+		return nil
+	}
+
+	return &mdl
 }
 
 func NewTokenRecord() *TokenRecord {

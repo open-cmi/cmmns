@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -9,7 +10,6 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/module/wac"
 	"github.com/open-cmi/memstore"
 	"github.com/topmyself/redistore"
 )
@@ -114,6 +114,10 @@ func ParseAuthToken(token string) (*UserClaims, error) {
 
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*UserClaims); ok && tokenClaims.Valid {
+			r := GetTokenRecordByToken(token)
+			if r == nil {
+				return nil, errors.New("token not exist")
+			}
 			return claims, nil
 		}
 	}
@@ -144,6 +148,7 @@ func GenerateAuthToken(name string, username string, id string, email string, ro
 
 	t := NewTokenRecord()
 	t.ExpireDay = expireDay
+	t.Token = token
 	t.Name = name
 	err = t.Save()
 	if err != nil {
@@ -152,15 +157,27 @@ func GenerateAuthToken(name string, username string, id string, email string, ro
 	return token, err
 }
 
-// Web Access Control middleware
-func WACMiddleware(r *gin.Engine) {
-	r.Use(func(c *gin.Context) {
-		src := c.ClientIP()
-		permit := wac.CheckPermit(src)
-		if !permit {
-			c.String(http.StatusForbidden, "")
-			c.Abort()
-		}
-		c.Next()
-	})
+func DeleteAuthToken(name string) error {
+	t := GetTokenRecord(name)
+	if t == nil {
+		return errors.New("token not existed")
+	}
+	err := t.Remove()
+	if err != nil {
+		return err
+	}
+	return nil
 }
+
+// // Web Access Control middleware
+// func WACMiddleware(r *gin.Engine) {
+// 	r.Use(func(c *gin.Context) {
+// 		src := c.ClientIP()
+// 		permit := wac.CheckPermit(src)
+// 		if !permit {
+// 			c.String(http.StatusForbidden, "")
+// 			c.Abort()
+// 		}
+// 		c.Next()
+// 	})
+// }

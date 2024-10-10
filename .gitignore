@@ -3,3 +3,4 @@ go.sum
 data/*
 out.gotext.json
 uncommit.sh
+catalog-gen.go

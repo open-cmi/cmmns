@@ -10,7 +10,7 @@
   "middleware": {
     "store": "redis"
   },
-  "model": {
+  "sqldb": {
     "type": "sqlite3",
     "file": "/tmp/cmmns.sqlite3",
     "host": "127.0.0.1",
@@ -22,8 +22,8 @@
     "engine": "netplan",
     "devices": []
   },
-  "wac": {
-    "nginx_conf_path": "",
+  "nginx": {
+    "conf_path": "",
     "reload": ""
   },
   "process": {
@@ -61,10 +61,8 @@
       }
     ]
   },
-  "prod": {
-    "name": "cmmns",
-    "footer": "cmmns",
-    "nav": [
+  "nav": {
+    "menus": [
       {
         "path": "/main/system-log",
         "name": "system log",
@@ -83,7 +81,8 @@
         "children": [
           {
             "path": "/main/system/sysinfo",
-            "name": "system info"
+            "name": "system info",
+            "require": true
           },
           {
             "path": "/main/system/security-setting",
@@ -106,6 +105,10 @@
             "name": "notify setting"
           },
           {
+            "path": "/main/system/service-setting",
+            "name": "service setting"
+          },
+          {
             "path": "/main/system/network-setting",
             "name": "network setting"
           },
@@ -123,7 +126,8 @@
           },
           {
             "path": "/main/system/license",
-            "name": "license"
+            "name": "license",
+            "require": true
           },
           {
             "path": "/main/system/license-manager",

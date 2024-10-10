@@ -11,13 +11,14 @@ import (
 )
 
 type Setting struct {
+	TimeZone   string `json:"timezone"`
 	NtpServer  string `json:"ntp_server"`
 	AutoAdjust bool   `json:"auto_adjust"`
 	isNew      bool
 }
 
 func (s *Setting) Key() string {
-	return "ntp-time-setting"
+	return "time-setting"
 }
 
 func (s *Setting) Value() string {
@@ -26,7 +27,7 @@ func (s *Setting) Value() string {
 }
 
 func (m *Setting) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if m.isNew {
 		// 存储到数据库
@@ -63,7 +64,7 @@ func New() *Setting {
 }
 
 func Get() *Setting {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	var m Setting
 	queryClause := `select value from k_v_table where key=$1`

@@ -27,7 +27,7 @@ func (em *LocaleModel) Value() string {
 }
 
 func (m *LocaleModel) Save() error {
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 
 	if m.isNew {
 		// 存储到数据库
@@ -64,7 +64,7 @@ func New() *LocaleModel {
 
 func Get() *LocaleModel {
 	queryClause := "select value from k_v_table where key=$1"
-	db := sqldb.GetConfDB()
+	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, LocaleKey)
 	if row == nil {
 		return nil

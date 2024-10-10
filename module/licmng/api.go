@@ -8,8 +8,8 @@ import (
 	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
-func ListLicense(query *goparam.Option) (int, []Model, error) {
-	db := sqldb.GetConfDB()
+func ListLicense(query *goparam.Param) (int, []Model, error) {
+	db := sqldb.GetDB()
 
 	var lics []Model = []Model{}
 	countClause := "select count(*) from license"

@@ -187,3 +187,47 @@ func BlinkingInterface(req *BlinkingRequest) error {
 	}
 	return nil
 }
+
+type SetManagementInterfaceRequest struct {
+	Devices []string `json:"devices"`
+}
+
+func SetManagementInterface(req *SetManagementInterfaceRequest) error {
+	m := GetManagementInterfaceModel()
+	if m == nil {
+		m = &ManagementInterfaceModel{
+			isNew: true,
+		}
+	}
+	m.Interfaces = req.Devices
+	err := m.Save()
+	if err != nil {
+		return nil
+	}
+	gConf.Devices = req.Devices
+	return nil
+}
+
+func GetAvailableManagementInterface() ([]string, error) {
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return []string{}, err
+	}
+	var devices []string = []string{}
+	for _, intf := range interfaces {
+		if intf.Name == "lo" {
+			continue
+		}
+		devices = append(devices, intf.Name)
+	}
+	return devices, nil
+}
+
+func IsManagementInterface(dev string) bool {
+	for _, device := range gConf.Devices {
+		if device == dev {
+			return true
+		}
+	}
+	return false
+}
