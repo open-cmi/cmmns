@@ -15,6 +15,7 @@ type Server struct {
 }
 
 type Config struct {
+	Debug  bool     `json:"debug"`
 	Server []Server `json:"server"`
 }
 
