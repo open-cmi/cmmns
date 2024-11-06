@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/smtp"
+	"strings"
 	"time"
 
 	"github.com/jordan-wright/email"
@@ -130,4 +131,13 @@ func CheckEmailSetting(req *SetRequest) error {
 	}
 	client.Quit()
 	return nil
+}
+
+func NotifyReceiver(receiver string, subject string, content string) error {
+	arrs := strings.Split(receiver, ",")
+	var recvs []string
+	for _, r := range arrs {
+		recvs = append(recvs, strings.Trim(r, " \t\r\n"))
+	}
+	return Send(recvs, []string{}, subject, content, nil)
 }
