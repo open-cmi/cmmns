@@ -48,7 +48,7 @@ func (p Proto) String() string {
 	case Fragment:
 		return "Frag"
 	case ICMPv4:
-		return "ICMPv4"
+		return "ICMP"
 	case IGMP:
 		return "IGMP"
 	case ICMPv6:
