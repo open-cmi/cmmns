@@ -128,6 +128,11 @@ func BuildWhereClause(opt *Param) (format string, args []interface{}) {
 				clause += fmt.Sprintf(" %s >= $%d", filter.Name, index+1)
 				args = append(args, value)
 			}
+		} else if filter.Type == "json-array" {
+			if filter.Condition == "in" {
+				clause += fmt.Sprintf(" %s ? $%d", filter.Name, index+1)
+				args = append(args, filter.Value)
+			}
 		}
 	}
 
