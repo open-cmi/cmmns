@@ -107,7 +107,11 @@ func BuildWhereClause(opt *Param) (format string, args []interface{}) {
 				}
 				args = append(args, value)
 			} else if filter.Condition == "eq" {
-				clause += fmt.Sprintf(" UPPER(%s) = UPPER($%d)", filter.Name, index+1)
+				if filter.CaseSensitive {
+					clause += fmt.Sprintf(" %s = $%d", filter.Name, index+1)
+				} else {
+					clause += fmt.Sprintf(" UPPER(%s) = UPPER($%d)", filter.Name, index+1)
+				}
 				args = append(args, value)
 			}
 		} else if filter.Type == "number" || filter.Type == "integer" {
