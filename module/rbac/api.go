@@ -29,7 +29,7 @@ func RoleNameList() (int, []string, error) {
 		// 没有的话，也不需要报错
 		return count, roles, nil
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var name string
 		err := rows.Scan(&name)
@@ -69,7 +69,7 @@ func RoleList(option *goparam.Param) (int, []Role, error) {
 		// 没有的话，也不需要报错
 		return count, roles, nil
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var item Role
 		err := rows.StructScan(&item)

@@ -91,7 +91,6 @@ func (c *RunCommand) Run() error {
 		return err
 	}
 
-	// run ticker service
 	err = ticker.Init()
 	if err != nil {
 		logger.Errorf(err.Error())

@@ -34,7 +34,7 @@ func ListLicense(query *goparam.Param) (int, []Model, error) {
 		// 没有的话，也不需要报错
 		return count, lics, nil
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var item Model
 		err := rows.StructScan(&item)

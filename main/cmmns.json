@@ -1,8 +1,4 @@
 {
-  "assist": {
-    "server_addr": "",
-    "server_port": 0
-  },
   "log": {
     "level": "debug",
     "path": "/tmp/"

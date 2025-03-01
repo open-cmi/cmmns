@@ -38,7 +38,7 @@ func TokenList(option *goparam.Param) (int, []TokenRecord, error) {
 		logger.Error(err.Error())
 		return count, results, nil
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var item TokenRecord
 		err := rows.StructScan(&item)

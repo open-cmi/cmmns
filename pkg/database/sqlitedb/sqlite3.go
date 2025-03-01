@@ -1,6 +1,7 @@
 package sqlitedb
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -36,6 +37,7 @@ func SQLite3Init(conf *Config) (db *sqlx.DB, err error) {
 		file.Close()
 	}
 
-	db, err = sqlx.Open("sqlite3", dbfile)
+	file := fmt.Sprintf("file:%s?cache=shared&mode=rwc", dbfile)
+	db, err = sqlx.Open("sqlite3", file)
 	return db, err
 }
