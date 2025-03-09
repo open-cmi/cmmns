@@ -39,8 +39,10 @@ func Init() error {
 	if len(gConf.Devices) == 0 {
 		gConf.Devices = LoadNetworkManagementInterface()
 	}
-	err := NetworkApply()
-	return err
+	if len(gConf.Devices) != 0 {
+		return NetworkApply(&gConf)
+	}
+	return nil
 }
 
 func init() {
