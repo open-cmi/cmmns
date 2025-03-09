@@ -19,7 +19,7 @@ type Model struct {
 	Version     string `json:"version" db:"version"`
 	Modules     string `json:"modules" db:"modules"`
 	ExpireTime  int64  `json:"expire_time" db:"expire_time"`
-	Machine     string `json:"machine" db:"machine"`
+	MCode       string `json:"mcode" db:"mcode"`
 	CreatedTime int64  `json:"created_time" db:"created_time"`
 	UpdatedTime int64  `json:"updated_time" db:"updated_time"`
 	isNew       bool

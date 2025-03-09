@@ -55,7 +55,7 @@ func CreateLicense(req *CreateLicenseRequest) error {
 	m.Version = req.Version
 	m.Modules = req.Modules
 	m.ExpireTime = req.ExpireTime
-	m.Machine = req.Machine
+	m.MCode = req.MCode
 	return m.Save()
 }
 

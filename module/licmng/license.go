@@ -80,7 +80,7 @@ func CreateLicenseContent(id string) (string, error) {
 	lic.Modules = strings.Split(m.Modules, ",")
 	lic.Version = m.Version
 	lic.ExpireTime = m.ExpireTime
-	lic.Machine = m.Machine
+	lic.MCode = m.MCode
 
 	oriByte, err := json.Marshal(lic)
 	if err != nil {
@@ -88,8 +88,9 @@ func CreateLicenseContent(id string) (string, error) {
 	}
 	ori := base64.StdEncoding.EncodeToString(oriByte)
 
-	signStr, err := Sign(ori, gConf.PrivateFile)
+	signStr, err := Sign(ori, GetPrivatePemPath())
 	if err != nil {
+		logger.Errorf("private file sign failed: %s\n", err.Error())
 		return "", err
 	}
 	return fmt.Sprintf("%s\n%s", ori, signStr), nil

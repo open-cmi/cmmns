@@ -16,7 +16,7 @@ type Config struct {
 }
 
 func GetLicensePath() string {
-	if gConf.Lic != "" {
+	if gConf.Lic == "" {
 		confDir := eyas.GetConfDir()
 		return path.Join(confDir, "xsnos.lic")
 	}

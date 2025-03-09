@@ -60,17 +60,6 @@
   "nav": {
     "menus": [
       {
-        "path": "/main/system-log",
-        "name": "system log",
-        "icon": "log",
-        "children": [
-          {
-            "path": "/main/system-log/audit-log",
-            "name": "operate log"
-          }
-        ]
-      },
-      {
         "path": "/main/system",
         "name": "system",
         "icon": "system",
@@ -79,6 +68,16 @@
             "path": "/main/system/sysinfo",
             "name": "system info",
             "require": true
+          },
+          {
+            "path": "/main/system/log",
+            "name": "system log",
+            "children": [
+              {
+                "path": "/main/system/log/operate",
+                "name": "operate log"
+              }
+            ]
           },
           {
             "path": "/main/system/security-setting",

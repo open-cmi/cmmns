@@ -45,9 +45,9 @@ func CreateLicense(c *gin.Context) {
 		ah.InsertOperationLog(i18n.Sprintf("create license"), false)
 		return
 	}
+
 	err := licmng.CreateLicense(&req)
 	if err != nil {
-
 		ah.InsertOperationLog(i18n.Sprintf("create license"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -90,6 +90,7 @@ func DownloadLicense(c *gin.Context) {
 	content, err := licmng.CreateLicenseContent(id)
 	if err != nil {
 		ah.InsertOperationLog(i18n.Sprintf("download license"), false)
+
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
@@ -98,11 +99,11 @@ func DownloadLicense(c *gin.Context) {
 
 	c.Writer.Header().Add("Content-Disposition", "attachment; filename="+fileName)
 	c.Writer.Header().Add("Content-Type", "application/octet-stream")
+
 	_, err = c.Writer.Write([]byte(content))
 	if err != nil {
-
 		ah.InsertOperationLog(i18n.Sprintf("download license"), false)
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"ret": -2, "msg": err.Error()})
 		return
 	}
 

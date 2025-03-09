@@ -22,12 +22,13 @@ var gConf Config
 
 func Init() error {
 	var err error
-	rdbConf := rdb.GetConf()
+
 	if gConf.Store == "memory" {
 		memoryStore = memstore.NewMemStore([]byte("memorystore"),
 			[]byte("enckey12341234567890123456789012"))
 		memoryStore.MaxAge(gConf.MaxAge)
 	} else if gConf.Store == "redis" {
+		rdbConf := rdb.GetConf()
 		host := fmt.Sprintf("%s:%d", rdbConf.Host, rdbConf.Port)
 		redisStore, err = redistore.NewRediStoreWithDB(100, "tcp", host, rdbConf.Password, "2")
 		if err != nil {

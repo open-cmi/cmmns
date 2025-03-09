@@ -6,18 +6,16 @@ import (
 	"errors"
 	"io"
 	"os"
-	"path"
 	"strings"
 
 	"github.com/open-cmi/cmmns/module/licmng"
-	"github.com/open-cmi/cmmns/pkg/eyas"
 )
 
 func GetLicenseInfo() (licmng.LicenseInfo, error) {
 	var mess licmng.LicenseInfo
 	mess.Version = "none"
-	confDir := eyas.GetConfDir()
-	licFile := path.Join(confDir, "xsnos.lic")
+
+	licFile := GetLicensePath()
 	rd, err := os.Open(licFile)
 	if err != nil {
 		return mess, err
