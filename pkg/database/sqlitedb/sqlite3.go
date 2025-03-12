@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/open-cmi/cmmns/pkg/eyas"
 
@@ -21,7 +22,7 @@ type Config struct {
 // SQLite3Init init
 func SQLite3Init(conf *Config) (db *sqlx.DB, err error) {
 	dbfile := conf.File
-	if !filepath.IsAbs(conf.File) {
+	if !strings.HasPrefix(dbfile, "/") && !strings.HasPrefix(dbfile, ".") {
 		dbfile = filepath.Join(eyas.GetRootPath(), "data", conf.File)
 	}
 
