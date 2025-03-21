@@ -6,7 +6,7 @@ import (
 
 func TestMacParse(t *testing.T) {
 
-	macAddr, err := ParseH3CMAC("0011-326d-bfb3")
+	macAddr, err := ParseThreeSectionMAC("0011-326d-bfb3")
 	if err != nil {
 		t.Errorf("field db parse failed")
 		return

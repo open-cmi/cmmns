@@ -1,11 +1,15 @@
 package mac
 
 import (
+	"fmt"
 	"net"
 	"strings"
 )
 
-func ParseH3CMAC(macStr string) (string, error) {
+func ParseThreeSectionMAC(macStr string) (string, error) {
+	if len(macStr) != 14 || strings.Count(macStr, "-") != 2 {
+		return "", fmt.Errorf("invalid mac format")
+	}
 
 	s := strings.ReplaceAll(macStr, "-", ".")
 	hw, err := net.ParseMAC(s)
@@ -17,9 +21,7 @@ func ParseH3CMAC(macStr string) (string, error) {
 }
 
 func ParseMAC(macStr string) (string, error) {
-
-	s := strings.ReplaceAll(macStr, "-", ".")
-	hw, err := net.ParseMAC(s)
+	hw, err := net.ParseMAC(macStr)
 	if err != nil {
 		return "", err
 	}
