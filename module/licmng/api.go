@@ -2,6 +2,7 @@ package licmng
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
@@ -49,6 +50,14 @@ func ListLicense(query *goparam.Param) (int, []Model, error) {
 }
 
 func CreateLicense(req *CreateLicenseRequest) error {
+	if req.Version != "trial" && req.Version != "pro" && req.Version != "enterprise" {
+		return fmt.Errorf("not supported version, version should be trial, pro or enterprise")
+	}
+
+	if req.Version == "pro" && req.MCode == "" {
+		return fmt.Errorf("machine code should not be empty")
+	}
+
 	m := New()
 	m.Customer = req.Customer
 	m.Prod = req.Prod
