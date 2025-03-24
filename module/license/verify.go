@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -144,14 +145,14 @@ func CheckLicenseValid() {
 	licFile := GetLicensePath()
 	rd, err := os.Open(licFile)
 	if err != nil {
-		gLicenseVerifyError = err
+		gLicenseVerifyError = fmt.Errorf("open license file failed")
 		logger.Errorf("license file open failed: %s\n", err.Error())
 		return
 	}
 
 	content, err := io.ReadAll(rd)
 	if err != nil {
-		gLicenseVerifyError = err
+		gLicenseVerifyError = fmt.Errorf("read license file failed")
 		logger.Errorf("license file real failed: %s\n", err.Error())
 		return
 	}
