@@ -10,9 +10,10 @@ import (
 
 func GetNavMenu(roleName string) []prod.Menu {
 	// 验证license
-	if !license.LicenseIsValid() {
+	if license.LicenseCheckError() != nil {
 		return prod.GetRequireNav()
 	}
+
 	// 普通用户获取授权菜单
 	if roleName == "admin" {
 		menu := prod.GetNav()

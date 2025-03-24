@@ -134,36 +134,36 @@ func VerifyLicenseContent(content string) error {
 	return nil
 }
 
-var gLicenseValid = false
+var gLicenseVerifyError error = nil
 
-func LicenseIsValid() bool {
-	return gLicenseValid
+func LicenseCheckError() error {
+	return gLicenseVerifyError
 }
 
 func CheckLicenseValid() {
 	licFile := GetLicensePath()
 	rd, err := os.Open(licFile)
 	if err != nil {
-		gLicenseValid = false
+		gLicenseVerifyError = err
 		logger.Errorf("license file open failed: %s\n", err.Error())
 		return
 	}
 
 	content, err := io.ReadAll(rd)
 	if err != nil {
-		gLicenseValid = false
+		gLicenseVerifyError = err
 		logger.Errorf("license file real failed: %s\n", err.Error())
 		return
 	}
 
 	err = VerifyLicenseContent(string(content))
 	if err != nil {
-		gLicenseValid = false
+		gLicenseVerifyError = err
 		logger.Errorf("license file check expired or invalid: %s\n", err.Error())
 		return
 	}
 
-	gLicenseValid = true
+	gLicenseVerifyError = nil
 }
 
 func Init() error {

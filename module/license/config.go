@@ -3,6 +3,7 @@ package license
 import (
 	"encoding/json"
 	"path"
+	"strings"
 
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/pkg/eyas"
@@ -20,14 +21,28 @@ func GetLicensePath() string {
 		confDir := eyas.GetConfDir()
 		return path.Join(confDir, "xsnos.lic")
 	}
-	return gConf.Lic
+	if strings.HasPrefix(gConf.Lic, "/") ||
+		strings.HasPrefix(gConf.Lic, "./") ||
+		strings.HasPrefix(gConf.Lic, "../") {
+		return gConf.Lic
+	}
+	confDir := eyas.GetConfDir()
+	return path.Join(confDir, gConf.Lic)
 }
 
 func GetPublicPemPath() string {
-	if gConf.PublicFile != "" {
+	if gConf.PublicFile == "" {
+		return path.Join(eyas.GetConfDir(), "public.pem")
+	}
+
+	if strings.HasPrefix(gConf.Lic, "/") ||
+		strings.HasPrefix(gConf.Lic, "./") ||
+		strings.HasPrefix(gConf.Lic, "../") {
 		return gConf.PublicFile
 	}
-	return path.Join(eyas.GetConfDir(), "public.pem")
+
+	confDir := eyas.GetConfDir()
+	return path.Join(confDir, gConf.PublicFile)
 }
 
 func Parse(mess json.RawMessage) error {
