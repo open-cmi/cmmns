@@ -18,15 +18,16 @@ type Config struct {
 
 func GetLicensePath() string {
 	if gConf.Lic == "" {
-		confDir := eyas.GetConfDir()
-		return path.Join(confDir, "xsnos.lic")
+		confDir := eyas.GetDataDir()
+		return path.Join(confDir, "cmmns.lic")
 	}
+
 	if strings.HasPrefix(gConf.Lic, "/") ||
 		strings.HasPrefix(gConf.Lic, "./") ||
 		strings.HasPrefix(gConf.Lic, "../") {
 		return gConf.Lic
 	}
-	confDir := eyas.GetConfDir()
+	confDir := eyas.GetDataDir()
 	return path.Join(confDir, gConf.Lic)
 }
 
