@@ -20,6 +20,10 @@ type Service struct {
 }
 
 func New() *Service {
+	if !gConf.Debug {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	return &Service{
 		Engine: gin.New(),
 	}
@@ -27,12 +31,6 @@ func New() *Service {
 
 func (s *Service) Init() error {
 	// init webserver
-
-	if !gConf.Debug {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
-	gin.SetMode(gin.ReleaseMode)
 	middleware.DefaultMiddleware(s.Engine)
 	//middleware.WACMiddleware(s.Engine)
 
