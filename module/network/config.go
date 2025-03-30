@@ -5,7 +5,7 @@ import (
 	"runtime"
 
 	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/cmmns/service/initial"
+	"github.com/open-cmi/cmmns/initial"
 )
 
 var gConf Config

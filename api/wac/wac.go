@@ -5,12 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/wac"
 	"github.com/open-cmi/cmmns/module/wac/blacklist"
 	"github.com/open-cmi/cmmns/module/wac/whitelist"
 	"github.com/open-cmi/cmmns/pkg/goparam"
-	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func GetWAC(c *gin.Context) {

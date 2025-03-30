@@ -1,8 +1,8 @@
 package web
 
 import (
+	"github.com/open-cmi/cmmns/initial"
 	"github.com/open-cmi/cmmns/module/nginxconf"
-	"github.com/open-cmi/cmmns/service/initial"
 )
 
 func Init() error {

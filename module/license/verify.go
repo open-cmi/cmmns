@@ -17,10 +17,10 @@ import (
 
 	"github.com/open-cmi/cmmns/essential/events"
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/essential/ticker"
+	"github.com/open-cmi/cmmns/initial"
 	"github.com/open-cmi/cmmns/module/licmng"
 	"github.com/open-cmi/cmmns/pkg/dev"
-	"github.com/open-cmi/cmmns/service/initial"
-	"github.com/open-cmi/cmmns/service/ticker"
 )
 
 func VerifySigned(origin string, signed string) error {

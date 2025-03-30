@@ -2,10 +2,12 @@ package license
 
 import (
 	"encoding/json"
+	"fmt"
 	"path"
 	"strings"
 
 	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/pkg/dev"
 	"github.com/open-cmi/cmmns/pkg/eyas"
 )
 
@@ -19,7 +21,8 @@ type Config struct {
 func GetLicensePath() string {
 	if gConf.Lic == "" {
 		confDir := eyas.GetDataDir()
-		return path.Join(confDir, "cmmns.lic")
+		mcode := dev.GetDeviceID()
+		return path.Join(confDir, fmt.Sprintf("%s.lic", mcode))
 	}
 
 	if strings.HasPrefix(gConf.Lic, "/") ||

@@ -1,8 +1,8 @@
 package events
 
 import (
+	"github.com/open-cmi/cmmns/initial"
 	"github.com/open-cmi/cmmns/pkg/evchan"
-	"github.com/open-cmi/cmmns/service/initial"
 )
 
 var echan *evchan.EventChan

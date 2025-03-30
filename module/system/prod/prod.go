@@ -8,7 +8,7 @@ import (
 
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/service/initial"
+	"github.com/open-cmi/cmmns/initial"
 )
 
 type ProdModel struct {

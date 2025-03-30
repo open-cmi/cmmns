@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/initial"
 	"github.com/robfig/cron/v3"
 )
 
@@ -36,7 +37,7 @@ func Register(name string, spec string, f func(string, interface{}), data interf
 		// 如果已经初始化了，此时需要立即创建
 		ins := cron.New(cron.WithSeconds())
 		ins.AddFunc(spec, func() {
-			logger.Infof("start to run timer %s\n", name)
+			logger.Debugf("start to run timer %s\n", name)
 			f(name, data)
 		})
 		go ins.Run()
@@ -47,11 +48,11 @@ func Register(name string, spec string, f func(string, interface{}), data interf
 
 func Init() error {
 
-	for i, _ := range tickers {
+	for i := range tickers {
 		t := tickers[i]
 		ins := cron.New(cron.WithSeconds())
 		_, err := ins.AddFunc(t.Spec, func() {
-			logger.Infof("start to run timer %s\n", t.Name)
+			logger.Debugf("start to run timer %s\n", t.Name)
 			t.Func(t.Name, t.Data)
 		})
 		if err != nil {
@@ -80,4 +81,8 @@ func Remove(name string) error {
 	delete(cronMap, name)
 	delete(tickers, name)
 	return nil
+}
+
+func init() {
+	initial.Register("ticker", initial.PhaseTicker, Init)
 }

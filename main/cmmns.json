@@ -45,6 +45,7 @@
     "private_file": ""
   },
   "webserver": {
+    "debug": true,
     "server": [
       {
         "address": "0.0.0.0",
@@ -104,12 +105,8 @@
             "name": "service setting"
           },
           {
-            "path": "/main/system/network-setting",
+            "path": "/main/system/management-interface",
             "name": "network setting"
-          },
-          {
-            "path": "/main/system/network-status",
-            "name": "network status"
           },
           {
             "path": "/main/system/users",

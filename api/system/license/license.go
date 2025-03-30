@@ -8,9 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/events"
 	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/license"
-	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func GetLicenseInfo(c *gin.Context) {

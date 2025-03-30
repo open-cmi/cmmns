@@ -8,7 +8,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/rdb"
-	"github.com/open-cmi/cmmns/service/initial"
+	"github.com/open-cmi/cmmns/initial"
 	"github.com/open-cmi/memstore"
 	"github.com/topmyself/redistore"
 )

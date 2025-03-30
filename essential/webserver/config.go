@@ -21,7 +21,7 @@ type Config struct {
 
 var gConf Config
 
-func Init(raw json.RawMessage) error {
+func Parse(raw json.RawMessage) error {
 	err := json.Unmarshal(raw, &gConf)
 	return err
 }
@@ -43,5 +43,5 @@ func init() {
 		Proto:   "unix",
 	})
 
-	config.RegisterConfig("webserver", Init, Save)
+	config.RegisterConfig("webserver", Parse, Save)
 }

@@ -10,9 +10,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/subcommands"
-	"github.com/open-cmi/cmmns/service/initial"
-	"github.com/open-cmi/cmmns/service/ticker"
-	"github.com/open-cmi/cmmns/service/webserver"
+	"github.com/open-cmi/cmmns/initial"
 )
 
 type RunCommand struct {
@@ -73,29 +71,6 @@ func (c *RunCommand) Run() error {
 	}
 
 	defer Fini()
-
-	// start web service
-	s := webserver.New()
-
-	// Init
-	err = s.Init()
-	if err != nil {
-		logger.Errorf(err.Error())
-		return err
-	}
-
-	// Run
-	err = s.Run()
-	if err != nil {
-		logger.Errorf(err.Error())
-		return err
-	}
-
-	err = ticker.Init()
-	if err != nil {
-		logger.Errorf(err.Error())
-		return err
-	}
 
 	logger.Infof("start successfully, wait for signal to terminate progress")
 	Wait()
