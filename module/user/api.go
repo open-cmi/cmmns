@@ -24,7 +24,8 @@ func List(query *goparam.Param) (int, []User, error) {
 	var users []User = []User{}
 	countClause := "select count(*) from users"
 
-	whereClause, args := goparam.BuildWhereClause(query)
+	whereClause := query.WhereClause
+	args := query.WhereArgs
 
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)

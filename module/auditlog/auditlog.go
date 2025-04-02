@@ -66,7 +66,8 @@ func List(p *goparam.Param) (int, []Model, error) {
 	var logs []Model = []Model{}
 
 	countClause := "select count(*) from audit_log"
-	whereClause, args := goparam.BuildWhereClause(p)
+	whereClause := p.WhereClause
+	args := p.WhereArgs
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
 

@@ -30,12 +30,14 @@ type OrderParam struct {
 
 // Param model option
 type Param struct {
-	UserID     string
-	Role       string
-	DevID      string
-	PageParam  PageParam
-	OrderParam OrderParam
-	Filters    []FilterParam
+	UserID      string
+	Role        string
+	DevID       string
+	WhereClause string
+	WhereArgs   []interface{}
+	PageParam   PageParam
+	OrderParam  OrderParam
+	Filters     []FilterParam
 }
 
 func GetColumn(v interface{}, skipColumn []string) []string {

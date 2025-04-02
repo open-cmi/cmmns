@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/dchest/captcha"
 	"github.com/gorilla/sessions"
+	"github.com/open-cmi/cmmns/essential/sqldb"
 	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/middleware"
 	"github.com/open-cmi/cmmns/module/setting/pubnet"
@@ -134,8 +136,25 @@ func ChangePassword(c *gin.Context) {
 
 // List list user
 func List(c *gin.Context) {
-
 	query := goparam.ParseParams(c)
+	var paramnum int = 1
+	var whereClause string
+	var whereArgs []interface{}
+
+	username := c.Query("username")
+	if username != "" {
+		if whereClause != "" {
+			whereClause += " and "
+		}
+		whereClause += fmt.Sprintf(`username like %s`, sqldb.LikePlaceHolder(paramnum))
+		whereArgs = append(whereArgs, username)
+		paramnum += 1
+	}
+
+	if paramnum != 1 {
+		query.WhereClause = " where " + whereClause
+		query.WhereArgs = whereArgs
+	}
 
 	count, users, err := user.List(query)
 	if err != nil {
