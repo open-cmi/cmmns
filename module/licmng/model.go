@@ -20,6 +20,7 @@ type Model struct {
 	Modules     string `json:"modules" db:"modules"`
 	ExpireTime  int64  `json:"expire_time" db:"expire_time"`
 	MCode       string `json:"mcode" db:"mcode"`
+	Serial      string `json:"serial"`
 	CreatedTime int64  `json:"created_time" db:"created_time"`
 	UpdatedTime int64  `json:"updated_time" db:"updated_time"`
 	isNew       bool
@@ -77,7 +78,7 @@ func (m *Model) Remove() error {
 
 func New() *Model {
 	return &Model{
-		ID:          uuid.NewString(),
+		ID:          uuid.New().String(),
 		CreatedTime: time.Now().Unix(),
 		UpdatedTime: time.Now().Unix(),
 		isNew:       true,

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+
+	"github.com/open-cmi/cmmns/essential/logger"
 )
 
 const (
@@ -47,8 +49,7 @@ func Register(name string, priority int, fn func() error) error {
 	for i := range initiales {
 		bz := &initiales[i]
 		if bz.Name == name {
-			errmsg := fmt.Sprintf("initial %s has been registered", name)
-			return errors.New(errmsg)
+			logger.Warnf("initial %s has been registered", name)
 		}
 	}
 

@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/events"
 	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/license"
@@ -77,7 +78,39 @@ func UploadLicenseFile(c *gin.Context) {
 	})
 }
 
+func SetProductSerial(c *gin.Context) {
+	ah := auditlog.NewAuditHandler(c)
+
+	var req struct {
+		Serial  string `json:"serial"`
+		Product string `json:"product"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		ah.InsertOperationLog(i18n.Sprintf("set product serial"), false)
+		return
+	}
+	if req.Product == "" {
+		req.Product = "swapi"
+	}
+	logger.Debugf("set product serial: %s, %s", req.Serial, req.Product)
+	err := license.SetProductSerial(req.Serial, req.Product)
+	if err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("set product serial"), false)
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	ah.InsertOperationLog(i18n.Sprintf("set product serial"), true)
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
+	})
+}
+
 func init() {
 	webserver.RegisterAuthAPI("system", "GET", "/license/", GetLicenseInfo)
 	webserver.RegisterAuthAPI("system", "POST", "/license/upload/", UploadLicenseFile)
+	webserver.RegisterUnauthAPI("system", "POST", "/license/product-serial/", SetProductSerial)
 }

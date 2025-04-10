@@ -24,16 +24,9 @@ import (
 )
 
 func VerifySigned(origin string, signed string) error {
-
-	publicFile := GetPublicPemPath()
-
-	return verifySigned(origin, signed, publicFile)
-}
-
-func verifySigned(origin string, signed string, pubfile string) error {
-	pub, err := os.ReadFile(pubfile)
+	pub, err := GetPubPemContent()
 	if err != nil {
-		logger.Errorf("No RSA private key found")
+		logger.Errorf("Get pub pem content failed: %s\n", err.Error())
 		return err
 	}
 

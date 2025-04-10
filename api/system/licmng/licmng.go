@@ -46,7 +46,7 @@ func CreateLicense(c *gin.Context) {
 		return
 	}
 
-	err := licmng.CreateLicense(&req)
+	_, err := licmng.CreateLicense(&req)
 	if err != nil {
 		ah.InsertOperationLog(i18n.Sprintf("create license"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
