@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/memstore"
+	"github.com/open-cmi/cmmns/pkg/memstore"
 	"github.com/topmyself/redistore"
 )
 

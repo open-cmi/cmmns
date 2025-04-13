@@ -10,6 +10,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/securecookie v1.1.2
 	github.com/gorilla/sessions v1.3.0
 	github.com/jackpal/gateway v1.0.15
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
@@ -18,7 +19,6 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/longbozhan/timewriter v0.0.0-20211208135957-a7873adad058
 	github.com/mattn/go-sqlite3 v1.14.22
-	github.com/open-cmi/memstore v0.1.0
 	github.com/pkg/sftp v1.13.6
 	github.com/prometheus-community/pro-bing v0.4.0
 	github.com/robfig/cron/v3 v3.0.1
@@ -48,7 +48,6 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v1.8.8 // indirect
-	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect

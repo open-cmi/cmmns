@@ -9,7 +9,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/rdb"
 	"github.com/open-cmi/cmmns/initial"
-	"github.com/open-cmi/memstore"
+	"github.com/open-cmi/cmmns/pkg/memstore"
 	"github.com/topmyself/redistore"
 )
 
