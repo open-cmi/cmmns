@@ -5,8 +5,8 @@ import (
 	"flag"
 	"os"
 
+	"github.com/open-cmi/cmmns/essential/migrate"
 	"github.com/open-cmi/cmmns/essential/subcommands"
-	"github.com/open-cmi/migrate"
 )
 
 type GenerateCommand struct {
