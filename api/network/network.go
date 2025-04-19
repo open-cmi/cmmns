@@ -109,11 +109,11 @@ func GetAvailableManagementInterface(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthRouter("network", "/api/network/v1/")
-	webserver.RegisterAuthAPI("network", "GET", "/", GetNetwork)
-	webserver.RegisterAuthAPI("network", "POST", "/", SetNetwork)
-	webserver.RegisterAuthAPI("network", "GET", "/status/", GetNetworkStatus)
-	webserver.RegisterAuthAPI("network", "POST", "/blinking/", BlinkingNetworkInterface)
-	webserver.RegisterAuthAPI("network", "POST", "/management-interface/", SetManagementInterface)
-	webserver.RegisterAuthAPI("network", "GET", "/available-management-interface/", GetAvailableManagementInterface)
+	webserver.RegisterMustAuthRouter("network", "/api/network/v1/")
+	webserver.RegisterMustAuthAPI("network", "GET", "/", GetNetwork)
+	webserver.RegisterMustAuthAPI("network", "POST", "/", SetNetwork)
+	webserver.RegisterMustAuthAPI("network", "GET", "/status/", GetNetworkStatus)
+	webserver.RegisterMustAuthAPI("network", "POST", "/blinking/", BlinkingNetworkInterface)
+	webserver.RegisterMustAuthAPI("network", "POST", "/management-interface/", SetManagementInterface)
+	webserver.RegisterMustAuthAPI("network", "GET", "/available-management-interface/", GetAvailableManagementInterface)
 }

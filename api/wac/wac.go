@@ -199,15 +199,15 @@ func ListBlacklist(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthRouter("wac", "/api/wac/v1/")
-	webserver.RegisterAuthAPI("wac", "GET", "/", GetWAC)
-	webserver.RegisterAuthAPI("wac", "POST", "/", SetWAC)
+	webserver.RegisterMustAuthRouter("wac", "/api/wac/v1/")
+	webserver.RegisterMustAuthAPI("wac", "GET", "/", GetWAC)
+	webserver.RegisterMustAuthAPI("wac", "POST", "/", SetWAC)
 
-	webserver.RegisterAuthAPI("wac", "POST", "/blacklist/add/", AddBlacklist)
-	webserver.RegisterAuthAPI("wac", "POST", "/blacklist/delete/", DelBlacklist)
-	webserver.RegisterAuthAPI("wac", "GET", "/blacklist/", ListBlacklist)
+	webserver.RegisterMustAuthAPI("wac", "POST", "/blacklist/add/", AddBlacklist)
+	webserver.RegisterMustAuthAPI("wac", "POST", "/blacklist/delete/", DelBlacklist)
+	webserver.RegisterMustAuthAPI("wac", "GET", "/blacklist/", ListBlacklist)
 
-	webserver.RegisterAuthAPI("wac", "POST", "/whitelist/add/", AddWhitelist)
-	webserver.RegisterAuthAPI("wac", "POST", "/whitelist/delete/", DelWhitelist)
-	webserver.RegisterAuthAPI("wac", "GET", "/whitelist/", ListWhitelist)
+	webserver.RegisterMustAuthAPI("wac", "POST", "/whitelist/add/", AddWhitelist)
+	webserver.RegisterMustAuthAPI("wac", "POST", "/whitelist/delete/", DelWhitelist)
+	webserver.RegisterMustAuthAPI("wac", "GET", "/whitelist/", ListWhitelist)
 }

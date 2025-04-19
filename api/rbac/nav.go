@@ -21,5 +21,5 @@ func GetNavMenu(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("rbac", "GET", "/nav-menu/", GetNavMenu)
+	webserver.RegisterMustAuthAPI("rbac", "GET", "/nav-menu/", GetNavMenu)
 }

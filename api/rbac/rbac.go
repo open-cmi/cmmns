@@ -63,8 +63,8 @@ func DeleteRole(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthRouter("rbac", "/api/rbac/v1")
-	webserver.RegisterAuthAPI("rbac", "GET", "/role/", RoleList)
-	webserver.RegisterAuthAPI("rbac", "DELETE", "/role/:id", DeleteRole)
-	webserver.RegisterAuthAPI("rbac", "GET", "/role/name-list/", RoleNameList)
+	webserver.RegisterMustAuthRouter("rbac", "/api/rbac/v1")
+	webserver.RegisterMustAuthAPI("rbac", "GET", "/role/", RoleList)
+	webserver.RegisterMustAuthAPI("rbac", "DELETE", "/role/:id", DeleteRole)
+	webserver.RegisterMustAuthAPI("rbac", "GET", "/role/name-list/", RoleNameList)
 }

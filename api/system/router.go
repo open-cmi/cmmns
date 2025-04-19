@@ -12,6 +12,7 @@ import (
 )
 
 func init() {
+	webserver.RegisterMustAuthRouter("system", "/api/system/v1")
 	webserver.RegisterAuthRouter("system", "/api/system/v1")
 	webserver.RegisterUnauthRouter("system", "/api/system/v1")
 }

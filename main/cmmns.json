@@ -45,6 +45,7 @@
     "private_file": ""
   },
   "webserver": {
+    "strict_auth": true,
     "debug": true,
     "server": [
       {

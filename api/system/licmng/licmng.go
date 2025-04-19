@@ -118,8 +118,8 @@ func DownloadLicense(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "GET", "/licmng/", ListLicense)
-	webserver.RegisterAuthAPI("system", "POST", "/licmng/", CreateLicense)
-	webserver.RegisterAuthAPI("system", "GET", "/licmng/download/", DownloadLicense)
-	webserver.RegisterAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense)
+	webserver.RegisterMustAuthAPI("system", "GET", "/licmng/", ListLicense)
+	webserver.RegisterMustAuthAPI("system", "POST", "/licmng/", CreateLicense)
+	webserver.RegisterMustAuthAPI("system", "GET", "/licmng/download/", DownloadLicense)
+	webserver.RegisterMustAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense)
 }

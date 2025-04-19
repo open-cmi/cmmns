@@ -5,6 +5,6 @@ import (
 )
 
 func init() {
-	webserver.RegisterAuthRouter("auditlog", "/api/auditlog/v1")
-	webserver.RegisterAuthAPI("auditlog", "GET", "/", List)
+	webserver.RegisterMustAuthRouter("auditlog", "/api/auditlog/v1")
+	webserver.RegisterMustAuthAPI("auditlog", "GET", "/", List)
 }
