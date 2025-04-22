@@ -6,9 +6,9 @@ require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/dchest/captcha v1.0.0
 	github.com/gin-gonic/gin v1.10.0
-	github.com/go-ping/ping v1.1.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/gomodule/redigo v1.8.8
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/securecookie v1.1.2
 	github.com/gorilla/sessions v1.3.0
@@ -23,7 +23,6 @@ require (
 	github.com/prometheus-community/pro-bing v0.4.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
-	github.com/topmyself/redistore v0.1.0
 	go.mongodb.org/mongo-driver v1.16.0
 	golang.org/x/crypto v0.25.0
 	golang.org/x/sync v0.8.0
@@ -47,7 +46,6 @@ require (
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/gomodule/redigo v1.8.8 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect

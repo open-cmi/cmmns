@@ -10,7 +10,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/rdb"
 	"github.com/open-cmi/cmmns/initial"
 	"github.com/open-cmi/cmmns/pkg/memstore"
-	"github.com/topmyself/redistore"
+	"github.com/open-cmi/cmmns/pkg/redistore"
 )
 
 type Config struct {
