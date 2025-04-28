@@ -19,7 +19,7 @@ var memoryStore *memstore.MemStore
 
 func GetSession(c *gin.Context) (*sessions.Session, error) {
 	if gConf.Store == "memory" {
-		return memoryStore.Get(c.Request, "cmmns")
+		return memoryStore.Get(c.Request, "koa")
 	} else {
 		return redisStore.Get(c.Request, "koa")
 	}
