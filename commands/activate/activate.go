@@ -51,9 +51,11 @@ func (c *activateCommand) Run() error {
 	err = license.SetProductSerial(serialString, prodString)
 	if err != nil {
 		fmt.Printf("activate failed:%s\n", err.Error())
+		return err
 	}
-
-	return err
+	fmt.Println("verify serial successfully")
+	fmt.Println("please restart service or wait for several minutes")
+	return nil
 }
 
 func init() {

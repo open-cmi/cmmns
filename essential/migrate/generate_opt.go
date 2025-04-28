@@ -13,7 +13,7 @@ var gotemplate string = `package migration
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/open-cmi/migrate"
+	"github.com/open-cmi/cmmns/essential/migrate"
 )
 
 // ChangeMeInstance migrate

@@ -30,7 +30,7 @@ var gConf Config
 
 // GetDB get db
 func GetDB() *sqlx.DB {
-	return gConfDB
+	return gConfDB.Unsafe()
 }
 
 func LikePlaceHolder(holderIndex int) string {
