@@ -9,19 +9,16 @@ import (
 	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
-func RoleNameList(c *gin.Context) {
-	count, results, err := rbac.RoleNameList()
+func GetAllRoleNames(c *gin.Context) {
+	names, err := rbac.GetAllRoleNames()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"ret": 0,
-		"msg": "",
-		"data": map[string]interface{}{
-			"count":   count,
-			"results": results,
-		},
+		"ret":  0,
+		"msg":  "",
+		"data": names,
 	})
 }
 
@@ -48,9 +45,9 @@ func DeleteRole(c *gin.Context) {
 
 	user := goparam.GetUser(c)
 	userID, _ := user["id"].(string)
-	err := rbac.DeleteRole(&goparam.Param{
-		UserID: userID,
-	}, ID)
+	var param goparam.Param
+	param.UserID = userID
+	err := rbac.DeleteRole(&param, ID)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -66,5 +63,5 @@ func init() {
 	webserver.RegisterMustAuthRouter("rbac", "/api/rbac/v1")
 	webserver.RegisterMustAuthAPI("rbac", "GET", "/role/", RoleList)
 	webserver.RegisterMustAuthAPI("rbac", "DELETE", "/role/:id", DeleteRole)
-	webserver.RegisterMustAuthAPI("rbac", "GET", "/role/name-list/", RoleNameList)
+	webserver.RegisterMustAuthAPI("rbac", "GET", "/role/name-list/", GetAllRoleNames)
 }

@@ -69,7 +69,7 @@ func (m *User) Remove() error {
 
 // Get get id
 func Get(id string) (user *User) {
-	queryClause := fmt.Sprintf(`select * from users where id=$1`)
+	queryClause := `select * from users where id=$1`
 	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, id)
 

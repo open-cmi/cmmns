@@ -302,13 +302,22 @@ func Create(c *gin.Context) {
 // Delete delete user
 func Delete(c *gin.Context) {
 	ah := auditlog.NewAuditHandler(c)
-	u := goparam.GetUser(c)
+	param := goparam.ParseParams(c)
 	id := c.Param("id")
-	userID := u["id"].(string)
+	userID := param.UserID
 	if id == userID {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": -1,
 			"msg": "can't delete youself",
+		})
+		ah.InsertOperationLog(i18n.Sprintf("delete user"), false)
+		return
+	}
+	role := param.Role
+	if role != "admin" {
+		c.JSON(http.StatusOK, gin.H{
+			"ret": -1,
+			"msg": "no permission",
 		})
 		ah.InsertOperationLog(i18n.Sprintf("delete user"), false)
 		return

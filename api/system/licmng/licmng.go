@@ -9,6 +9,7 @@ import (
 	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/licmng"
+	"github.com/open-cmi/cmmns/module/user"
 	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
@@ -61,6 +62,19 @@ func CreateLicense(c *gin.Context) {
 }
 
 func DeleteLicense(c *gin.Context) {
+	param := goparam.ParseParams(c)
+
+	usr := user.Get(param.UserID)
+	if usr == nil {
+		c.JSON(http.StatusForbidden, "")
+		return
+	}
+
+	if param.Role != "admin" {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "no permission"})
+		return
+	}
+
 	ah := auditlog.NewAuditHandler(c)
 	id := c.Param("id")
 	if id == "" {

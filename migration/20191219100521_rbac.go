@@ -18,13 +18,25 @@ func (mi RBACInstance) SyncData(db *sqlx.DB) error {
 	id := uuid.New().String()
 
 	now := time.Now().Unix()
+	// 添加admin用户
 	dbsql := fmt.Sprintf(`
 		INSERT INTO roles (id, name, created_time, updated_time, permisions, description) 
-			values ('%s', 'admin', %d, %d, '*', 'administrators');
-  `, id, now, now)
+			values ('%s', 'admin', %d, %d, '*', 'administrators');`, id, now, now)
 	_, err := db.Exec(dbsql)
+	if err != nil {
+		return err
+	}
 
-	return err
+	// 添加operator角色
+	id = uuid.New().String()
+	dbsql = fmt.Sprintf(`
+		INSERT INTO roles (id, name, created_time, updated_time, permisions, description) 
+			values ('%s', 'operator', %d, %d, '*', 'operator');`, id, now, now)
+	_, err = db.Exec(dbsql)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Up up migrate

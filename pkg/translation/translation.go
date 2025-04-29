@@ -7,8 +7,10 @@ import (
 )
 
 type PlaceHolder struct {
-	ID     string `json:"id"`
-	String string `json:"string"`
+	ID             string `json:"id"`
+	String         string `json:"string"`
+	ArgNum         int    `json:"argNum"`
+	UnderlyingType string `json:"underlyingType"`
 }
 
 type MessageItem struct {
@@ -32,7 +34,6 @@ func (d *Dictionary) Lookup(key string) (data string, ok bool) {
 	if !ok {
 		return "", false
 	}
-
 	return fmt.Sprintf("\x02%s", trans), true
 }
 
@@ -51,6 +52,9 @@ func InitTransDict(content string) (*Dictionary, error) {
 		if len(item.PlaceHolders) != 0 {
 			for _, ph := range item.PlaceHolders {
 				item.Translation = strings.Replace(item.Translation, fmt.Sprintf("{%s}", ph.ID), ph.String, 1)
+
+				placeHolder := fmt.Sprintf("[%d]", ph.ArgNum)
+				item.ID = strings.Replace(item.ID, fmt.Sprintf("{%s}", ph.ID), strings.ReplaceAll(ph.String, placeHolder, ""), -1)
 			}
 		}
 		d.trans[item.ID] = item.Translation
