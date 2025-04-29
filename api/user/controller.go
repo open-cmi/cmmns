@@ -317,7 +317,7 @@ func Delete(c *gin.Context) {
 	if role != "admin" {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": -1,
-			"msg": "no permission",
+			"msg": i18n.Sprintf("no permission"),
 		})
 		ah.InsertOperationLog(i18n.Sprintf("delete user"), false)
 		return
