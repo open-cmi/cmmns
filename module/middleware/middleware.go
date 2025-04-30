@@ -168,16 +168,3 @@ func DeleteAuthToken(name string) error {
 	}
 	return nil
 }
-
-// // Web Access Control middleware
-// func WACMiddleware(r *gin.Engine) {
-// 	r.Use(func(c *gin.Context) {
-// 		src := c.ClientIP()
-// 		permit := wac.CheckPermit(src)
-// 		if !permit {
-// 			c.String(http.StatusForbidden, "")
-// 			c.Abort()
-// 		}
-// 		c.Next()
-// 	})
-// }

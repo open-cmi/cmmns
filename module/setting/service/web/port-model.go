@@ -67,7 +67,7 @@ func GetServicePortModel() *ServicePortModel {
 	var v string
 	err := row.Scan(&v)
 	if err != nil {
-		logger.Errorf("pubnet row scan failed: %s\n", err.Error())
+		logger.Debugf("service port scan failed: %s\n", err.Error())
 		return nil
 	}
 	var m ServicePortModel

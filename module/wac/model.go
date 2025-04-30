@@ -10,8 +10,6 @@ import (
 	"github.com/open-cmi/cmmns/essential/sqldb"
 )
 
-var globalModel *Model
-
 type Model struct {
 	Enable bool   `json:"enable" db:"enable"`
 	Mode   string `json:"mode" db:"mode"` // blacklist or whitelist
@@ -75,7 +73,7 @@ func Get() *Model {
 	var value string
 	err := row.Scan(&value)
 	if err != nil {
-		logger.Infof("wac scan model failed: %s\n", err.Error())
+		logger.Debugf("wac scan model failed: %s\n", err.Error())
 		return nil
 	}
 

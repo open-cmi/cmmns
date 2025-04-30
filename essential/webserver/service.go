@@ -32,7 +32,6 @@ func New() *Service {
 func (s *Service) Init() error {
 	// init webserver
 	middleware.DefaultMiddleware(s.Engine)
-	//middleware.WACMiddleware(s.Engine)
 
 	workDir := eyas.GetRootPath()
 	dir := fmt.Sprintf("%s/static/", workDir)
