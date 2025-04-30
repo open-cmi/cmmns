@@ -44,5 +44,9 @@ func SQLite3Init(conf *Config) (db *sqlx.DB, err error) {
 		file = fmt.Sprintf("file:%s?cache=shared&mode=rwc", dbfile)
 	}
 	db, err = sqlx.Open("sqlite3", file)
-	return db, err
+	if err != nil {
+		return nil, err
+	}
+	db.SetMaxOpenConns(1)
+	return db, nil
 }
