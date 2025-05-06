@@ -3,6 +3,7 @@ package sqldb
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/pkg/database/postgresdb"
@@ -29,7 +30,11 @@ var gConf Config
 
 // GetDB get db
 func GetDB() *sqlx.DB {
-	return gConfDB
+	return gConfDB.Unsafe()
+}
+
+func LikePlaceHolder(holderIndex int) string {
+	return fmt.Sprintf("'%%' || $%d || '%%'", holderIndex)
 }
 
 // Parse db init

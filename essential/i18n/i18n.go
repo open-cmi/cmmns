@@ -3,6 +3,7 @@ package i18n
 import (
 	"errors"
 
+	"github.com/open-cmi/cmmns/initial"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
@@ -61,11 +62,16 @@ func GetLang() string {
 	return gLang
 }
 
-func init() {
+func Init() error {
 	gLang = "en-US"
 	for _, lang := range supportedLang {
 		tag := language.MustParse(lang)
 		p := message.NewPrinter(tag)
 		printerMapping[lang] = p
 	}
+	return nil
+}
+
+func init() {
+	initial.Register("i18n", initial.PhaseEssential, Init)
 }

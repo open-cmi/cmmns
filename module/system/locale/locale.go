@@ -2,7 +2,7 @@ package locale
 
 import (
 	"github.com/open-cmi/cmmns/essential/i18n"
-	"github.com/open-cmi/cmmns/service/initial"
+	"github.com/open-cmi/cmmns/initial"
 )
 
 func SetLocale(lang string) error {

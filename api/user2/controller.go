@@ -11,10 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/open-cmi/cmmns/essential/rdb"
+	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/setting/email"
 	"github.com/open-cmi/cmmns/module/user"
 	"github.com/open-cmi/cmmns/pkg/verify"
-	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 // EmailTemplate html content template

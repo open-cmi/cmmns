@@ -24,7 +24,8 @@ func List(query *goparam.Param) (int, []User, error) {
 	var users []User = []User{}
 	countClause := "select count(*) from users"
 
-	whereClause, args := goparam.BuildWhereClause(query)
+	whereClause := query.WhereClause
+	args := query.WhereArgs
 
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
@@ -44,7 +45,7 @@ func List(query *goparam.Param) (int, []User, error) {
 		// 没有的话，也不需要报错
 		return count, users, nil
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var item User
 		err := rows.StructScan(&item)
@@ -149,6 +150,7 @@ func Create(m *CreateMsg) (err error) {
 	user.Activate = true
 	user.Role = m.Role
 	user.Status = "offline"
+	user.PasswordChangeTime = time.Now().Unix()
 
 	err = user.Save()
 	if err == nil {
@@ -229,9 +231,11 @@ func ChangePassword(userid string, password string) error {
 func ResetPasswd(req *ResetPasswdRequest) error {
 	salt, _ := bcrypt.Salt(10)
 	hash, _ := bcrypt.Hash(req.Password, salt)
-	updateClause := `update users set password=$1 where id=$2`
+
+	t := time.Now().Unix()
+	updateClause := `update users set password=$1,password_change_time=$2 andwhere id=$3`
 	db := sqldb.GetDB()
-	_, err := db.Exec(updateClause, hash, req.ID)
+	_, err := db.Exec(updateClause, hash, t, req.ID)
 	return err
 }
 

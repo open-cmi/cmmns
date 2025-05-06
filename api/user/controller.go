@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -10,11 +11,12 @@ import (
 
 	"github.com/dchest/captcha"
 	"github.com/gorilla/sessions"
+	"github.com/open-cmi/cmmns/essential/sqldb"
+	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/middleware"
 	"github.com/open-cmi/cmmns/module/setting/pubnet"
 	"github.com/open-cmi/cmmns/pkg/goparam"
 	"github.com/open-cmi/cmmns/pkg/verify"
-	"github.com/open-cmi/cmmns/service/webserver"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/user"
@@ -134,8 +136,25 @@ func ChangePassword(c *gin.Context) {
 
 // List list user
 func List(c *gin.Context) {
-
 	query := goparam.ParseParams(c)
+	var paramnum int = 1
+	var whereClause string
+	var whereArgs []interface{}
+
+	username := c.Query("username")
+	if username != "" {
+		if whereClause != "" {
+			whereClause += " and "
+		}
+		whereClause += fmt.Sprintf(`username like %s`, sqldb.LikePlaceHolder(paramnum))
+		whereArgs = append(whereArgs, username)
+		paramnum += 1
+	}
+
+	if paramnum != 1 {
+		query.WhereClause = " where " + whereClause
+		query.WhereArgs = whereArgs
+	}
 
 	count, users, err := user.List(query)
 	if err != nil {
@@ -283,13 +302,22 @@ func Create(c *gin.Context) {
 // Delete delete user
 func Delete(c *gin.Context) {
 	ah := auditlog.NewAuditHandler(c)
-	u := goparam.GetUser(c)
+	param := goparam.ParseParams(c)
 	id := c.Param("id")
-	userID := u["id"].(string)
+	userID := param.UserID
 	if id == userID {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": -1,
 			"msg": "can't delete youself",
+		})
+		ah.InsertOperationLog(i18n.Sprintf("delete user"), false)
+		return
+	}
+	role := param.Role
+	if role != "admin" {
+		c.JSON(http.StatusOK, gin.H{
+			"ret": -1,
+			"msg": i18n.Sprintf("no permission"),
 		})
 		ah.InsertOperationLog(i18n.Sprintf("delete user"), false)
 		return
@@ -441,19 +469,19 @@ func TokenList(c *gin.Context) {
 
 // v1 user适用于普通的后台管理系统，用户由管理员创建管理，不支持自注册用户
 func init() {
-	webserver.RegisterAuthRouter("user", "/api/user/v1")
-	webserver.RegisterAuthAPI("user", "GET", "/checkauth", CheckAuth)
-	webserver.RegisterAuthAPI("user", "GET", "/", List)
-	webserver.RegisterAuthAPI("user", "POST", "/", Create)
-	webserver.RegisterAuthAPI("user", "POST", "/change-passwd", ChangePassword)
-	webserver.RegisterAuthAPI("user", "POST", "/reset-passwd", ResetPassword)
-	webserver.RegisterAuthAPI("user", "POST", "/logout", Logout)
-	webserver.RegisterAuthAPI("user", "GET", "/:id", Get)
-	webserver.RegisterAuthAPI("user", "PUT", "/:id", Edit)
-	webserver.RegisterAuthAPI("user", "DELETE", "/:id", Delete)
-	webserver.RegisterAuthAPI("user", "POST", "/jwt-token/", CreateToken)
-	webserver.RegisterAuthAPI("user", "POST", "/jwt-token/delete/", DeleteToken)
-	webserver.RegisterAuthAPI("user", "GET", "/jwt-token/", TokenList)
+	webserver.RegisterMustAuthRouter("user", "/api/user/v1")
+	webserver.RegisterMustAuthAPI("user", "GET", "/checkauth", CheckAuth)
+	webserver.RegisterMustAuthAPI("user", "GET", "/", List)
+	webserver.RegisterMustAuthAPI("user", "POST", "/", Create)
+	webserver.RegisterMustAuthAPI("user", "POST", "/change-passwd", ChangePassword)
+	webserver.RegisterMustAuthAPI("user", "POST", "/reset-passwd", ResetPassword)
+	webserver.RegisterMustAuthAPI("user", "POST", "/logout", Logout)
+	webserver.RegisterMustAuthAPI("user", "GET", "/:id", Get)
+	webserver.RegisterMustAuthAPI("user", "PUT", "/:id", Edit)
+	webserver.RegisterMustAuthAPI("user", "DELETE", "/:id", Delete)
+	webserver.RegisterMustAuthAPI("user", "POST", "/jwt-token/", CreateToken)
+	webserver.RegisterMustAuthAPI("user", "POST", "/jwt-token/delete/", DeleteToken)
+	webserver.RegisterMustAuthAPI("user", "GET", "/jwt-token/", TokenList)
 
 	webserver.RegisterUnauthRouter("user", "/api/user/v1")
 	webserver.RegisterUnauthAPI("user", "POST", "/login", Login)

@@ -12,20 +12,22 @@ import (
 	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
-type Model struct {
+type LicenseModel struct {
 	ID          string `json:"id" db:"id"`
 	Customer    string `json:"customer" db:"customer"`
 	Prod        string `json:"prod" db:"prod"`
 	Version     string `json:"version" db:"version"`
 	Modules     string `json:"modules" db:"modules"`
 	ExpireTime  int64  `json:"expire_time" db:"expire_time"`
-	Machine     string `json:"machine" db:"machine"`
+	MCode       string `json:"mcode" db:"mcode"`
+	Serial      string `json:"serial"`
+	Model       string `json:"model" db:"model"`
 	CreatedTime int64  `json:"created_time" db:"created_time"`
 	UpdatedTime int64  `json:"updated_time" db:"updated_time"`
 	isNew       bool
 }
 
-func (m *Model) Save() error {
+func (m *LicenseModel) Save() error {
 	db := sqldb.GetDB()
 
 	if m.isNew {
@@ -64,7 +66,7 @@ func (m *Model) Save() error {
 	return nil
 }
 
-func (m *Model) Remove() error {
+func (m *LicenseModel) Remove() error {
 	db := sqldb.GetDB()
 
 	deleteClause := "delete from license where id=$1"
@@ -75,21 +77,21 @@ func (m *Model) Remove() error {
 	return nil
 }
 
-func New() *Model {
-	return &Model{
-		ID:          uuid.NewString(),
+func New() *LicenseModel {
+	return &LicenseModel{
+		ID:          uuid.New().String(),
 		CreatedTime: time.Now().Unix(),
 		UpdatedTime: time.Now().Unix(),
 		isNew:       true,
 	}
 }
 
-func Get(id string) *Model {
+func Get(id string) *LicenseModel {
 	queryClause := `select * from license where id=$1`
 	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, id)
 
-	var mdl Model
+	var mdl LicenseModel
 	err := row.StructScan(&mdl)
 	if err != nil {
 		logger.Errorf("license %s not found: %s\n", id, err.Error())

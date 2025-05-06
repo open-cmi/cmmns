@@ -1,7 +1,7 @@
 package time
 
 import (
-	"github.com/open-cmi/cmmns/service/initial"
+	"github.com/open-cmi/cmmns/initial"
 )
 
 func GetTimeZoneList() ([]string, error) {

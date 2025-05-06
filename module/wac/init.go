@@ -2,10 +2,10 @@ package wac
 
 import (
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/initial"
 	"github.com/open-cmi/cmmns/module/nginxconf"
 	"github.com/open-cmi/cmmns/module/wac/blacklist"
 	"github.com/open-cmi/cmmns/module/wac/whitelist"
-	"github.com/open-cmi/cmmns/service/initial"
 )
 
 func Init() error {

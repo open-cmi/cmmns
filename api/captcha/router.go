@@ -1,7 +1,7 @@
 package captcha
 
 import (
-	"github.com/open-cmi/cmmns/service/webserver"
+	"github.com/open-cmi/cmmns/essential/webserver"
 )
 
 func init() {

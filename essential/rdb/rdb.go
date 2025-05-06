@@ -18,7 +18,7 @@ const (
 )
 
 // clients redis clients
-var clients map[string]*redis.Client
+var clients map[string]*redis.Client = make(map[string]*redis.Client)
 
 var modules map[string]int = make(map[string]int)
 
@@ -59,8 +59,6 @@ func Parse(raw json.RawMessage) error {
 	cachehost := gConf.Host
 	cacheport := gConf.Port
 	cachepassword := gConf.Password
-
-	clients = make(map[string]*redis.Client)
 
 	for module, db := range modules {
 		clients[module] = redis.NewClient(&redis.Options{

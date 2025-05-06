@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/open-cmi/cmmns"
-
 	_ "github.com/open-cmi/cmmns/internal/translation"
+
+	"github.com/open-cmi/cmmns"
 )
 
 func main() {

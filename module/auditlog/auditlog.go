@@ -66,7 +66,8 @@ func List(p *goparam.Param) (int, []Model, error) {
 	var logs []Model = []Model{}
 
 	countClause := "select count(*) from audit_log"
-	whereClause, args := goparam.BuildWhereClause(p)
+	whereClause := p.WhereClause
+	args := p.WhereArgs
 	countClause += whereClause
 	row := db.QueryRow(countClause, args...)
 
@@ -88,7 +89,7 @@ func List(p *goparam.Param) (int, []Model, error) {
 		// 没有的话，也不需要报错
 		return count, logs, nil
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var item Model
 		err := rows.StructScan(&item)

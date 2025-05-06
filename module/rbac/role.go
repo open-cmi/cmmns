@@ -75,7 +75,7 @@ func GetByName(name string) *Role {
 	return &r
 }
 
-func Get(id string) *Role {
+func GetByID(id string) *Role {
 	queryClause := `select * from roles where id=$1`
 	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, id)

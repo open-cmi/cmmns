@@ -8,9 +8,9 @@ import (
 	"github.com/open-cmi/cmmns/essential/config"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/rdb"
-	"github.com/open-cmi/cmmns/service/initial"
-	"github.com/open-cmi/memstore"
-	"github.com/topmyself/redistore"
+	"github.com/open-cmi/cmmns/initial"
+	"github.com/open-cmi/cmmns/pkg/memstore"
+	"github.com/open-cmi/cmmns/pkg/redistore"
 )
 
 type Config struct {
@@ -22,12 +22,13 @@ var gConf Config
 
 func Init() error {
 	var err error
-	rdbConf := rdb.GetConf()
+
 	if gConf.Store == "memory" {
 		memoryStore = memstore.NewMemStore([]byte("memorystore"),
 			[]byte("enckey12341234567890123456789012"))
 		memoryStore.MaxAge(gConf.MaxAge)
 	} else if gConf.Store == "redis" {
+		rdbConf := rdb.GetConf()
 		host := fmt.Sprintf("%s:%d", rdbConf.Host, rdbConf.Port)
 		redisStore, err = redistore.NewRediStoreWithDB(100, "tcp", host, rdbConf.Password, "2")
 		if err != nil {

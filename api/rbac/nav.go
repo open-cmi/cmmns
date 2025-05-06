@@ -4,15 +4,15 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/pkg/goparam"
-	"github.com/open-cmi/cmmns/service/webserver"
 )
 
-func GetNavMenu(c *gin.Context) {
+func GetRoleMenus(c *gin.Context) {
 	param := goparam.ParseParams(c)
 
-	menu := rbac.GetNavMenu(param.Role)
+	menu := rbac.GetRoleMenus(param.Role)
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,
 		"msg":  "",
@@ -21,5 +21,5 @@ func GetNavMenu(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("rbac", "GET", "/nav-menu/", GetNavMenu)
+	webserver.RegisterMustAuthAPI("rbac", "GET", "/nav-menu/", GetRoleMenus)
 }

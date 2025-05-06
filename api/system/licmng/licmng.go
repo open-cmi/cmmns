@@ -6,10 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/licmng"
+	"github.com/open-cmi/cmmns/module/user"
 	"github.com/open-cmi/cmmns/pkg/goparam"
-	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 // List list license
@@ -45,9 +46,9 @@ func CreateLicense(c *gin.Context) {
 		ah.InsertOperationLog(i18n.Sprintf("create license"), false)
 		return
 	}
-	err := licmng.CreateLicense(&req)
-	if err != nil {
 
+	_, err := licmng.CreateLicense(&req)
+	if err != nil {
 		ah.InsertOperationLog(i18n.Sprintf("create license"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -61,6 +62,19 @@ func CreateLicense(c *gin.Context) {
 }
 
 func DeleteLicense(c *gin.Context) {
+	param := goparam.ParseParams(c)
+
+	usr := user.Get(param.UserID)
+	if usr == nil {
+		c.JSON(http.StatusForbidden, "")
+		return
+	}
+
+	if param.Role != "admin" {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "no permission"})
+		return
+	}
+
 	ah := auditlog.NewAuditHandler(c)
 	id := c.Param("id")
 	if id == "" {
@@ -87,22 +101,30 @@ func DeleteLicense(c *gin.Context) {
 func DownloadLicense(c *gin.Context) {
 	ah := auditlog.NewAuditHandler(c)
 	id := c.Query("id")
+	m := licmng.Get(id)
+	if m == nil {
+		ah.InsertOperationLog(i18n.Sprintf("download license"), false)
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "license not found"})
+		return
+	}
+
 	content, err := licmng.CreateLicenseContent(id)
 	if err != nil {
 		ah.InsertOperationLog(i18n.Sprintf("download license"), false)
+
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
 
-	fileName := fmt.Sprintf("%s.lic", id)
+	fileName := fmt.Sprintf("%s.lic", m.MCode)
 
 	c.Writer.Header().Add("Content-Disposition", "attachment; filename="+fileName)
 	c.Writer.Header().Add("Content-Type", "application/octet-stream")
+
 	_, err = c.Writer.Write([]byte(content))
 	if err != nil {
-
 		ah.InsertOperationLog(i18n.Sprintf("download license"), false)
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"ret": -2, "msg": err.Error()})
 		return
 	}
 
@@ -110,8 +132,8 @@ func DownloadLicense(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "GET", "/licmng/", ListLicense)
-	webserver.RegisterAuthAPI("system", "POST", "/licmng/", CreateLicense)
-	webserver.RegisterAuthAPI("system", "GET", "/licmng/download/", DownloadLicense)
-	webserver.RegisterAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense)
+	webserver.RegisterMustAuthAPI("system", "GET", "/licmng/", ListLicense)
+	webserver.RegisterMustAuthAPI("system", "POST", "/licmng/", CreateLicense)
+	webserver.RegisterMustAuthAPI("system", "GET", "/licmng/download/", DownloadLicense)
+	webserver.RegisterMustAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense)
 }

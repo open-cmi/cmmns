@@ -1,8 +1,10 @@
 package sqlitedb
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/open-cmi/cmmns/pkg/eyas"
 
@@ -20,7 +22,7 @@ type Config struct {
 // SQLite3Init init
 func SQLite3Init(conf *Config) (db *sqlx.DB, err error) {
 	dbfile := conf.File
-	if !filepath.IsAbs(conf.File) {
+	if !strings.HasPrefix(dbfile, "/") && !strings.HasPrefix(dbfile, ".") {
 		dbfile = filepath.Join(eyas.GetRootPath(), "data", conf.File)
 	}
 
@@ -35,7 +37,20 @@ func SQLite3Init(conf *Config) (db *sqlx.DB, err error) {
 		}
 		file.Close()
 	}
-
-	db, err = sqlx.Open("sqlite3", dbfile)
-	return db, err
+	var file string
+	if conf.User != "" && conf.Password != "" {
+		file = fmt.Sprintf("file:%s?cache=shared&mode=rwc&_auth&_auth_user=%s&_auth_pass=%s", dbfile, conf.User, conf.Password)
+	} else {
+		file = fmt.Sprintf("file:%s?cache=shared&mode=rwc", dbfile)
+	}
+	db, err = sqlx.Open("sqlite3", file)
+	if err != nil {
+		return nil, err
+	}
+	//db.SetMaxOpenConns(1)
+	// _, err = db.Exec("PRAGMA busy_timeout=5000;")
+	// if err != nil {
+	// 	logger.Warnf("database set busy_timeout failed: %s\n", err.Error())
+	// }
+	return db, nil
 }

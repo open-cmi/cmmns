@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/initial"
 	"github.com/open-cmi/cmmns/pkg/eyas"
 	"github.com/open-cmi/cmmns/pkg/transport/http"
-	"github.com/open-cmi/cmmns/service/initial"
 )
 
 type EyasAPICommand struct {

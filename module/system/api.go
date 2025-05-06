@@ -144,7 +144,7 @@ func List(option *goparam.Param) (int, []Model, error) {
 		logger.Error(err.Error())
 		return count, results, nil
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var item Model
 		err := rows.StructScan(&item)

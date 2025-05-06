@@ -7,7 +7,6 @@ import (
 )
 
 func BlacklistList(c *gin.Context) {
-	return
 }
 
 func TestRegister(t *testing.T) {

@@ -8,6 +8,8 @@ import (
 
 var gConfCtx *confparser.Context
 
+var gConfFile string
+
 // Init config init
 func Init(configfile string) error {
 	err := gConfCtx.Load(configfile)
@@ -32,4 +34,8 @@ func RegisterConfig(name string, parseFunc func(json.RawMessage) error, saveFunc
 	opt.ParseFunc = parseFunc
 	opt.SaveFunc = saveFunc
 	return gConfCtx.Register(&opt)
+}
+
+func SetConfigFile(configFile string) {
+	gConfFile = configFile
 }

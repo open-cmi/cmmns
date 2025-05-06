@@ -6,25 +6,55 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
+	"embed"
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/pkg/eyas"
 )
 
-func Sign(ori string, privateFile string) (string, error) {
-	priv, err := os.ReadFile(privateFile)
-	if err != nil {
-		logger.Errorf("No RSA private key found, generating temp one")
-		return "", err
+//go:embed licmng.pem
+var pemFile embed.FS
+
+func GetPrivPemPath() string {
+	if gConf.PrivateFile != "" {
+		return gConf.PrivateFile
+	}
+	return path.Join(eyas.GetConfDir(), "private.pem")
+}
+
+func GetPrivPemContent() ([]byte, error) {
+	if gConf.PrivateFile != "" {
+		var privPath string
+		if strings.HasPrefix(gConf.PrivateFile, "/") ||
+			strings.HasPrefix(gConf.PrivateFile, "./") ||
+			strings.HasPrefix(gConf.PrivateFile, "../") {
+			privPath = gConf.PrivateFile
+		} else {
+			confDir := eyas.GetConfDir()
+			privPath = path.Join(confDir, gConf.PrivateFile)
+		}
+
+		cont, err := os.ReadFile(privPath)
+		if err != nil {
+			logger.Errorf("open private pem file failed: %s\n", err.Error())
+		}
+		return cont, err
 	}
 
-	privPem, _ := pem.Decode(priv)
+	cont, err := pemFile.ReadFile("licmng.pem")
+	return cont, err
+}
+
+func Sign(ori string, pemContent []byte) (string, error) {
+	privPem, _ := pem.Decode(pemContent)
 	var privPemBytes []byte
 	if privPem.Type != "PRIVATE KEY" {
 		logger.Errorf("RSA private key is of the wrong type :%s", privPem.Type)
@@ -34,6 +64,7 @@ func Sign(ori string, privateFile string) (string, error) {
 	privPemBytes = privPem.Bytes
 
 	var parsedKey interface{}
+	var err error
 	if parsedKey, err = x509.ParsePKCS1PrivateKey(privPemBytes); err != nil {
 		if parsedKey, err = x509.ParsePKCS8PrivateKey(privPemBytes); err != nil { // note this returns type `interface{}`
 			logger.Errorf("Unable to parse RSA private key, generating a temp one :%s", err.Error())
@@ -80,7 +111,7 @@ func CreateLicenseContent(id string) (string, error) {
 	lic.Modules = strings.Split(m.Modules, ",")
 	lic.Version = m.Version
 	lic.ExpireTime = m.ExpireTime
-	lic.Machine = m.Machine
+	lic.MCode = m.MCode
 
 	oriByte, err := json.Marshal(lic)
 	if err != nil {
@@ -88,8 +119,13 @@ func CreateLicenseContent(id string) (string, error) {
 	}
 	ori := base64.StdEncoding.EncodeToString(oriByte)
 
-	signStr, err := Sign(ori, gConf.PrivateFile)
+	cont, err := GetPrivPemContent()
 	if err != nil {
+		return "", err
+	}
+	signStr, err := Sign(ori, cont)
+	if err != nil {
+		logger.Errorf("private file sign failed: %s\n", err.Error())
 		return "", err
 	}
 	return fmt.Sprintf("%s\n%s", ori, signStr), nil

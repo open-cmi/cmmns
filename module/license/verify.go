@@ -9,31 +9,24 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	"io"
 	"os"
-	"path"
 	"strings"
 	"time"
 
 	"github.com/open-cmi/cmmns/essential/events"
 	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/cmmns/essential/ticker"
+	"github.com/open-cmi/cmmns/initial"
 	"github.com/open-cmi/cmmns/module/licmng"
-	"github.com/open-cmi/cmmns/pkg/eyas"
-	"github.com/open-cmi/cmmns/service/initial"
-	"github.com/open-cmi/cmmns/service/ticker"
+	"github.com/open-cmi/cmmns/pkg/dev"
 )
 
 func VerifySigned(origin string, signed string) error {
-
-	publicFile := GetPublicPemPath()
-
-	return verifySigned(origin, signed, publicFile)
-}
-
-func verifySigned(origin string, signed string, pubfile string) error {
-	pub, err := os.ReadFile(pubfile)
+	pub, err := GetPubPemContent()
 	if err != nil {
-		logger.Errorf("No RSA private key found")
+		logger.Errorf("Get pub pem content failed: %s\n", err.Error())
 		return err
 	}
 
@@ -80,11 +73,11 @@ func verifySigned(origin string, signed string, pubfile string) error {
 		logger.Errorf("could not verifySigned signature: %s", err.Error())
 		return err
 	}
-	logger.Infof("VerifySigned license origin and signed string success\n")
+	logger.Debugf("VerifySigned license origin and signed string success\n")
 	return nil
 }
 
-func VerifyLicenseContent(content string, importVerify bool) error {
+func VerifyLicenseContent(content string) error {
 	arr := strings.Split(content, "\n")
 	if len(arr) < 2 {
 		return errors.New("license format is invalid")
@@ -96,10 +89,12 @@ func VerifyLicenseContent(content string, importVerify bool) error {
 	if err != nil {
 		return errors.New("license signed string verified failed")
 	}
+
 	data, err := base64.StdEncoding.DecodeString(licBase64)
 	if err != nil {
 		return errors.New("base64 decode failed")
 	}
+
 	var lic licmng.LicenseInfo
 	err = json.Unmarshal(data, &lic)
 	if err != nil {
@@ -108,50 +103,66 @@ func VerifyLicenseContent(content string, importVerify bool) error {
 
 	ts := time.Now().Unix()
 	// 导入校验，不区分版本，只区分时间
-	if importVerify {
+	if lic.Version == "trial" {
+		// 适用版本，既比较机器码，又比较时间
+		mcode := dev.GetDeviceID()
+		if mcode != lic.MCode {
+			return errors.New("machine code not matched")
+		}
 		if lic.ExpireTime < ts {
 			return errors.New("license is expired")
 		}
-	} else if lic.Version != "enterprise" && lic.ExpireTime < ts {
-		return errors.New("license is expired")
+	} else if lic.Version == "pro" {
+		// pro版本，只比较机器码，永久
+		mcode := dev.GetDeviceID()
+		if mcode != lic.MCode {
+			return errors.New("machine code not matched")
+		}
+	} else if lic.Version == "enterprise" {
+		// 企业版本，比较时间，不比较机器码
+		if lic.ExpireTime < ts {
+			return errors.New("license is expired")
+		}
 	}
 
 	return nil
 }
 
-var gLicenseValid = false
+var gLicenseVerifyError error = nil
 
-func LicenseIsValid() bool {
-	return gLicenseValid
-}
-
-func checkLocalLicenseFile() error {
-	confDir := eyas.GetConfDir()
-
-	licFile := path.Join(confDir, "xsnos.lic")
-	rd, err := os.Open(licFile)
-	if err != nil {
-		return err
-	}
-	content, err := io.ReadAll(rd)
-	if err != nil {
-		return err
-	}
-	err = VerifyLicenseContent(string(content), false)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func LicenseCheckError() error {
+	return gLicenseVerifyError
 }
 
 func CheckLicenseValid() {
-	err := checkLocalLicenseFile()
+	licFile := GetLicensePath()
+	rd, err := os.Open(licFile)
 	if err != nil {
-		gLicenseValid = false
-	} else {
-		gLicenseValid = true
+		gLicenseVerifyError = fmt.Errorf("open license file failed")
+		logger.Errorf("license file open failed: %s\n", err.Error())
+		return
 	}
+
+	content, err := io.ReadAll(rd)
+	if err != nil {
+		gLicenseVerifyError = fmt.Errorf("read license file failed")
+		logger.Errorf("license file real failed: %s\n", err.Error())
+		return
+	}
+
+	err = VerifyLicenseContent(string(content))
+	if err != nil {
+		gLicenseVerifyError = err
+		logger.Errorf("license file check expired or invalid: %s\n", err.Error())
+		return
+	}
+
+	gLicenseVerifyError = nil
+}
+
+func Init() error {
+	CheckLicenseValid()
+	return nil
 }
 
 func init() {
@@ -163,8 +174,5 @@ func init() {
 		CheckLicenseValid()
 	}, nil)
 
-	initial.Register("license", initial.DefaultPriority, func() error {
-		CheckLicenseValid()
-		return nil
-	})
+	initial.Register("license", initial.DefaultPriority, Init)
 }

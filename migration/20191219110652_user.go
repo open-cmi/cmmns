@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"github.com/open-cmi/migrate"
+	"github.com/open-cmi/cmmns/essential/migrate"
 
 	"github.com/jameskeane/bcrypt"
 )
@@ -14,8 +15,25 @@ import (
 type UserInstance struct {
 }
 
-// SyncData sync data
-func (mi UserInstance) SyncData(db *sqlx.DB) error {
+// SyncAdminData sync data
+func (mi UserInstance) SyncOperatorData(db *sqlx.DB) error {
+	id := uuid.New().String()
+
+	salt, _ := bcrypt.Salt(10)
+	hash, _ := bcrypt.Hash("operator12345678", salt)
+	itime := time.Now().Unix()
+	dbsql := fmt.Sprintf(`
+		INSERT INTO users (id, username, password, email, role, status, activate, itime, utime, description) 
+			values ('%s', 'operator', '%s', 'operator@localhost',
+			'operator', 'offline', true, %d, %d, 'operator');
+  `, id, hash, itime, itime)
+	_, err := db.Exec(dbsql)
+
+	return err
+}
+
+// SyncAdminData sync data
+func (mi UserInstance) SyncAdminData(db *sqlx.DB) error {
 	id := "87fd7602-d20d-4ccb-80c5-b554cae79ce8"
 
 	salt, _ := bcrypt.Salt(10)
@@ -50,7 +68,14 @@ func (mi UserInstance) Up(db *sqlx.DB) error {
       );
 	`)
 	if err == nil {
-		err = mi.SyncData(db)
+		errSync1 := mi.SyncAdminData(db)
+		errSync2 := mi.SyncOperatorData(db)
+		if errSync1 != nil {
+			return errSync1
+		}
+		if errSync2 != nil {
+			return errSync2
+		}
 	}
 	return err
 }

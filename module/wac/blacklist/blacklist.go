@@ -104,7 +104,7 @@ func List(query *goparam.Param) (int, []Blacklist, error) {
 		// 没有的话，也不需要报错
 		return count, users, nil
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var item Blacklist
 		err := rows.StructScan(&item)

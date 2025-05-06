@@ -62,3 +62,7 @@ func (ev *EventChan) Run() {
 		ev.Running = false
 	}()
 }
+
+func (ev *EventChan) Stop() {
+	ev.ExitChan <- 1
+}

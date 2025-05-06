@@ -5,7 +5,7 @@ import (
 	"runtime"
 
 	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/cmmns/service/initial"
+	"github.com/open-cmi/cmmns/initial"
 )
 
 var gConf Config
@@ -39,8 +39,10 @@ func Init() error {
 	if len(gConf.Devices) == 0 {
 		gConf.Devices = LoadNetworkManagementInterface()
 	}
-	err := NetworkApply()
-	return err
+	if len(gConf.Devices) != 0 {
+		return NetworkApply(&gConf)
+	}
+	return nil
 }
 
 func init() {

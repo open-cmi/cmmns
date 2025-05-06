@@ -8,28 +8,18 @@ import (
 	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
-func RoleNameList() (int, []string, error) {
+func GetAllRoleNames() ([]string, error) {
 	db := sqldb.GetDB()
 
 	var roles []string = []string{}
-	countClause := "select count(*) from roles"
-
-	row := db.QueryRow(countClause)
-
-	var count int
-	err := row.Scan(&count)
-	if err != nil {
-		logger.Errorf("roles list count failed, %s\n", err.Error())
-		return 0, roles, errors.New("list count failed")
-	}
 
 	queryClause := `select name from roles`
 	rows, err := db.Queryx(queryClause)
 	if err != nil {
 		// 没有的话，也不需要报错
-		return count, roles, nil
+		return roles, nil
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var name string
 		err := rows.Scan(&name)
@@ -40,7 +30,7 @@ func RoleNameList() (int, []string, error) {
 
 		roles = append(roles, name)
 	}
-	return count, roles, err
+	return roles, err
 }
 
 func RoleList(option *goparam.Param) (int, []Role, error) {
@@ -69,7 +59,7 @@ func RoleList(option *goparam.Param) (int, []Role, error) {
 		// 没有的话，也不需要报错
 		return count, roles, nil
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var item Role
 		err := rows.StructScan(&item)
@@ -84,7 +74,7 @@ func RoleList(option *goparam.Param) (int, []Role, error) {
 }
 
 func DeleteRole(option *goparam.Param, id string) error {
-	role := Get(id)
+	role := GetByID(id)
 	if role == nil {
 		return errors.New("role not exist")
 	}

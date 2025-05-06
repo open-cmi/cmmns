@@ -10,6 +10,7 @@ import (
 // RouterGroup is a function to api group router
 type RouterGroup func(e *gin.Engine)
 
+var mustAuthGroup map[string]string = make(map[string]string)
 var authGroup map[string]string = make(map[string]string)
 var unauthGroup map[string]string = make(map[string]string)
 
@@ -63,6 +64,31 @@ func AuthInit(e *gin.Engine) {
 	}
 }
 
+// AuthInit auth router init
+func MustAuthInit(e *gin.Engine) {
+	for mod, groupPath := range mustAuthGroup {
+		g := e.Group(groupPath)
+		{
+			modPath, found := mustAuthAPIPath[mod]
+			if !found {
+				continue
+			}
+
+			for _, r := range modPath {
+				if r.Method == "POST" {
+					g.POST(r.Path, r.Callback)
+				} else if r.Method == "GET" {
+					g.GET(r.Path, r.Callback)
+				} else if r.Method == "DELETE" {
+					g.DELETE(r.Path, r.Callback)
+				} else if r.Method == "PUT" {
+					g.PUT(r.Path, r.Callback)
+				}
+			}
+		}
+	}
+}
+
 func RegisterAuthRouter(module string, groupPath string) error {
 	_, found := authGroup[module]
 	if found {
@@ -70,6 +96,16 @@ func RegisterAuthRouter(module string, groupPath string) error {
 		return errors.New(errMsg)
 	}
 	authGroup[module] = groupPath
+	return nil
+}
+
+func RegisterMustAuthRouter(module string, groupPath string) error {
+	_, found := mustAuthGroup[module]
+	if found {
+		errMsg := fmt.Sprintf("module %s auth group api has been registered", module)
+		return errors.New(errMsg)
+	}
+	mustAuthGroup[module] = groupPath
 	return nil
 }
 
@@ -90,6 +126,7 @@ type API struct {
 	Callback func(c *gin.Context)
 }
 
+var mustAuthAPIPath map[string][]API = make(map[string][]API)
 var authAPIPath map[string][]API = make(map[string][]API)
 var unauthAPIPath map[string][]API = make(map[string][]API)
 
@@ -125,6 +162,24 @@ func RegisterUnauthAPI(prod string, method string, path string, proc func(c *gin
 		Callback: proc,
 	})
 	unauthAPIPath[prod] = modPath
+
+	return nil
+}
+
+func RegisterMustAuthAPI(prod string, method string, path string, proc func(c *gin.Context)) error {
+	modPath, found := mustAuthAPIPath[prod]
+	if !found {
+		mustAuthAPIPath[prod] = []API{}
+		modPath = mustAuthAPIPath[prod]
+	}
+
+	modPath = append(modPath, API{
+		Prod:     prod,
+		Method:   method,
+		Path:     path,
+		Callback: proc,
+	})
+	mustAuthAPIPath[prod] = modPath
 
 	return nil
 }

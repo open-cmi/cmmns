@@ -10,8 +10,8 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/memstore"
-	"github.com/topmyself/redistore"
+	"github.com/open-cmi/cmmns/pkg/memstore"
+	"github.com/open-cmi/cmmns/pkg/redistore"
 )
 
 var redisStore *redistore.RediStore
@@ -19,7 +19,7 @@ var memoryStore *memstore.MemStore
 
 func GetSession(c *gin.Context) (*sessions.Session, error) {
 	if gConf.Store == "memory" {
-		return memoryStore.Get(c.Request, "cmmns")
+		return memoryStore.Get(c.Request, "koa")
 	} else {
 		return redisStore.Get(c.Request, "koa")
 	}
@@ -168,16 +168,3 @@ func DeleteAuthToken(name string) error {
 	}
 	return nil
 }
-
-// // Web Access Control middleware
-// func WACMiddleware(r *gin.Engine) {
-// 	r.Use(func(c *gin.Context) {
-// 		src := c.ClientIP()
-// 		permit := wac.CheckPermit(src)
-// 		if !permit {
-// 			c.String(http.StatusForbidden, "")
-// 			c.Abort()
-// 		}
-// 		c.Next()
-// 	})
-// }

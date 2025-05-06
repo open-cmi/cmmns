@@ -72,7 +72,7 @@ func Get() *LocaleModel {
 	var v string
 	err := row.Scan(&v)
 	if err != nil {
-		logger.Errorf("locale row scan failed: %s\n", err.Error())
+		logger.Debugf("locale row scan failed: %s\n", err.Error())
 		return nil
 	}
 	var m LocaleModel

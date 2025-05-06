@@ -173,7 +173,7 @@ func Set(msg *ConfigRequest) error {
 		return err
 	}
 
-	err = NetworkApply()
+	err = NetworkApply(&gConf)
 	return err
 }
 

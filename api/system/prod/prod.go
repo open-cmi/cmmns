@@ -5,11 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/i18n"
+	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/setting/time"
 	"github.com/open-cmi/cmmns/module/system/locale"
 	"github.com/open-cmi/cmmns/module/system/prod"
-	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func SetProdBasisInfo(c *gin.Context) {
@@ -56,20 +56,7 @@ func GetProdBasisInfo(c *gin.Context) {
 	})
 }
 
-func ToggleExperimentalSetting(c *gin.Context) {
-
-	ah := auditlog.NewAuditHandler(c)
-	ah.InsertOperationLog(i18n.Sprintf("toggle experimental setting"), true)
-	prod.ToggleExperimentalSetting()
-
-	c.JSON(http.StatusOK, gin.H{
-		"ret": 0,
-		"msg": "",
-	})
-}
-
 func init() {
 	webserver.RegisterUnauthAPI("system", "GET", "/prod/basis/", GetProdBasisInfo)
 	webserver.RegisterUnauthAPI("system", "POST", "/prod/basis/", SetProdBasisInfo)
-	webserver.RegisterAuthAPI("system", "POST", "/prod/experimental-setting/", ToggleExperimentalSetting)
 }

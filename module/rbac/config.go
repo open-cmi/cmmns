@@ -1,4 +1,4 @@
-package prod
+package rbac
 
 import (
 	"encoding/json"
@@ -15,24 +15,24 @@ type Menu struct {
 	Children     []Menu `json:"children,omitempty"`
 }
 
-type NavConfig struct {
-	Experimental bool   `json:"experimental"`
-	Menus        []Menu `json:"menus"`
+type RbacMenu struct {
+	NoLic []Menu            `json:"nolic"`
+	Roles map[string][]Menu `json:"roles"`
 }
 
-var gNavConf NavConfig
+var gRbacMenus RbacMenu
 
 func Parse(mess json.RawMessage) error {
-	err := json.Unmarshal(mess, &gNavConf)
+	err := json.Unmarshal(mess, &gRbacMenus)
 
 	return err
 }
 
 func Save() json.RawMessage {
-	v, _ := json.Marshal(gNavConf)
+	v, _ := json.Marshal(gRbacMenus)
 	return v
 }
 
 func init() {
-	config.RegisterConfig("nav", Parse, Save)
+	config.RegisterConfig("rbac", Parse, Save)
 }

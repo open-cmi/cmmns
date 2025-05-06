@@ -1,7 +1,7 @@
 package system
 
 import (
-	"github.com/open-cmi/cmmns/service/ticker"
+	"github.com/open-cmi/cmmns/essential/ticker"
 )
 
 func init() {

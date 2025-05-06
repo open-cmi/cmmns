@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/service/initial"
+	"github.com/open-cmi/cmmns/initial"
 )
 
 func GetTimeZoneList() ([]string, error) {

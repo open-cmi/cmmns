@@ -20,6 +20,10 @@ type Service struct {
 }
 
 func New() *Service {
+	if !gConf.Debug {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	return &Service{
 		Engine: gin.New(),
 	}
@@ -27,9 +31,7 @@ func New() *Service {
 
 func (s *Service) Init() error {
 	// init webserver
-
 	middleware.DefaultMiddleware(s.Engine)
-	//middleware.WACMiddleware(s.Engine)
 
 	workDir := eyas.GetRootPath()
 	dir := fmt.Sprintf("%s/static/", workDir)
@@ -37,8 +39,14 @@ func (s *Service) Init() error {
 	middleware.SessionMiddleware(s.Engine)
 	middleware.JWTMiddleware(s.Engine)
 	UnauthInit(s.Engine)
+	if !gConf.StrictAuth {
+		AuthInit(s.Engine)
+	}
 	middleware.AuthMiddleware(s.Engine)
-	AuthInit(s.Engine)
+	if gConf.StrictAuth {
+		AuthInit(s.Engine)
+	}
+	MustAuthInit(s.Engine)
 	return nil
 }
 

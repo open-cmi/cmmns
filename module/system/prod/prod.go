@@ -8,7 +8,7 @@ import (
 
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/service/initial"
+	"github.com/open-cmi/cmmns/initial"
 )
 
 type ProdModel struct {
@@ -80,6 +80,7 @@ func GetProdModel() *ProdModel {
 	}
 	return &m
 }
+
 func NewProdModel() *ProdModel {
 	return &ProdModel{
 		isNew: true,
@@ -107,10 +108,6 @@ func SetProdBasisInfo(req *ProdInfoSetRequest) error {
 	m.Name = req.Name
 	m.Footer = req.Footer
 	return m.Save()
-}
-
-func ToggleExperimentalSetting() {
-	gNavConf.Experimental = !gNavConf.Experimental
 }
 
 func Init() error {

@@ -2,7 +2,7 @@ package migration
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/open-cmi/migrate"
+	"github.com/open-cmi/cmmns/essential/migrate"
 )
 
 // LicenseInstance migrate
@@ -18,8 +18,9 @@ func (mi LicenseInstance) Up(db *sqlx.DB) error {
 			prod varchar(64) not NULL default '',
 			version varchar(64) not null default '',
 			modules text not NULL default '',
+			model varchar(64) default '',
 			expire_time BIGINT NOT NULL DEFAULT 0,
-			machine varchar(64) not null default '',
+			mcode varchar(256) not null default '',
 			created_time BIGINT NOT NULL DEFAULT 0,
 			updated_time BIGINT NOT NULL DEFAULT 0
 		)

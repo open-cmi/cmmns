@@ -15,12 +15,14 @@ type Server struct {
 }
 
 type Config struct {
-	Server []Server `json:"server"`
+	Debug      bool     `json:"debug"`
+	Server     []Server `json:"server"`
+	StrictAuth bool     `json:"strict_auth"`
 }
 
 var gConf Config
 
-func Init(raw json.RawMessage) error {
+func Parse(raw json.RawMessage) error {
 	err := json.Unmarshal(raw, &gConf)
 	return err
 }
@@ -42,5 +44,5 @@ func init() {
 		Proto:   "unix",
 	})
 
-	config.RegisterConfig("webserver", Init, Save)
+	config.RegisterConfig("webserver", Parse, Save)
 }

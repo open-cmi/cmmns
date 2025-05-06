@@ -9,10 +9,11 @@ import (
 
 // 条件比较
 type FilterParam struct {
-	Type      string      `json:"type"`
-	Name      string      `json:"name"`
-	Value     interface{} `json:"value"`
-	Condition string      `json:"condition"`
+	Type          string      `json:"type"`
+	Name          string      `json:"name"`
+	Value         interface{} `json:"value"`
+	Condition     string      `json:"condition"`
+	CaseSensitive bool        `json:"casesensitive"`
 }
 
 // PageParam page param
@@ -29,12 +30,14 @@ type OrderParam struct {
 
 // Param model option
 type Param struct {
-	UserID     string
-	Role       string
-	DevID      string
-	PageParam  PageParam
-	OrderParam OrderParam
-	Filters    []FilterParam
+	UserID      string
+	Role        string
+	DevID       string
+	WhereClause string
+	WhereArgs   []interface{}
+	PageParam   PageParam
+	OrderParam  OrderParam
+	Filters     []FilterParam
 }
 
 func GetColumn(v interface{}, skipColumn []string) []string {
@@ -99,10 +102,18 @@ func BuildWhereClause(opt *Param) (format string, args []interface{}) {
 		if filter.Type == "string" {
 			value := filter.Value.(string)
 			if filter.Condition == "contains" {
-				clause += fmt.Sprintf(` UPPER(%s) like UPPER('%%' || $%d || '%%')`, filter.Name, index+1)
+				if filter.CaseSensitive {
+					clause += fmt.Sprintf(` %s like '%%' || $%d || '%%'`, filter.Name, index+1)
+				} else {
+					clause += fmt.Sprintf(` UPPER(%s) like UPPER('%%' || $%d || '%%')`, filter.Name, index+1)
+				}
 				args = append(args, value)
 			} else if filter.Condition == "eq" {
-				clause += fmt.Sprintf(" UPPER(%s) = UPPER($%d)", filter.Name, index+1)
+				if filter.CaseSensitive {
+					clause += fmt.Sprintf(" %s = $%d", filter.Name, index+1)
+				} else {
+					clause += fmt.Sprintf(" UPPER(%s) = UPPER($%d)", filter.Name, index+1)
+				}
 				args = append(args, value)
 			}
 		} else if filter.Type == "number" || filter.Type == "integer" {
@@ -122,6 +133,11 @@ func BuildWhereClause(opt *Param) (format string, args []interface{}) {
 			} else if filter.Condition == "ge" {
 				clause += fmt.Sprintf(" %s >= $%d", filter.Name, index+1)
 				args = append(args, value)
+			}
+		} else if filter.Type == "json-array" {
+			if filter.Condition == "in" {
+				clause += fmt.Sprintf(" %s ? $%d", filter.Name, index+1)
+				args = append(args, filter.Value)
 			}
 		}
 	}

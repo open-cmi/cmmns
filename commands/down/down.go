@@ -7,9 +7,9 @@ import (
 	"os"
 
 	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/essential/migrate"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 	"github.com/open-cmi/cmmns/essential/subcommands"
-	"github.com/open-cmi/migrate"
 )
 
 type DownCommand struct {

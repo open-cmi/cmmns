@@ -68,7 +68,7 @@ func Get() *PublicNet {
 	var v string
 	err := row.Scan(&v)
 	if err != nil {
-		logger.Errorf("pubnet row scan failed: %s\n", err.Error())
+		logger.Debugf("pubnet row scan failed: %s\n", err.Error())
 		return nil
 	}
 	var m PublicNet

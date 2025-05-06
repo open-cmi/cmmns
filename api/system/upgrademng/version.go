@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/pkg/eyas"
-	"github.com/open-cmi/cmmns/service/webserver"
 )
 
 func GetCurrentVersion(c *gin.Context) {
