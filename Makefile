@@ -1,6 +1,7 @@
 ROOT := $(shell pwd)
 
 TARGET=$(ROOT)/main/cmmns
+all:build
 
 .PHONY:dep
 dep:
