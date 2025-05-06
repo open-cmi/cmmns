@@ -20,11 +20,11 @@ func (mi UserInstance) SyncOperatorData(db *sqlx.DB) error {
 	id := uuid.New().String()
 
 	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash("123456", salt)
+	hash, _ := bcrypt.Hash("operator12345678", salt)
 	itime := time.Now().Unix()
 	dbsql := fmt.Sprintf(`
 		INSERT INTO users (id, username, password, email, role, status, activate, itime, utime, description) 
-			values ('%s', 'operator', '%s', 'admin@localhost',
+			values ('%s', 'operator', '%s', 'operator@localhost',
 			'operator', 'offline', true, %d, %d, 'operator');
   `, id, hash, itime, itime)
 	_, err := db.Exec(dbsql)

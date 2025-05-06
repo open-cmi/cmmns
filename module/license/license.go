@@ -10,6 +10,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/module/licmng"
@@ -77,7 +78,7 @@ func SetProductSerial(serial string, prod string) error {
 		var verifySuccess bool = false
 		tp := strings.LastIndex(serial, "-") + 1
 		expirestr := serial[tp:]
-		expireTime, _ = strconv.ParseInt(expirestr, 10, 0)
+		expireTime, _ = strconv.ParseInt(expirestr, 16, 0)
 		for _, ver := range versions {
 			for _, mdl := range models {
 				s = licmng.GenerateSerial(ver, mdl, mcode, expireTime)
@@ -98,6 +99,14 @@ func SetProductSerial(serial string, prod string) error {
 		memstat, _ := mem.VirtualMemory()
 		if memstat.Total > 8*1024*1024*1024 {
 			return fmt.Errorf("serial on this device is not supported")
+		}
+	}
+
+	if version == "trial" {
+		now := time.Now()
+		n := now.AddDate(0, 6, 0)
+		if expireTime > n.Unix() {
+			return fmt.Errorf("invalid serial on trial version")
 		}
 	}
 
