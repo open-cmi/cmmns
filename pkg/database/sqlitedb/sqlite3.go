@@ -47,7 +47,7 @@ func SQLite3Init(conf *Config) (db *sqlx.DB, err error) {
 	if err != nil {
 		return nil, err
 	}
-	db.SetMaxOpenConns(1)
+	//db.SetMaxOpenConns(1)
 	// _, err = db.Exec("PRAGMA busy_timeout=5000;")
 	// if err != nil {
 	// 	logger.Warnf("database set busy_timeout failed: %s\n", err.Error())
