@@ -18,10 +18,8 @@ func ListLicense(query *goparam.Param) (int, []LicenseModel, error) {
 	var lics []LicenseModel = []LicenseModel{}
 	countClause := "select count(*) from license"
 
-	whereClause, args := goparam.BuildWhereClause(query)
-
-	countClause += whereClause
-	row := db.QueryRow(countClause, args...)
+	countClause += query.WhereClause
+	row := db.QueryRow(countClause, query.WhereArgs...)
 
 	var count int
 	err := row.Scan(&count)
@@ -32,8 +30,8 @@ func ListLicense(query *goparam.Param) (int, []LicenseModel, error) {
 
 	queryClause := `select * from license`
 	finalClause := goparam.BuildFinalClause(query)
-	queryClause += (whereClause + finalClause)
-	rows, err := db.Queryx(queryClause, args...)
+	queryClause += (query.WhereClause + finalClause)
+	rows, err := db.Queryx(queryClause, query.WhereArgs...)
 	if err != nil {
 		// 没有的话，也不需要报错
 		return count, lics, nil
@@ -53,7 +51,7 @@ func ListLicense(query *goparam.Param) (int, []LicenseModel, error) {
 	return count, lics, err
 }
 
-func CreateLicense(req *CreateLicenseRequest) (*LicenseModel, error) {
+func CreateLicense(req *CreateLicenseRequest, username string) (*LicenseModel, error) {
 	if req.Version != "trial" && req.Version != "pro" && req.Version != "enterprise" {
 		return nil, fmt.Errorf("not supported version")
 	}
@@ -85,6 +83,7 @@ func CreateLicense(req *CreateLicenseRequest) (*LicenseModel, error) {
 	m.ExpireTime = p.Unix()
 	m.MCode = req.MCode
 	m.Model = req.Model
+	m.User = username
 	err := m.Save()
 	return m, err
 }
