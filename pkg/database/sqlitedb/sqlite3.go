@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/pkg/eyas"
 
 	"github.com/jmoiron/sqlx"
@@ -49,9 +48,9 @@ func SQLite3Init(conf *Config) (db *sqlx.DB, err error) {
 		return nil, err
 	}
 	db.SetMaxOpenConns(1)
-	_, err = db.Exec("PRAGMA busy_timeout=5000;")
-	if err != nil {
-		logger.Warnf("database set busy_timeout failed: %s\n", err.Error())
-	}
+	// _, err = db.Exec("PRAGMA busy_timeout=5000;")
+	// if err != nil {
+	// 	logger.Warnf("database set busy_timeout failed: %s\n", err.Error())
+	// }
 	return db, nil
 }
