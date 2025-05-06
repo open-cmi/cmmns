@@ -4,7 +4,7 @@ TARGET=$(ROOT)/main/cmmns
 
 .PHONY:dep
 dep:
-	cd src && go mod tidy
+	go mod tidy
 
 .PHONY:build
 build:dep
