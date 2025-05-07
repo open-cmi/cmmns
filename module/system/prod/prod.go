@@ -8,7 +8,6 @@ import (
 
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/initial"
 )
 
 type ProdModel struct {
@@ -69,7 +68,7 @@ func GetProdModel() *ProdModel {
 	var v string
 	err := row.Scan(&v)
 	if err != nil {
-		logger.Errorf("prod model row scan failed: %s\n", err.Error())
+		logger.Debugf("prod model row scan failed: %s\n", err.Error())
 		return nil
 	}
 
@@ -90,7 +89,10 @@ func NewProdModel() *ProdModel {
 func GetProdBasisInfo() ProdModel {
 	m := GetProdModel()
 	if m == nil {
-		return ProdModel{}
+		return ProdModel{
+			Name:   gConf.Name,
+			Footer: gConf.Footer,
+		}
 	}
 	return *m
 }
@@ -108,22 +110,4 @@ func SetProdBasisInfo(req *ProdInfoSetRequest) error {
 	m.Name = req.Name
 	m.Footer = req.Footer
 	return m.Save()
-}
-
-func Init() error {
-	m := GetProdModel()
-	if m != nil {
-		return nil
-	}
-
-	m = &ProdModel{
-		Name:   "xsnos",
-		Footer: "xsnos",
-		isNew:  true,
-	}
-	return m.Save()
-}
-
-func init() {
-	initial.Register("prod-model", initial.DefaultPriority, Init)
 }
