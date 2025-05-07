@@ -74,6 +74,12 @@ func CreateLicense(c *gin.Context) {
 	ah := auditlog.NewAuditHandler(c)
 	var req licmng.CreateLicenseRequest
 
+	if !licmng.IsEnable() {
+		c.String(http.StatusNotFound, "404 Not Found")
+		ah.InsertOperationLog(i18n.Sprintf("create license"), false)
+		return
+	}
+
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		ah.InsertOperationLog(i18n.Sprintf("create license"), false)

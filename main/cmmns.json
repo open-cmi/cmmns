@@ -42,6 +42,7 @@
     "public_file": ""
   },
   "licmng": {
+    "enable": true,
     "private_file": ""
   },
   "webserver": {

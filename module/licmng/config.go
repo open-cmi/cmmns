@@ -9,6 +9,7 @@ import (
 var gConf Config
 
 type Config struct {
+	Enable      bool   `json:"enable"`
 	PrivateFile string `json:"private_file"`
 }
 

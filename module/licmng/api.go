@@ -117,3 +117,7 @@ func GenerateSerial(version string, model string, mcode string, expire int64) st
 		result[5], result[6], result[7], result[8], result[9], result[10], result[11], result[12], result[13], result[14], result[15], expire)
 	return serial
 }
+
+func IsEnable() bool {
+	return gConf.Enable
+}
