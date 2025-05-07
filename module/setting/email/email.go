@@ -3,9 +3,9 @@ package email
 import (
 	"crypto/tls"
 	"errors"
-	"fmt"
 	"net"
 	"net/smtp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -35,14 +35,14 @@ func Send(to []string, cc []string, subject string, content string, opt *SendOpt
 	e.Subject = subject
 
 	e.HTML = []byte(content)
-	addr := fmt.Sprintf("%s:%d", m.Server, m.Port)
+	target := net.JoinHostPort(m.Server, strconv.Itoa(m.Port))
 	var tlsConfig tls.Config
 	tlsConfig.InsecureSkipVerify = false
 	tlsConfig.ServerName = m.Server
 
 	var err error
 	if m.UseTLS {
-		err = e.SendWithTLS(addr,
+		err = e.SendWithTLS(target,
 			smtp.PlainAuth(
 				"",
 				m.Sender,
@@ -51,7 +51,7 @@ func Send(to []string, cc []string, subject string, content string, opt *SendOpt
 			&tlsConfig,
 		)
 	} else {
-		err = e.Send(addr,
+		err = e.Send(target,
 			smtp.PlainAuth(
 				"",
 				m.Sender,
@@ -85,7 +85,7 @@ func SetNotifyEmail(req *SetRequest) error {
 }
 
 func CheckEmailSetting(req *SetRequest) error {
-	addr := fmt.Sprintf("%s:%d", req.Server, req.Port)
+	target := net.JoinHostPort(req.Server, strconv.Itoa(req.Port))
 
 	var client *smtp.Client
 	var err error
@@ -96,7 +96,7 @@ func CheckEmailSetting(req *SetRequest) error {
 		}
 		var timeDialer net.Dialer
 		timeDialer.Timeout = 5 * time.Second
-		conn, err := tls.DialWithDialer(&timeDialer, "tcp", addr, tlsConfig)
+		conn, err := tls.DialWithDialer(&timeDialer, "tcp", target, tlsConfig)
 		if err != nil {
 			logger.Infof("check email failed: %s\n", err.Error())
 			return errors.New("server or port is unreachable")
@@ -108,7 +108,7 @@ func CheckEmailSetting(req *SetRequest) error {
 			return errors.New("check whether the server is using tls")
 		}
 	} else {
-		conn, err := net.DialTimeout("tcp", addr, 5*time.Second)
+		conn, err := net.DialTimeout("tcp", target, 5*time.Second)
 		if err != nil {
 			logger.Infof("check email failed: %s\n", err.Error())
 			return errors.New("server or port is unreachable")
