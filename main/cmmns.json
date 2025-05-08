@@ -217,6 +217,36 @@
             }
           ]
         }
+      ],
+      "auditor": [
+        {
+          "path": "/main/system",
+          "name": "system",
+          "icon": "system",
+          "children": [
+            {
+              "path": "/main/system/log",
+              "name": "system log",
+              "children": [
+                {
+                  "path": "/main/system/log/operate",
+                  "name": "operate log"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "/main/my",
+          "name": "my",
+          "icon": "user",
+          "children": [
+            {
+              "path": "/main/my/change-password",
+              "name": "change password"
+            }
+          ]
+        }
       ]
     }
   }

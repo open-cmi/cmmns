@@ -36,6 +36,16 @@ func (mi RBACInstance) SyncData(db *sqlx.DB) error {
 	if err != nil {
 		return err
 	}
+
+	// 添加auditor角色
+	id = uuid.New().String()
+	dbsql = fmt.Sprintf(`
+		INSERT INTO roles (id, name, created_time, updated_time, permisions, description) 
+			values ('%s', 'auditor', %d, %d, '*', 'auditor');`, id, now, now)
+	_, err = db.Exec(dbsql)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

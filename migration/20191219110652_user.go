@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/open-cmi/cmmns/essential/migrate"
 
@@ -15,22 +14,39 @@ import (
 type UserInstance struct {
 }
 
-// SyncAdminData sync data
-func (mi UserInstance) SyncOperatorData(db *sqlx.DB) error {
-	id := uuid.New().String()
+// // SyncAdminData sync data
+// func (mi UserInstance) SyncAuditorData(db *sqlx.DB) error {
+// 	id := uuid.New().String()
 
-	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash("operator12345678", salt)
-	itime := time.Now().Unix()
-	dbsql := fmt.Sprintf(`
-		INSERT INTO users (id, username, password, email, role, status, activate, itime, utime, description) 
-			values ('%s', 'operator', '%s', 'operator@localhost',
-			'operator', 'offline', true, %d, %d, 'operator');
-  `, id, hash, itime, itime)
-	_, err := db.Exec(dbsql)
+// 	salt, _ := bcrypt.Salt(10)
+// 	hash, _ := bcrypt.Hash("auditor12345678", salt)
+// 	itime := time.Now().Unix()
+// 	dbsql := fmt.Sprintf(`
+// 		INSERT INTO users (id, username, password, email, role, status, activate, itime, utime, description)
+// 			values ('%s', 'auditor', '%s', 'auditor@localhost',
+// 			'auditor', 'offline', true, %d, %d, 'auditor');
+//   `, id, hash, itime, itime)
+// 	_, err := db.Exec(dbsql)
 
-	return err
-}
+// 	return err
+// }
+
+// // SyncAdminData sync data
+// func (mi UserInstance) SyncOperatorData(db *sqlx.DB) error {
+// 	id := uuid.New().String()
+
+// 	salt, _ := bcrypt.Salt(10)
+// 	hash, _ := bcrypt.Hash("operator12345678", salt)
+// 	itime := time.Now().Unix()
+// 	dbsql := fmt.Sprintf(`
+// 		INSERT INTO users (id, username, password, email, role, status, activate, itime, utime, description)
+// 			values ('%s', 'operator', '%s', 'operator@localhost',
+// 			'operator', 'offline', true, %d, %d, 'operator');
+//   `, id, hash, itime, itime)
+// 	_, err := db.Exec(dbsql)
+
+// 	return err
+// }
 
 // SyncAdminData sync data
 func (mi UserInstance) SyncAdminData(db *sqlx.DB) error {
@@ -69,12 +85,8 @@ func (mi UserInstance) Up(db *sqlx.DB) error {
 	`)
 	if err == nil {
 		errSync1 := mi.SyncAdminData(db)
-		errSync2 := mi.SyncOperatorData(db)
 		if errSync1 != nil {
 			return errSync1
-		}
-		if errSync2 != nil {
-			return errSync2
 		}
 	}
 	return err
