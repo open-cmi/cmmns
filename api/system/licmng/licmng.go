@@ -88,6 +88,14 @@ func CreateLicense(c *gin.Context) {
 
 	userparam := goparam.GetUser(c)
 	username := userparam["username"].(string)
+	role := userparam["role"].(string)
+
+	// 如果
+	if req.Version == "enterprise" && role != "admin" {
+		ah.InsertOperationLog(i18n.Sprintf("create enterprise license"), false)
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "no permission"})
+		return
+	}
 
 	_, err := licmng.CreateLicense(&req, username)
 	if err != nil {
