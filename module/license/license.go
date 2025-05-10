@@ -115,7 +115,7 @@ func SetProductSerial(serial string, prod string) error {
 	lic.Customer = "local_user"
 	lic.Prod = prod
 	lic.Version = version
-	lic.Modules = "libpar,libapr"
+	lic.Modules = "par,apr"
 	lic.ExpireTime = expireTime
 	lic.MCode = mcode
 	lic.Model = model
