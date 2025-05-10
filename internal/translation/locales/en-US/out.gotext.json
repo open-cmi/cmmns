@@ -30,6 +30,13 @@
             "fuzzy": true
         },
         {
+            "id": "set product serial",
+            "message": "set product serial",
+            "translation": "set product serial",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "list license failed",
             "message": "list license failed",
             "translation": "list license failed",
@@ -40,6 +47,13 @@
             "id": "create license",
             "message": "create license",
             "translation": "create license",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "create enterprise license",
+            "message": "create enterprise license",
+            "translation": "create enterprise license",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -61,13 +75,6 @@
             "id": "set prod basis info",
             "message": "set prod basis info",
             "translation": "set prod basis info",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "toggle experimental setting",
-            "message": "toggle experimental setting",
-            "translation": "toggle experimental setting",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -210,6 +217,13 @@
             "id": "delete user",
             "message": "delete user",
             "translation": "delete user",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "no permission",
+            "message": "no permission",
+            "translation": "no permission",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },

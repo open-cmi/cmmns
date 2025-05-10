@@ -22,6 +22,11 @@
             "translation": "上传license文件"
         },
         {
+            "id": "set product serial",
+            "message": "set product serial",
+            "translation": "设置产品序列号"
+        },
+        {
             "id": "list license failed",
             "message": "list license failed",
             "translation": "获取license列表失败"
@@ -32,24 +37,24 @@
             "translation": "创建license"
         },
         {
+            "id": "create enterprise license",
+            "message": "create enterprise license",
+            "translation": "创建企业授权"
+        },
+        {
             "id": "delete license",
             "message": "delete license",
-            "translation": "删除license"
+            "translation": "删除授权"
         },
         {
             "id": "download license",
             "message": "download license",
-            "translation": "下载license"
+            "translation": "下载授权文件"
         },
         {
             "id": "set prod basis info",
             "message": "set prod basis info",
             "translation": "设置产品基本信息"
-        },
-        {
-            "id": "toggle experimental setting",
-            "message": "toggle experimental setting",
-            "translation": "变更实验性设置"
         },
         {
             "id": "set email setting",
@@ -154,6 +159,11 @@
             "id": "delete user",
             "message": "delete user",
             "translation": "删除用户"
+        },
+        {
+            "id": "no permission",
+            "message": "no permission",
+            "translation": "权限不足"
         },
         {
             "id": "create token",
