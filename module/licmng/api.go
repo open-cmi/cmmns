@@ -108,6 +108,9 @@ func GenerateGeneralSerial(mcode string) string {
 }
 
 func GenerateSerial(version string, model string, mcode string, expire int64) string {
+	if version == "enterprise" {
+		mcode = ""
+	}
 	str := fmt.Sprintf("%s-%s-%s", version, model, mcode)
 	bs64 := base64.StdEncoding.EncodeToString([]byte(str))
 
