@@ -116,10 +116,6 @@
               "name": "shutdown reboot"
             },
             {
-              "path": "/main/system/remote-assist",
-              "name": "remote assist"
-            },
-            {
               "path": "/main/system/notify-setting",
               "name": "notify setting"
             },
