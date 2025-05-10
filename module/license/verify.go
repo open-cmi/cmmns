@@ -120,9 +120,7 @@ func VerifyLicenseContent(content string) error {
 		}
 	} else if lic.Version == "enterprise" {
 		// 企业版本，比较时间，不比较机器码
-		if lic.ExpireTime < ts {
-			return errors.New("license is expired")
-		}
+		// 不比较任何东西
 	}
 
 	return nil
