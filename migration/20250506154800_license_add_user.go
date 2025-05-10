@@ -12,7 +12,7 @@ type LicenseAddUserInstance struct {
 // Up up migrate
 func (mi LicenseAddUserInstance) Up(db *sqlx.DB) error {
 	sqlClause := `
-		ALTER TABLE license ADD COLUMN user varchar(100) default '';
+		ALTER TABLE license ADD COLUMN username varchar(100) default '';
 	`
 	db.Exec(sqlClause)
 	return nil

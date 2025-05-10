@@ -31,7 +31,7 @@ func ListLicense(c *gin.Context) {
 		if whereClause != "" {
 			whereClause += " and "
 		}
-		whereClause += fmt.Sprintf(" user=$%d", paramnum)
+		whereClause += fmt.Sprintf(" username=$%d", paramnum)
 		paramnum += 1
 		whereArgs = append(whereArgs, username)
 	}

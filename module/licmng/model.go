@@ -22,7 +22,7 @@ type LicenseModel struct {
 	MCode       string `json:"mcode" db:"mcode"`
 	Serial      string `json:"serial"`
 	Model       string `json:"model" db:"model"`
-	User        string `json:"user" db:"user"`
+	Username    string `json:"username" db:"username"`
 	CreatedTime int64  `json:"created_time" db:"created_time"`
 	UpdatedTime int64  `json:"updated_time" db:"updated_time"`
 	isNew       bool

@@ -19,7 +19,7 @@ func (mi LicenseInstance) Up(db *sqlx.DB) error {
 			version varchar(64) not null default '',
 			modules text not NULL default '',
 			model varchar(64) default '',
-			user varchar(100) default '',
+			username varchar(100) default '',
 			expire_time BIGINT NOT NULL DEFAULT 0,
 			mcode varchar(256) not null default '',
 			created_time BIGINT NOT NULL DEFAULT 0,

@@ -83,7 +83,7 @@ func CreateLicense(req *CreateLicenseRequest, username string) (*LicenseModel, e
 	m.ExpireTime = p.Unix()
 	m.MCode = req.MCode
 	m.Model = req.Model
-	m.User = username
+	m.Username = username
 	err := m.Save()
 	return m, err
 }
