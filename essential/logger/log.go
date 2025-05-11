@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/cmmns/pkg/clogger"
 	"github.com/open-cmi/cmmns/pkg/eyas"
-	"github.com/open-cmi/cmmns/pkg/logger"
 )
 
 type Feature interface {
@@ -105,16 +105,16 @@ func Parse(raw json.RawMessage) error {
 		return nil
 	}
 
-	level := logger.Info
+	level := clogger.Info
 	switch gConf.Level {
 	case "debug":
-		level = logger.Debug
+		level = clogger.Debug
 	case "info":
-		level = logger.Info
+		level = clogger.Info
 	case "warn":
-		level = logger.Warn
+		level = clogger.Warn
 	case "error":
-		level = logger.Error
+		level = clogger.Error
 	}
 	logPath := gConf.Path
 	if logPath == "" {
@@ -122,7 +122,7 @@ func Parse(raw json.RawMessage) error {
 		logPath = filepath.Join(rp, "data")
 	}
 
-	Logger = logger.NewLogger(&logger.Option{
+	Logger = clogger.NewLogger(&clogger.Option{
 		Dir:        logPath,
 		Compress:   true,
 		Level:      level,
