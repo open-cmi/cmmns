@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 	"github.com/open-cmi/cmmns/essential/webserver"
+	"github.com/open-cmi/cmmns/module/object/time"
 	"github.com/open-cmi/cmmns/pkg/goparam"
-	"github.com/open-cmi/nays/module/object/time"
 )
 
 func ObjectNameList(c *gin.Context) {
