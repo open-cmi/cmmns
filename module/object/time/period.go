@@ -1,7 +1,6 @@
 package time
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -40,7 +39,6 @@ func (o *WeekPeriod) isDaysActive() bool {
 	for _, day := range days {
 		daysInt, err := strconv.Atoi(day)
 		if err != nil {
-			fmt.Printf("dow: %s, day: %s\n", dow.String()[0:2], day)
 			if strings.EqualFold(dow.String()[0:3], day) {
 				return true
 			}
@@ -64,7 +62,6 @@ func (o *WeekPeriod) IsActive() bool {
 	nowUnix := now.Unix()
 
 	ztm := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, nil).Unix()
-	fmt.Printf("start: %d, now: %d, end: %d\n", ztm+o.PeriodTimeStart, nowUnix, ztm+o.PeriodTimeEnd)
 	if ztm+o.PeriodTimeStart < nowUnix && nowUnix < ztm+o.PeriodTimeEnd {
 		return true
 	}
