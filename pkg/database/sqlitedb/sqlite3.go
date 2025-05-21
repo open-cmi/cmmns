@@ -41,7 +41,7 @@ func SQLite3Init(conf *Config) (db *sqlx.DB, err error) {
 	if conf.User != "" && conf.Password != "" {
 		file = fmt.Sprintf("file:%s?cache=shared&mode=rwc&_auth&_auth_user=%s&_auth_pass=%s", dbfile, conf.User, conf.Password)
 	} else {
-		file = fmt.Sprintf("file:%s?cache=shared&mode=rwc", dbfile)
+		file = fmt.Sprintf("file:%s?cache=shared", dbfile)
 	}
 	db, err = sqlx.Open("sqlite3", file)
 	if err != nil {
