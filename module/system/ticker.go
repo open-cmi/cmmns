@@ -4,12 +4,18 @@ import (
 	"github.com/open-cmi/cmmns/essential/ticker"
 )
 
+func MonitorSystemUsage() {
+	if gConf.MonitorUsage {
+		MonitorCpuUsage()
+		MonitorMemUsage()
+	}
+}
+
 func init() {
 	// ticker.Register("system_status", "0 */2 * * * *", func(name string, data interface{}) {
 	// 	StartMonitor()
 	// }, nil)
-	ticker.Register("system_monitor", "*/15 * * * * *", func(name string, data interface{}) {
-		MonitorCpuUsage()
-		MonitorMemUsage()
+	ticker.Register("system_monitor", "*/30 * * * * *", func(name string, data interface{}) {
+		MonitorSystemUsage()
 	}, nil)
 }

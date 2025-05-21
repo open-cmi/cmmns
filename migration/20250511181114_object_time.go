@@ -61,7 +61,7 @@ func init() {
 		Description:   "object_time",
 		Ext:           "go",
 		Instance:      ObjectTimeInstance{},
-		Ignore:        false,
+		Ignore:        true,
 		AlterOpertion: false,
 	})
 }
