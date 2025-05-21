@@ -81,7 +81,7 @@ func QueryAbsoluteTimeObjectList(param *goparam.Param) (int, []AbsoluteTimeObjec
 		logger.Errorf("time object queryx failed: %s\n", err.Error())
 		return 0, results, errors.New("no rows found")
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var mdl TimeObject
 		err := rows.StructScan(&mdl)
@@ -132,7 +132,7 @@ func QueryPeriodTimeObjectList(param *goparam.Param) (int, []PeriodTimeObject, e
 		logger.Errorf("time object queryx failed: %s\n", err.Error())
 		return 0, results, errors.New("no rows found")
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var mdl TimeObject
 		err := rows.StructScan(&mdl)
@@ -165,6 +165,7 @@ func QueryTimeObjectNames(param *goparam.Param) ([]string, error) {
 		return results, errors.New("no rows found")
 	}
 
+	defer rows.Close()
 	for rows.Next() {
 		var name string
 		err := rows.Scan(&name)
@@ -197,7 +198,7 @@ func TimeObjectList() ([]TimeObject, error) {
 		logger.Errorf("time object queryx failed: %s\n", err.Error())
 		return results, errors.New("no rows found")
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var mdl TimeObject
 		err := rows.StructScan(&mdl)
