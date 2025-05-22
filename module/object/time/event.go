@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/essential/ticker"
 )
 
 var Registers map[string]func(string, bool) = make(map[string]func(string, bool))
@@ -42,6 +41,6 @@ func CheckObjectStatus(name string, data interface{}) {
 	}
 }
 
-func init() {
-	ticker.Register("time-object", "*/20 * * * * *", CheckObjectStatus, nil)
-}
+// func init() {
+// 	ticker.Register("time-object", "*/20 * * * * *", CheckObjectStatus, nil)
+// }
