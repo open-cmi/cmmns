@@ -39,7 +39,7 @@
         {
             "id": "create enterprise license",
             "message": "create enterprise license",
-            "translation": "创建企业授权"
+            "translation": "创建企业版授权"
         },
         {
             "id": "delete license",
