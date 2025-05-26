@@ -19,7 +19,7 @@
         {
             "id": "upload license file",
             "message": "upload license file",
-            "translation": "上传license文件"
+            "translation": "上传授权文件"
         },
         {
             "id": "set product serial",
@@ -29,12 +29,12 @@
         {
             "id": "list license failed",
             "message": "list license failed",
-            "translation": "获取license列表失败"
+            "translation": "获取授权列表失败"
         },
         {
             "id": "create license",
             "message": "create license",
-            "translation": "创建license"
+            "translation": "创建授权"
         },
         {
             "id": "create enterprise license",
@@ -168,12 +168,12 @@
         {
             "id": "create token",
             "message": "create token",
-            "translation": "创建token"
+            "translation": "创建令牌"
         },
         {
             "id": "delete token",
             "message": "delete token",
-            "translation": "删除token"
+            "translation": "删除令牌"
         },
         {
             "id": "edit user",
@@ -202,32 +202,32 @@
         {
             "id": "list tokens failed",
             "message": "list tokens failed",
-            "translation": "获取token列表失败"
+            "translation": "获取令牌列表失败"
         },
         {
             "id": "set web access control",
             "message": "set web access control",
-            "translation": "设置web访问控制"
+            "translation": "设置页面访问控制"
         },
         {
             "id": "web access control add whitelist",
             "message": "web access control add whitelist",
-            "translation": "web访问控制添加白名单"
+            "translation": "页面访问控制添加白名单"
         },
         {
             "id": "web access control delete whitelist",
             "message": "web access control delete whitelist",
-            "translation": "web访问控制删除白名单"
+            "translation": "页面访问控制删除白名单"
         },
         {
             "id": "web access control add blacklist",
             "message": "web access control add blacklist",
-            "translation": "web访问控制添加黑名单"
+            "translation": "页面访问控制添加黑名单"
         },
         {
             "id": "web access control delete blacklist",
             "message": "web access control delete blacklist",
-            "translation": "web访问控制删除黑名单"
+            "translation": "页面访问控制删除黑名单"
         },
         {
             "id": "success",
