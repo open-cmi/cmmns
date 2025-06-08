@@ -17,7 +17,7 @@ func Init() error {
 	if m == nil {
 		m = New()
 		m.AutoAdjust = true
-		m.NtpServer = "ntp.ubuntu.com"
+		m.NtpServer = "cn.ntp.org.cn"
 		m.TimeZone = "Asia/Shanghai"
 		return m.Save()
 	}
