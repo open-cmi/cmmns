@@ -159,25 +159,6 @@
               "name": "api token"
             }
           ]
-        },
-        {
-          "path": "/main/tools",
-          "name": "tools",
-          "icon": "tool",
-          "children": [
-            {
-              "path": "/main/tools/manhour",
-              "name": "man hour"
-            },
-            {
-              "path": "/main/tools/secret-key",
-              "name": "secret key manager"
-            },
-            {
-              "path": "/main/tools/md5",
-              "name": "md5"
-            }
-          ]
         }
       ],
       "operator": [
