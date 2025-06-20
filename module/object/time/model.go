@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	TimeTypeAbsolute = iota
+	TimeTypeAbsolute int = iota
 	TimeTypePeriod
 )
 
@@ -72,15 +72,17 @@ func (to *TimeObject) Remove() error {
 }
 
 func (t *TimeObject) IsActive() bool {
-	if t.TimeType == TimeTypeAbsolute {
+	switch t.TimeType {
+	case TimeTypeAbsolute:
 		var atm AbsoluteTimeObject
 		json.Unmarshal([]byte(t.Value), &atm)
 		return atm.IsActive()
-	} else if t.TimeType == TimeTypePeriod {
+	case TimeTypePeriod:
 		var ptm PeriodTimeObject
 		json.Unmarshal([]byte(t.Value), &ptm)
 		return ptm.IsActive()
 	}
+
 	return false
 }
 

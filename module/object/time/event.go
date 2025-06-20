@@ -2,6 +2,7 @@ package time
 
 import (
 	"errors"
+	"time"
 
 	"github.com/open-cmi/cmmns/essential/logger"
 )
@@ -19,28 +20,37 @@ func RegisterEvent(mod string, callback func(string, bool)) error {
 
 var allObjs map[string]*TimeObject = make(map[string]*TimeObject)
 
-func CheckObjectStatus(name string, data interface{}) {
-	results, err := TimeObjectList()
-	if err != nil {
-		logger.Errorf("ticker run check status failed: %s\n", err.Error())
-		return
-	}
-	for _, obj := range results {
-		c, ok := allObjs[obj.Name]
-		if !ok {
-			allObjs[obj.Name] = &obj
-			continue
-		}
-		if c.active != obj.IsActive() {
-			for name, cb := range Registers {
-				logger.Infof("start to run time object callback: %s\n", name)
+func AddObject(obj *TimeObject) {
+	allObjs[obj.Name] = obj
+}
+
+func RemoveObject(obj *TimeObject) {
+	delete(allObjs, obj.Name)
+}
+
+func CheckObjectStatus() {
+	for _, obj := range allObjs {
+		if obj.active != obj.IsActive() {
+			logger.Infof("time object status change from %v to %v \n", obj.active, obj.IsActive())
+			for _, cb := range Registers {
 				cb(obj.Name, obj.IsActive())
-				c.active = obj.IsActive()
+				obj.active = obj.IsActive()
 			}
 		}
 	}
 }
 
-// func init() {
-// 	ticker.Register("time-object", "*/20 * * * * *", CheckObjectStatus, nil)
-// }
+var gStopChan chan bool = make(chan bool)
+
+func ObjectEventLoop() {
+	t := time.NewTicker(1 * time.Second)
+	for {
+		select {
+		case <-t.C:
+			CheckObjectStatus()
+		case <-gStopChan:
+			t.Stop()
+			return
+		}
+	}
+}

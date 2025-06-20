@@ -47,6 +47,7 @@ func CreatePeriodTimeObject(req *PeriodTimeObject) error {
 	v, _ := json.Marshal(req)
 	m = CreateNewTimeObject(req.Name, req.Description, TimeTypePeriod, string(v))
 
+	AddObject(m)
 	return m.Save()
 }
 
@@ -184,6 +185,8 @@ func DeleteTimeObject(name string) error {
 	if m == nil {
 		return fmt.Errorf("time object with name %s is not exist", name)
 	}
+
+	RemoveObject(m)
 	return m.Remove()
 }
 
