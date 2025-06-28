@@ -102,11 +102,12 @@ func RunUnixServer(eng *gin.Engine, s *Server) {
 func (s *Service) Run() error {
 	// unix sock api
 	for _, srv := range gConf.Server {
-		if srv.Proto == "unix" {
+		switch srv.Proto {
+		case "unix":
 			go RunUnixServer(s.Engine, &srv)
-		} else if srv.Proto == "http" {
+		case "http":
 			go RunHTTPServer(s.Engine, &srv)
-		} else if srv.Proto == "https" {
+		case "https":
 			go RunHTTPSServer(s.Engine, &srv)
 		}
 	}

@@ -2,7 +2,8 @@ package evchan
 
 import (
 	"errors"
-	"fmt"
+
+	"github.com/open-cmi/cmmns/essential/i18n"
 )
 
 type EventData struct {
@@ -35,8 +36,7 @@ func (ev *EventChan) NotifyEvent(event string, data interface{}) {
 func (ev *EventChan) RegisterEvent(event string, handler func(event string, data interface{})) error {
 	_, ok := ev.Handlers[event]
 	if ok {
-		errmsg := fmt.Sprintf("event handler %s is existed", event)
-		return errors.New(errmsg)
+		return errors.New(i18n.Sprintf("event handler %s is existing", event))
 	}
 	ev.Handlers[event] = handler
 	return nil

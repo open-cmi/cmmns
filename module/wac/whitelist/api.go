@@ -4,14 +4,16 @@ import (
 	"errors"
 	"time"
 
+	"github.com/open-cmi/cmmns/essential/i18n"
 	"github.com/open-cmi/cmmns/module/nginxconf"
 )
 
 func AddWhitelist(address string) error {
 	blk := Get(address)
 	if blk != nil {
-		return errors.New("address is existed")
+		return errors.New(i18n.Sprintf("address %s is existing", address))
 	}
+
 	blk = New()
 	blk.Address = address
 	blk.Timestamp = time.Now().Unix()

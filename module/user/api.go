@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jameskeane/bcrypt"
+	"github.com/open-cmi/cmmns/essential/i18n"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/pubsub"
 	"github.com/open-cmi/cmmns/essential/rdb"
@@ -134,7 +135,7 @@ func Create(m *CreateMsg) (err error) {
 	err = row.Scan(&un)
 	if err == nil {
 		// 用户名已经被占用
-		return errors.New("username or email is exist")
+		return errors.New(i18n.Sprint("username or email is existing"))
 	}
 
 	id := uuid.New()
