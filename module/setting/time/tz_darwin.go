@@ -17,7 +17,7 @@ func Init() error {
 	if m == nil {
 		m = New()
 		m.AutoAdjust = true
-		m.NtpServer = "ntp.ubuntu.com"
+		m.NtpServer = "cn.ntp.org.cn"
 		m.TimeZone = "Asia/Shanghai"
 		return m.Save()
 	}
@@ -25,5 +25,5 @@ func Init() error {
 }
 
 func init() {
-	initial.Register("time-setting", initial.DefaultPriority, Init)
+	initial.Register("time-setting", initial.PhaseDefault, Init)
 }

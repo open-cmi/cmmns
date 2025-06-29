@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jameskeane/bcrypt"
+	"github.com/open-cmi/cmmns/essential/i18n"
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/pubsub"
 	"github.com/open-cmi/cmmns/essential/rdb"
@@ -134,7 +135,7 @@ func Create(m *CreateMsg) (err error) {
 	err = row.Scan(&un)
 	if err == nil {
 		// 用户名已经被占用
-		return errors.New("username or email is exist")
+		return errors.New(i18n.Sprint("username or email is existing"))
 	}
 
 	id := uuid.New()
@@ -205,7 +206,7 @@ func Register(m *RegisterMsg) (err error) {
 func Edit(req *EditMsg) error {
 	user := Get(req.ID)
 	if user == nil {
-		return errors.New("user is not exist")
+		return errors.New("user is is not existing")
 	}
 	user.Email = req.Email
 	user.Role = req.Role
@@ -218,7 +219,7 @@ func Edit(req *EditMsg) error {
 func ChangePassword(userid string, password string) error {
 	u := Get(userid)
 	if u == nil {
-		return errors.New("users not exist")
+		return errors.New("users is not existing")
 	}
 
 	salt, _ := bcrypt.Salt(10)
@@ -242,7 +243,7 @@ func ResetPasswd(req *ResetPasswdRequest) error {
 func Delete(id string) error {
 	u := Get(id)
 	if u == nil {
-		return errors.New("user does not exist")
+		return errors.New("user does is not existing")
 	}
 	err := u.Remove()
 	return err

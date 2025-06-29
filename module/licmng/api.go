@@ -91,7 +91,7 @@ func CreateLicense(req *CreateLicenseRequest, username string) (*LicenseModel, e
 func DeleteLicense(id string) error {
 	m := Get(id)
 	if m == nil {
-		return errors.New("license not exist")
+		return errors.New("license is not existing")
 	}
 	return m.Remove()
 }

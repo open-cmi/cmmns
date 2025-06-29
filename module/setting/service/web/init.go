@@ -14,5 +14,5 @@ func Init() error {
 }
 
 func init() {
-	initial.Register("service-port-setting", initial.DefaultPriority, Init)
+	initial.Register("service-port-setting", initial.PhaseDefault, Init)
 }

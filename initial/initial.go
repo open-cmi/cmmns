@@ -9,11 +9,9 @@ import (
 )
 
 const (
-	PhaseConfig     = 0
-	PhaseEssential  = 1
-	DefaultPriority = 50
-	PhaseWebserver  = 99
-	PhaseTicker     = 100
+	PhaseZero    = 0
+	PhaseDefault = 50
+	PhaseFinal   = 100
 )
 
 type Business struct {

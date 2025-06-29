@@ -35,7 +35,7 @@ func ExecSQLMigrate(db *sqlx.DB, si *SeqInfo, updown string) (err error) {
 
 	_, err = os.Stat(sqlfilepath)
 	if err != nil {
-		return fmt.Errorf("migrate file %s not exist", sqlfilepath)
+		return fmt.Errorf("migrate file %s is not existing", sqlfilepath)
 	}
 
 	// exec file content

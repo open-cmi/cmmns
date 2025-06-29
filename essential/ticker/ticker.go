@@ -47,7 +47,6 @@ func Register(name string, spec string, f func(string, interface{}), data interf
 }
 
 func Init() error {
-
 	for i := range tickers {
 		t := tickers[i]
 		ins := cron.New(cron.WithSeconds())
@@ -75,7 +74,7 @@ func Close() {
 func Remove(name string) error {
 	ins, ok := cronMap[name]
 	if !ok {
-		return errors.New("cron task not exist")
+		return errors.New("cron task is not existing")
 	}
 	ins.Stop()
 	delete(cronMap, name)
@@ -84,5 +83,5 @@ func Remove(name string) error {
 }
 
 func init() {
-	initial.Register("ticker", initial.PhaseTicker, Init)
+	initial.Register("ticker", initial.PhaseFinal, Init)
 }

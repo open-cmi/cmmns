@@ -97,7 +97,7 @@ func (g *GenerateOpt) Run() error {
 		wfilepath := filepath.Join(MigrateDir, wfile)
 		wf, err := os.OpenFile(wfilepath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 		if err != nil {
-			fmt.Printf("create file failed in migrations, please confirm migrations directory is exist\n")
+			fmt.Println("create file failed in migrations, please confirm migrations directory is existing")
 			return err
 		}
 

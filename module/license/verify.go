@@ -172,5 +172,5 @@ func init() {
 		CheckLicenseValid()
 	}, nil)
 
-	initial.Register("license", initial.DefaultPriority, Init)
+	initial.Register("license", initial.PhaseDefault, Init)
 }

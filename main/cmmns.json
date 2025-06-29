@@ -68,7 +68,7 @@
     "nolic": [
       {
         "path": "/main/system",
-        "name": "system",
+        "name": "system management",
         "icon": "system",
         "children": [
           {
@@ -86,22 +86,12 @@
       "admin": [
         {
           "path": "/main/system",
-          "name": "system",
+          "name": "system management",
           "icon": "system",
           "children": [
             {
               "path": "/main/system/sysinfo",
               "name": "system info"
-            },
-            {
-              "path": "/main/system/log",
-              "name": "system log",
-              "children": [
-                {
-                  "path": "/main/system/log/operate",
-                  "name": "operate log"
-                }
-              ]
             },
             {
               "path": "/main/system/security-setting",
@@ -146,6 +136,17 @@
           ]
         },
         {
+          "path": "/main/log",
+          "name": "log",
+          "icon": "log",
+          "children": [
+            {
+              "path": "/main/log/operate",
+              "name": "operate log"
+            }
+          ]
+        },
+        {
           "path": "/main/my",
           "name": "my",
           "icon": "user",
@@ -159,46 +160,28 @@
               "name": "api token"
             }
           ]
-        },
-        {
-          "path": "/main/tools",
-          "name": "tools",
-          "icon": "tool",
-          "children": [
-            {
-              "path": "/main/tools/manhour",
-              "name": "man hour"
-            },
-            {
-              "path": "/main/tools/secret-key",
-              "name": "secret key manager"
-            },
-            {
-              "path": "/main/tools/md5",
-              "name": "md5"
-            }
-          ]
         }
       ],
       "operator": [
         {
           "path": "/main/system",
-          "name": "system",
+          "name": "system management",
           "icon": "system",
           "children": [
             {
-              "path": "/main/system/log",
-              "name": "system log",
-              "children": [
-                {
-                  "path": "/main/system/log/operate",
-                  "name": "operate log"
-                }
-              ]
-            },
-            {
               "path": "/main/system/license-manager",
               "name": "license manager"
+            }
+          ]
+        },
+        {
+          "path": "/main/log",
+          "name": "log",
+          "icon": "log",
+          "children": [
+            {
+              "path": "/main/log/operate",
+              "name": "operate log"
             }
           ]
         },
@@ -216,19 +199,13 @@
       ],
       "auditor": [
         {
-          "path": "/main/system",
-          "name": "system",
-          "icon": "system",
+          "path": "/main/log",
+          "name": "log",
+          "icon": "log",
           "children": [
             {
-              "path": "/main/system/log",
-              "name": "system log",
-              "children": [
-                {
-                  "path": "/main/system/log/operate",
-                  "name": "operate log"
-                }
-              ]
+              "path": "/main/log/operate",
+              "name": "operate log"
             }
           ]
         },

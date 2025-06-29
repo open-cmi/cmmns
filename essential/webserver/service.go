@@ -11,7 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/module/middleware"
+	"github.com/open-cmi/cmmns/essential/webserver/middleware"
 	"github.com/open-cmi/cmmns/pkg/eyas"
 )
 
@@ -50,45 +50,65 @@ func (s *Service) Init() error {
 	return nil
 }
 
+func RunHTTPSServer(eng *gin.Engine, s *Server) {
+	rp := eyas.GetRootPath()
+	var certFile string
+	if strings.HasPrefix(s.CertFile, ".") {
+		certFile = filepath.Join(rp, s.CertFile)
+	} else {
+		certFile = s.CertFile
+	}
+	var keyFile string
+	if strings.HasPrefix(s.KeyFile, ".") {
+		keyFile = filepath.Join(rp, s.KeyFile)
+	} else {
+		keyFile = s.KeyFile
+	}
+	t := net.JoinHostPort(s.Address, strconv.Itoa(s.Port))
+	logger.Debugf("tls server started: %s, cert %s, key %s",
+		t, certFile, keyFile)
+	err := eng.RunTLS(t, certFile, keyFile)
+	logger.Debugf("tls server stopped: %s, cert %s, key %s, err: %s",
+		t, certFile, keyFile, err.Error())
+}
+
+func RunHTTPServer(eng *gin.Engine, s *Server) {
+	t := net.JoinHostPort(s.Address, strconv.Itoa(s.Port))
+	logger.Debugf("http server started: %s\n", t)
+	err := eng.Run(t)
+	logger.Debugf("http server %s stopped: %s\n", t, err.Error())
+}
+
+func RunUnixServer(eng *gin.Engine, s *Server) {
+	sockAddr := s.Address
+	os.Remove(sockAddr)
+	unixAddr, err := net.ResolveUnixAddr("unix", sockAddr)
+	if err != nil {
+		logger.Error(err.Error() + "\n")
+		return
+	}
+
+	listener, err := net.ListenUnix("unix", unixAddr)
+	if err != nil {
+		logger.Errorf("listening error: %s\n", err.Error())
+		return
+	}
+
+	logger.Debugf("unix socket started: %s\n", sockAddr)
+	err = http.Serve(listener, eng)
+	logger.Debugf("unix socket %s stopped: %s\n", sockAddr, err.Error())
+}
+
 func (s *Service) Run() error {
 	// unix sock api
 	for _, srv := range gConf.Server {
-		if srv.Proto == "unix" {
-			sockAddr := srv.Address
-			os.Remove(sockAddr)
-			unixAddr, err := net.ResolveUnixAddr("unix", sockAddr)
-			if err != nil {
-				logger.Error(err.Error() + "\n")
-				return err
-			}
-
-			listener, err := net.ListenUnix("unix", unixAddr)
-			if err != nil {
-				logger.Errorf("listening error: %s\n", err.Error())
-			}
-
-			logger.Debugf("listening unix socket: %s\n", sockAddr)
-			go http.Serve(listener, s.Engine)
-		} else if srv.Proto == "http" {
-			go s.Engine.Run(srv.Address + ":" + strconv.Itoa(srv.Port))
-		} else if srv.Proto == "https" {
-			rp := eyas.GetRootPath()
-			var certFile string
-			if strings.HasPrefix(srv.CertFile, ".") {
-				certFile = filepath.Join(rp, srv.CertFile)
-			} else {
-				certFile = srv.CertFile
-			}
-			var keyFile string
-			if strings.HasPrefix(srv.KeyFile, ".") {
-				keyFile = filepath.Join(rp, srv.KeyFile)
-			} else {
-				keyFile = srv.KeyFile
-			}
-			logger.Debugf("run tls %s:%d, cert %s, key %s",
-				srv.Address, srv.Port, certFile, keyFile)
-			go s.Engine.RunTLS(srv.Address+":"+strconv.Itoa(srv.Port),
-				certFile, keyFile)
+		switch srv.Proto {
+		case "unix":
+			go RunUnixServer(s.Engine, &srv)
+		case "http":
+			go RunHTTPServer(s.Engine, &srv)
+		case "https":
+			go RunHTTPSServer(s.Engine, &srv)
 		}
 	}
 

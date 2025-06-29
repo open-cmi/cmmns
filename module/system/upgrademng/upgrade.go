@@ -57,5 +57,5 @@ func Init() error {
 }
 
 func init() {
-	initial.Register("upgrade", initial.DefaultPriority, Init)
+	initial.Register("upgrade", initial.PhaseDefault, Init)
 }

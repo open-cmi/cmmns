@@ -76,7 +76,7 @@ func RoleList(option *goparam.Param) (int, []Role, error) {
 func DeleteRole(option *goparam.Param, id string) error {
 	role := GetByID(id)
 	if role == nil {
-		return errors.New("role not exist")
+		return errors.New("role is not existing")
 	}
 	if role.Name == "admin" {
 		return errors.New("admin should not be deleted")
@@ -88,7 +88,7 @@ func DeleteRole(option *goparam.Param, id string) error {
 func GetPermisions(roleName string) (string, error) {
 	role := GetByName(roleName)
 	if role == nil {
-		return "", errors.New("role not exist")
+		return "", errors.New("role is not existing")
 	}
 	return role.Permisions, nil
 }

@@ -15,7 +15,7 @@ func GetRoleMenus(roleName string) []Menu {
 
 	role := GetByName(roleName)
 	if role == nil {
-		logger.Errorf("role not exist")
+		logger.Errorf("role is not existing")
 		return []Menu{}
 	}
 

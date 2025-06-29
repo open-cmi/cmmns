@@ -6,6 +6,10 @@ import (
 )
 
 func Init() error {
+	if !gShouldStartServer {
+		return nil
+	}
+
 	// start web service
 	s := New()
 
@@ -26,5 +30,5 @@ func Init() error {
 }
 
 func init() {
-	initial.Register("webserver", initial.PhaseWebserver, Init)
+	initial.Register("webserver", initial.PhaseFinal, Init)
 }

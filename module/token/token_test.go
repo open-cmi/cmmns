@@ -1,16 +1,22 @@
-package middleware
+package token
 
 import (
 	"testing"
 	"time"
+
+	"github.com/open-cmi/cmmns/essential/webserver/middleware"
 )
 
 func TestGenerateToken(t *testing.T) {
-	token, err := GenerateAuthToken("test", "frank", "10001", "frank@163.com", 0, 1, 1)
+	err := CreateToken("test", "frank", "10001", "frank@163.com", 0, 1, 1)
 	if err != nil {
 		t.Errorf("user generate token failed")
 	}
-	claims, err := ParseAuthToken(token)
+	m := GetTokenRecord("frank")
+	if m == nil {
+		t.Errorf("get token failed")
+	}
+	claims, err := middleware.ParseAuthToken(m.Token)
 	if claims == nil || err != nil {
 		t.Errorf("user token parse failed")
 		return
@@ -31,7 +37,7 @@ func TestGenerateToken(t *testing.T) {
 		t.Errorf("role is invalid")
 	}
 	time.Sleep(2 * time.Second)
-	claims, err = ParseAuthToken(token)
+	claims, err = middleware.ParseAuthToken(m.Token)
 	if err != nil {
 		t.Errorf("user token parse failed: %s", err.Error())
 		return

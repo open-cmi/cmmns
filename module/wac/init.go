@@ -45,5 +45,5 @@ func Init() error {
 }
 
 func init() {
-	initial.Register("wac", initial.DefaultPriority, Init)
+	initial.Register("wac", initial.PhaseDefault, Init)
 }

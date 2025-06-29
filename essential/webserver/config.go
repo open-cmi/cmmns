@@ -21,8 +21,10 @@ type Config struct {
 }
 
 var gConf Config
+var gShouldStartServer bool = false
 
 func Parse(raw json.RawMessage) error {
+	gShouldStartServer = true
 	err := json.Unmarshal(raw, &gConf)
 	return err
 }
@@ -33,16 +35,5 @@ func Save() json.RawMessage {
 }
 
 func init() {
-	// default config
-
-	gConf.Server = append(gConf.Server, Server{
-		Address: "127.0.0.1",
-		Port:    30000,
-		Proto:   "http",
-	}, Server{
-		Address: "/tmp/cmmns.sock",
-		Proto:   "unix",
-	})
-
 	config.RegisterConfig("webserver", Parse, Save)
 }

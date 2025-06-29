@@ -88,7 +88,7 @@ func Activate(c *gin.Context) {
 	activateCode := fmt.Sprintf("activate_code_%s", code)
 	username, err := cache.Get(context.TODO(), activateCode).Result()
 	if err != nil {
-		c.String(200, "activate code is not exist")
+		c.String(200, "activate code is is not existing")
 		return
 	}
 

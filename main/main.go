@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	_ "github.com/open-cmi/cmmns/internal/commands"
 	_ "github.com/open-cmi/cmmns/internal/translation"
 
 	"github.com/open-cmi/cmmns"
