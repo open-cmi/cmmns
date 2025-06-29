@@ -8,7 +8,7 @@ import (
 
 	netio "github.com/shirou/gopsutil/net"
 
-	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/gobase/essential/logger"
 )
 
 func Get() []ConfigRequest {

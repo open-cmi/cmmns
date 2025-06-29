@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"runtime"
 
-	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/cmmns/initial"
+	"github.com/open-cmi/gobase/essential/config"
+	"github.com/open-cmi/gobase/initial"
 )
 
 var gConf Config

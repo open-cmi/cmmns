@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/open-cmi/cmmns/essential/i18n"
 	"github.com/open-cmi/cmmns/module/nginxconf"
+	"github.com/open-cmi/gobase/essential/i18n"
 )
 
 func AddBlacklist(address string) error {

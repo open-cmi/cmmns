@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/system"
+	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetSystemStatusInfo(c *gin.Context) {

@@ -6,10 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/essential/sqldb"
 	"github.com/open-cmi/cmmns/pkg/shell"
-	"github.com/open-cmi/cmmns/pkg/systemctl"
+	"github.com/open-cmi/gobase/essential/logger"
+	"github.com/open-cmi/gobase/essential/sqldb"
 )
 
 type SSHServiceModel struct {
@@ -116,11 +115,11 @@ func SetSSHServiceSetting(req *SetSSHServiceRequest) error {
 		return err
 	}
 	if oen && req.Enable {
-		err = systemctl.RestartService("ssh")
+		err = shell.Execute("systemctl restart sshd")
 	} else if oen && !req.Enable {
-		err = systemctl.StopService("ssh")
+		err = shell.Execute("systemctl stop sshd")
 	} else if !oen && req.Enable {
-		err = systemctl.StartService("ssh")
+		err = shell.Execute("systemctl start sshd")
 	}
 	return err
 }

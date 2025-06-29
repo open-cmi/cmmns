@@ -10,11 +10,11 @@ import (
 	"github.com/dchest/captcha"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/open-cmi/cmmns/essential/rdb"
-	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/setting/email"
 	"github.com/open-cmi/cmmns/module/user"
-	"github.com/open-cmi/cmmns/pkg/verify"
+	"github.com/open-cmi/gobase/essential/rdb"
+	"github.com/open-cmi/gobase/essential/webserver"
+	"github.com/open-cmi/gobase/pkg/verify"
 )
 
 // EmailTemplate html content template

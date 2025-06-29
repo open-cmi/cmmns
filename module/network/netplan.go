@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"path"
 
-	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/gobase/essential/logger"
 	"gopkg.in/yaml.v3"
 )
 

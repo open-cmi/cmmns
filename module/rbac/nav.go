@@ -3,8 +3,8 @@ package rbac
 import (
 	"encoding/json"
 
-	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/module/license"
+	"github.com/open-cmi/gobase/essential/logger"
 )
 
 func GetRoleMenus(roleName string) []Menu {

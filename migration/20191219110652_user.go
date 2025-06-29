@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/open-cmi/cmmns/essential/migrate"
+	"github.com/open-cmi/gobase/essential/migrate"
 
 	"github.com/jameskeane/bcrypt"
 )

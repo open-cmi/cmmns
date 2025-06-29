@@ -3,7 +3,7 @@ package translation
 import (
 	_ "embed"
 
-	"github.com/open-cmi/cmmns/pkg/translation"
+	"github.com/open-cmi/gobase/pkg/translation"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 	"golang.org/x/text/message/catalog"

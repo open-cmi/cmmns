@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/essential/webserver"
+	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 type MD5Request struct {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"github.com/open-cmi/cmmns/essential/migrate"
+	"github.com/open-cmi/gobase/essential/migrate"
 )
 
 // RBACInstance migrate

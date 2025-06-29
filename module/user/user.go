@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/open-cmi/cmmns/essential/rdb"
+	"github.com/open-cmi/gobase/essential/rdb"
 )
 
 func init() {

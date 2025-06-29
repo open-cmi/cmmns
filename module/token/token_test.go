@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/open-cmi/cmmns/essential/webserver/middleware"
+	"github.com/open-cmi/gobase/essential/webserver/middleware"
 )
 
 func TestGenerateToken(t *testing.T) {

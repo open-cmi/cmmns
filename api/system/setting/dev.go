@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/pkg/dev"
+	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetDevID(c *gin.Context) {

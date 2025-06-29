@@ -5,10 +5,10 @@ import (
 	"errors"
 	"path/filepath"
 
-	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/initial"
-	"github.com/open-cmi/cmmns/pkg/eyas"
-	"github.com/open-cmi/cmmns/pkg/transport/http"
+	"github.com/open-cmi/cmmns/module/system/upgrademng/transport/http"
+	"github.com/open-cmi/gobase/essential/logger"
+	"github.com/open-cmi/gobase/initial"
+	"github.com/open-cmi/gobase/pkg/eyas"
 )
 
 type EyasAPICommand struct {

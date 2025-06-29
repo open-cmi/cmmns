@@ -7,11 +7,12 @@ import (
 	_ "github.com/open-cmi/cmmns/internal/commands"
 	_ "github.com/open-cmi/cmmns/internal/translation"
 
-	"github.com/open-cmi/cmmns"
+	_ "github.com/open-cmi/cmmns"
+	"github.com/open-cmi/gobase"
 )
 
 func main() {
-	err := cmmns.Main()
+	err := gobase.Run()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

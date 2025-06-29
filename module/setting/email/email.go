@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/jordan-wright/email"
-	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/gobase/essential/logger"
 )
 
 type SendOption struct {
