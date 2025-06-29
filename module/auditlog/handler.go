@@ -2,7 +2,7 @@ package auditlog
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 type AuditLogHandler struct {

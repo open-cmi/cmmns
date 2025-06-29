@@ -8,12 +8,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jameskeane/bcrypt"
-	"github.com/open-cmi/cmmns/essential/i18n"
-	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/essential/pubsub"
-	"github.com/open-cmi/cmmns/essential/rdb"
-	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/pkg/goparam"
+	"github.com/open-cmi/gobase/essential/i18n"
+	"github.com/open-cmi/gobase/essential/logger"
+	"github.com/open-cmi/gobase/essential/pubsub"
+	"github.com/open-cmi/gobase/essential/rdb"
+	"github.com/open-cmi/gobase/essential/sqldb"
+	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 const UserLoginMaxTried = 5

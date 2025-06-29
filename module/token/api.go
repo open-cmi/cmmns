@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/essential/webserver/middleware"
-	"github.com/open-cmi/cmmns/pkg/goparam"
+	"github.com/open-cmi/gobase/essential/logger"
+	"github.com/open-cmi/gobase/essential/sqldb"
+	"github.com/open-cmi/gobase/essential/webserver/middleware"
+	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 // List list

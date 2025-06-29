@@ -4,9 +4,9 @@ import (
 	"os/exec"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/essential/i18n"
-	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/gobase/essential/i18n"
+	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func Reboot(c *gin.Context) {

@@ -5,13 +5,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/essential/i18n"
-	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/licmng"
 	"github.com/open-cmi/cmmns/module/user"
-	"github.com/open-cmi/cmmns/pkg/goparam"
+	"github.com/open-cmi/gobase/essential/i18n"
+	"github.com/open-cmi/gobase/essential/sqldb"
+	"github.com/open-cmi/gobase/essential/webserver"
+	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 // List list license

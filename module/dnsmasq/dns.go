@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/gobase/essential/logger"
 )
 
 type DNSConf struct {

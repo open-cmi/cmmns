@@ -3,7 +3,7 @@ package user2
 import (
 	"encoding/json"
 
-	"github.com/open-cmi/cmmns/essential/config"
+	"github.com/open-cmi/gobase/essential/config"
 )
 
 // Config smtp

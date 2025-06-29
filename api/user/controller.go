@@ -11,19 +11,19 @@ import (
 
 	"github.com/dchest/captcha"
 	"github.com/gorilla/sessions"
-	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/setting/pubnet"
 	"github.com/open-cmi/cmmns/module/token"
-	"github.com/open-cmi/cmmns/pkg/goparam"
-	"github.com/open-cmi/cmmns/pkg/verify"
+	"github.com/open-cmi/gobase/essential/sqldb"
+	"github.com/open-cmi/gobase/essential/webserver"
+	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/verify"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/user"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/essential/i18n"
-	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/gobase/essential/i18n"
+	"github.com/open-cmi/gobase/essential/logger"
 )
 
 // CheckAuth get userinfo

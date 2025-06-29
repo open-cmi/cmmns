@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/open-cmi/cmmns/essential/logger"
+	"github.com/open-cmi/gobase/essential/logger"
 )
 
 type NetworkingConfig struct {

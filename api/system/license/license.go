@@ -6,12 +6,12 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/cmmns/essential/events"
-	"github.com/open-cmi/cmmns/essential/i18n"
-	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/essential/webserver"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/license"
+	"github.com/open-cmi/gobase/essential/events"
+	"github.com/open-cmi/gobase/essential/i18n"
+	"github.com/open-cmi/gobase/essential/logger"
+	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetLicenseInfo(c *gin.Context) {

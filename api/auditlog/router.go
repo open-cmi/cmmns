@@ -1,7 +1,7 @@
 package auditlog
 
 import (
-	"github.com/open-cmi/cmmns/essential/webserver"
+	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func init() {

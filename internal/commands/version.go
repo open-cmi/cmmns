@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/open-cmi/cmmns/essential/subcommands"
+	"github.com/open-cmi/gobase/essential/subcommands"
 )
 
 var Version string

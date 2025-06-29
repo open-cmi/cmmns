@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/open-cmi/cmmns/essential/logger"
-	"github.com/open-cmi/cmmns/essential/sqldb"
-	"github.com/open-cmi/cmmns/pkg/goparam"
+	"github.com/open-cmi/gobase/essential/logger"
+	"github.com/open-cmi/gobase/essential/sqldb"
+	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 func ListLicense(query *goparam.Param) (int, []LicenseModel, error) {

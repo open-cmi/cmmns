@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/open-cmi/cmmns/essential/config"
-	"github.com/open-cmi/cmmns/essential/subcommands"
 	"github.com/open-cmi/cmmns/module/license"
+	"github.com/open-cmi/gobase/essential/config"
+	"github.com/open-cmi/gobase/essential/subcommands"
 )
 
 type activateCommand struct {

@@ -1,7 +1,7 @@
 package system
 
 import (
-	"github.com/open-cmi/cmmns/essential/ticker"
+	"github.com/open-cmi/gobase/essential/ticker"
 )
 
 func MonitorSystemUsage() {

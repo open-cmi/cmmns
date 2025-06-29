@@ -1,8 +1,8 @@
 package locale
 
 import (
-	"github.com/open-cmi/cmmns/essential/i18n"
-	"github.com/open-cmi/cmmns/initial"
+	"github.com/open-cmi/gobase/essential/i18n"
+	"github.com/open-cmi/gobase/initial"
 )
 
 func SetLocale(lang string) error {

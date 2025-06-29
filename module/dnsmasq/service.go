@@ -1,8 +1,8 @@
 package dnsmasq
 
 import (
-	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/pkg/shell"
+	"github.com/open-cmi/gobase/essential/logger"
 )
 
 func RestartService() error {
