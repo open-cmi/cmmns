@@ -235,6 +235,13 @@
             "fuzzy": true
         },
         {
+            "id": "get token",
+            "message": "get token",
+            "translation": "get token",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "delete token",
             "message": "delete token",
             "translation": "delete token",
@@ -325,6 +332,38 @@
             "message": "fail",
             "translation": "fail",
             "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "address {Arg_1} is existing",
+            "message": "address {Arg_1} is existing",
+            "translation": "address {Arg_1} is existing",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                }
+            ],
+            "fuzzy": true
+        },
+        {
+            "id": "event handler {Arg_1} is existing",
+            "message": "event handler {Arg_1} is existing",
+            "translation": "event handler {Arg_1} is existing",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                }
+            ],
             "fuzzy": true
         }
     ]

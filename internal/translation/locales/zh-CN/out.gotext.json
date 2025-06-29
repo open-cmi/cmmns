@@ -171,6 +171,11 @@
             "translation": "创建令牌"
         },
         {
+            "id": "get token",
+            "message": "get token",
+            "translation": "获取令牌"
+        },
+        {
             "id": "delete token",
             "message": "delete token",
             "translation": "删除令牌"
@@ -238,6 +243,34 @@
             "id": "fail",
             "message": "fail",
             "translation": "失败"
+        },
+        {
+            "id": "address {Arg_1} is existing",
+            "message": "address {Arg_1} is existing",
+            "translation": "地址{Arg_1}已经存在了",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                }
+            ]
+        },
+        {
+            "id": "event handler {Arg_1} is existing",
+            "message": "event handler {Arg_1} is existing",
+            "translation": "事件句柄{Arg_1}已经存在了",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                }
+            ]
         }
     ]
 }
