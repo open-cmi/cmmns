@@ -39,7 +39,11 @@ func Init() error {
 		req.AutoAdjust = true
 		req.NtpServer = "cn.ntp.org.cn"
 		req.TimeZone = "Asia/Shanghai"
-		SetTimeSetting(&req)
+		err := SetTimeSetting(&req)
+		if err != nil {
+			logger.Errorf("set time setting failed: %s\n", err.Error())
+			return err
+		}
 	}
 	return nil
 }
