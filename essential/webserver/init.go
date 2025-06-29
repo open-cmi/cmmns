@@ -30,5 +30,5 @@ func Init() error {
 }
 
 func init() {
-	initial.Register("webserver", initial.PhaseWebserver, Init)
+	initial.Register("webserver", initial.PhaseFinal, Init)
 }

@@ -47,7 +47,6 @@ func Register(name string, spec string, f func(string, interface{}), data interf
 }
 
 func Init() error {
-
 	for i := range tickers {
 		t := tickers[i]
 		ins := cron.New(cron.WithSeconds())
@@ -84,5 +83,5 @@ func Remove(name string) error {
 }
 
 func init() {
-	initial.Register("ticker", initial.PhaseTicker, Init)
+	initial.Register("ticker", initial.PhaseFinal, Init)
 }

@@ -25,5 +25,5 @@ func Init() error {
 }
 
 func init() {
-	initial.Register("time-setting", initial.DefaultPriority, Init)
+	initial.Register("time-setting", initial.PhaseDefault, Init)
 }

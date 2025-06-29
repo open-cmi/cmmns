@@ -48,6 +48,6 @@ func Init() error {
 func init() {
 	config.RegisterConfig("network", Parse, Save)
 	if runtime.GOOS == "linux" {
-		initial.Register("network", initial.DefaultPriority, Init)
+		initial.Register("network", initial.PhaseDefault, Init)
 	}
 }

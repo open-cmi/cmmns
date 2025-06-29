@@ -22,5 +22,5 @@ func Init() error {
 
 func init() {
 	echan = evchan.NewEventChan()
-	initial.Register("chan-event", initial.DefaultPriority, Init)
+	initial.Register("chan-event", initial.PhaseDefault, Init)
 }

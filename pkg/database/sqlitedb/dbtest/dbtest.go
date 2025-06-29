@@ -95,5 +95,5 @@ func Init() error {
 }
 
 func init() {
-	initial.Register("dbtest", initial.DefaultPriority, Init)
+	initial.Register("dbtest", initial.PhaseDefault, Init)
 }

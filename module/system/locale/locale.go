@@ -37,5 +37,5 @@ func Init() error {
 }
 
 func init() {
-	initial.Register("locale", initial.DefaultPriority, Init)
+	initial.Register("locale", initial.PhaseDefault, Init)
 }
