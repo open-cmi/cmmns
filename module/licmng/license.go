@@ -104,7 +104,7 @@ func Sign(ori string, pemContent []byte) (string, error) {
 func CreateLicenseContent(id string) (string, error) {
 	m := Get(id)
 	if m == nil {
-		return "", errors.New("license not exist")
+		return "", errors.New("license is not existing")
 	}
 
 	var lic LicenseInfo

@@ -154,7 +154,7 @@ func (m *Manager) AddProcess(conf *Config) error {
 func (m *Manager) DelProcess(name string) error {
 	p := m.Procs[name]
 	if p == nil {
-		return errors.New("process not exist")
+		return errors.New("process is not existing")
 	}
 	p.Stop()
 	m.Procs[name] = nil
@@ -164,7 +164,7 @@ func (m *Manager) DelProcess(name string) error {
 func (m *Manager) StartProcess(name string) error {
 	p := m.Procs[name]
 	if p == nil {
-		return errors.New("process not exist")
+		return errors.New("process is not existing")
 	}
 	return p.Start()
 }
@@ -172,7 +172,7 @@ func (m *Manager) StartProcess(name string) error {
 func (m *Manager) StopProcess(name string) error {
 	p := m.Procs[name]
 	if p == nil {
-		return errors.New("process not exist")
+		return errors.New("process is not existing")
 	}
 	return p.Stop()
 }

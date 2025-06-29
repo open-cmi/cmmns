@@ -23,11 +23,12 @@ var gConf Config
 func Init() error {
 	var err error
 
-	if gConf.Store == "memory" {
+	switch gConf.Store {
+	case "memory":
 		memoryStore = memstore.NewMemStore([]byte("memorystore"),
 			[]byte("enckey12341234567890123456789012"))
 		memoryStore.MaxAge(gConf.MaxAge)
-	} else if gConf.Store == "redis" {
+	case "redis":
 		rdbConf := rdb.GetConf()
 		host := fmt.Sprintf("%s:%d", rdbConf.Host, rdbConf.Port)
 		redisStore, err = redistore.NewRediStoreWithDB(100, "tcp", host, rdbConf.Password, "2")
@@ -39,7 +40,7 @@ func Init() error {
 		redisStore.SetKeyPrefix("koa-sess-")
 		redisStore.SetSerializer(redistore.JSONSerializer{})
 		redisStore.SetMaxAge(gConf.MaxAge)
-	} else {
+	default:
 		return errors.New("middleware store type not supported")
 	}
 

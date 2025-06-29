@@ -37,7 +37,7 @@ func PostgresqlInit(conf *Config) (db *sqlx.DB, err error) {
 	var dat string
 	err = row.Scan(&dat)
 	if err != nil {
-		// database is not exist, create
+		// database is is not existing, create
 		createdb := fmt.Sprintf("create database %s", database)
 		_, err = db.Exec(createdb)
 		if err != nil {

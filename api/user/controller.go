@@ -13,8 +13,8 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/essential/sqldb"
 	"github.com/open-cmi/cmmns/essential/webserver"
-	"github.com/open-cmi/cmmns/module/middleware"
 	"github.com/open-cmi/cmmns/module/setting/pubnet"
+	"github.com/open-cmi/cmmns/module/token"
 	"github.com/open-cmi/cmmns/pkg/goparam"
 	"github.com/open-cmi/cmmns/pkg/verify"
 
@@ -80,7 +80,7 @@ func ChangePassword(c *gin.Context) {
 	if usermap == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
-			"msg": i18n.Sprintf("user does not exist"),
+			"msg": i18n.Sprintf("user does is not existing"),
 		})
 		ah.InsertOperationLog(i18n.Sprintf("change password"), false)
 		return
@@ -183,7 +183,7 @@ func Get(c *gin.Context) {
 	if user == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": -1,
-			"msg": i18n.Sprintf("user does not exist"),
+			"msg": i18n.Sprintf("user does is not existing"),
 		})
 		return
 	}
@@ -339,7 +339,7 @@ func Delete(c *gin.Context) {
 
 func CreateToken(c *gin.Context) {
 	ah := auditlog.NewAuditHandler(c)
-	var req middleware.CreateTokenRequest
+	var req token.CreateTokenRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		ah.InsertOperationLog(i18n.Sprintf("create token"), false)
@@ -358,27 +358,34 @@ func CreateToken(c *gin.Context) {
 	email, _ := user["email"].(string)
 	role, _ := user["role"].(int)
 	status, _ := user["status"].(int)
-	tk, err := middleware.GenerateAuthToken(req.Name, username, userid, email, role, status, req.ExpireDay)
+	err := token.CreateToken(req.Name, username, userid, email, role, status, req.ExpireDay)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "create token failed"})
 		ah.InsertOperationLog(i18n.Sprintf("create token"), false)
 		return
 	}
+	m := token.GetTokenRecord(req.Name)
+	if m == nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "get token failed"})
+		ah.InsertOperationLog(i18n.Sprintf("get token"), false)
+		return
+	}
+
 	ah.InsertOperationLog(i18n.Sprintf("create token"), true)
-	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "token": tk})
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "token": m.Token})
 }
 
 func DeleteToken(c *gin.Context) {
 	ah := auditlog.NewAuditHandler(c)
 
-	var req middleware.DeleteTokenRequest
+	var req token.DeleteTokenRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		ah.InsertOperationLog(i18n.Sprintf("delete token"), false)
 		return
 	}
 
-	err := middleware.DeleteAuthToken(req.Name)
+	err := token.DeleteAuthToken(req.Name)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "delete token failed"})
 		ah.InsertOperationLog(i18n.Sprintf("delete token"), false)
@@ -420,7 +427,7 @@ func ResetPassword(c *gin.Context) {
 	if usermap == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
-			"msg": i18n.Sprintf("user does not exist"),
+			"msg": i18n.Sprintf("user does is not existing"),
 		})
 		ah.InsertOperationLog(i18n.Sprintf("reset password"), false)
 		return
@@ -445,10 +452,10 @@ func ResetPassword(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }
 
-func TokenList(c *gin.Context) {
+func QueryTokenList(c *gin.Context) {
 	query := goparam.ParseParams(c)
 
-	count, tokens, err := middleware.TokenList(query)
+	count, tokens, err := token.QueryTokenList(query)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
@@ -481,7 +488,7 @@ func init() {
 	webserver.RegisterMustAuthAPI("user", "DELETE", "/:id", Delete)
 	webserver.RegisterMustAuthAPI("user", "POST", "/jwt-token/", CreateToken)
 	webserver.RegisterMustAuthAPI("user", "POST", "/jwt-token/delete/", DeleteToken)
-	webserver.RegisterMustAuthAPI("user", "GET", "/jwt-token/", TokenList)
+	webserver.RegisterMustAuthAPI("user", "GET", "/jwt-token/", QueryTokenList)
 
 	webserver.RegisterUnauthRouter("user", "/api/user/v1")
 	webserver.RegisterUnauthAPI("user", "POST", "/login", Login)

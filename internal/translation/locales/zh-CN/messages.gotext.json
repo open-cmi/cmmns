@@ -97,8 +97,8 @@
             "translation": "设置升级配置"
         },
         {
-            "id": "user does not exist",
-            "message": "user does not exist",
+            "id": "user does is not existing",
+            "message": "user does is not existing",
             "translation": "用户不存在"
         },
         {

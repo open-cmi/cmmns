@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -114,10 +113,6 @@ func ParseAuthToken(token string) (*UserClaims, error) {
 
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*UserClaims); ok && tokenClaims.Valid {
-			r := GetTokenRecordByToken(token)
-			if r == nil {
-				return nil, errors.New("token not exist")
-			}
 			return claims, nil
 		}
 	}
@@ -125,7 +120,7 @@ func ParseAuthToken(token string) (*UserClaims, error) {
 	return nil, err
 }
 
-func GenerateAuthToken(name string, username string, id string, email string, role int, status int, expireDay int) (string, error) {
+func GenerateAuthToken(username string, id string, email string, role int, status int, expireDay int) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(3600 * 24 * (time.Duration)(expireDay) * time.Second)
 	issuer := "cmmns"
@@ -146,25 +141,5 @@ func GenerateAuthToken(name string, username string, id string, email string, ro
 		return "", err
 	}
 
-	t := NewTokenRecord()
-	t.ExpireDay = expireDay
-	t.Token = token
-	t.Name = name
-	err = t.Save()
-	if err != nil {
-		return "", err
-	}
-	return token, err
-}
-
-func DeleteAuthToken(name string) error {
-	t := GetTokenRecord(name)
-	if t == nil {
-		return errors.New("token not existed")
-	}
-	err := t.Remove()
-	if err != nil {
-		return err
-	}
-	return nil
+	return token, nil
 }

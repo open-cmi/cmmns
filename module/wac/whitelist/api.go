@@ -37,7 +37,7 @@ func AddWhitelist(address string) error {
 func DelWhitelist(address string) error {
 	blk := Get(address)
 	if blk == nil {
-		return errors.New("address is not existed")
+		return errors.New("address is not existing")
 	}
 	err := blk.Remove()
 	if err != nil {

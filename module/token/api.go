@@ -1,4 +1,4 @@
-package middleware
+package token
 
 import (
 	"errors"
@@ -7,11 +7,12 @@ import (
 
 	"github.com/open-cmi/cmmns/essential/logger"
 	"github.com/open-cmi/cmmns/essential/sqldb"
+	"github.com/open-cmi/cmmns/essential/webserver/middleware"
 	"github.com/open-cmi/cmmns/pkg/goparam"
 )
 
 // List list
-func TokenList(option *goparam.Param) (int, []TokenRecord, error) {
+func QueryTokenList(option *goparam.Param) (int, []TokenRecord, error) {
 	db := sqldb.GetDB()
 
 	var results []TokenRecord = []TokenRecord{}
@@ -50,4 +51,42 @@ func TokenList(option *goparam.Param) (int, []TokenRecord, error) {
 		results = append(results, item)
 	}
 	return count, results, err
+}
+
+type DeleteTokenRequest struct {
+	Name string `json:"name"`
+}
+
+func DeleteAuthToken(name string) error {
+	t := GetTokenRecord(name)
+	if t == nil {
+		return errors.New("token is not existing")
+	}
+	err := t.Remove()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type CreateTokenRequest struct {
+	Name      string `json:"name"`
+	ExpireDay int    `json:"expire_day"`
+}
+
+func CreateToken(name string, username string, id string, email string, role int, status int, expireDay int) error {
+	token, err := middleware.GenerateAuthToken(username, id, email, role, status, expireDay)
+	if err != nil {
+		return err
+	}
+
+	t := NewTokenRecord()
+	t.ExpireDay = expireDay
+	t.Token = token
+	t.Name = name
+	err = t.Save()
+	if err != nil {
+		return err
+	}
+	return nil
 }
