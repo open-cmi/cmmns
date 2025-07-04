@@ -108,7 +108,7 @@ func CreateLicenseContent(id string) (string, error) {
 	}
 
 	var lic LicenseInfo
-	lic.Modules = strings.Split(m.Modules, ",")
+	lic.Modules = []string{"par", "apr"}
 	lic.Version = m.Version
 	lic.ExpireTime = m.ExpireTime
 	lic.MCode = m.MCode
