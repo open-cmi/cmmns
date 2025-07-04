@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/open-cmi/gobase/essential/logger"
-	"github.com/open-cmi/gobase/initial"
 )
 
 func GetTimeZoneList() ([]string, error) {
@@ -21,7 +20,7 @@ func GetTimeZoneList() ([]string, error) {
 	return arrs, nil
 }
 
-func SetTimeZone(tz string) error {
+func ApplyTimeZone(tz string) error {
 	cmdStr := fmt.Sprintf("timedatectl set-timezone %s", tz)
 	cmd := exec.Command("bash", "-c", cmdStr)
 	err := cmd.Run()
@@ -30,24 +29,4 @@ func SetTimeZone(tz string) error {
 		return errors.New("set time zone failed")
 	}
 	return nil
-}
-
-func Init() error {
-	m := Get()
-	if m == nil {
-		var req SettingRequest
-		req.AutoAdjust = true
-		req.NtpServer = "cn.ntp.org.cn"
-		req.TimeZone = "Asia/Shanghai"
-		err := SetTimeSetting(&req)
-		if err != nil {
-			logger.Errorf("set time setting failed: %s\n", err.Error())
-			return err
-		}
-	}
-	return nil
-}
-
-func init() {
-	initial.Register("time-setting", initial.PhaseDefault, Init)
 }
