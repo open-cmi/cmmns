@@ -135,9 +135,9 @@
             "fuzzy": true
         },
         {
-            "id": "user does is not existing",
-            "message": "user does is not existing",
-            "translation": "user does is not existing",
+            "id": "user is not existing",
+            "message": "user is not existing",
+            "translation": "user is not existing",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },

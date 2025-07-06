@@ -243,7 +243,7 @@ func ResetPasswd(req *ResetPasswdRequest) error {
 func Delete(id string) error {
 	u := Get(id)
 	if u == nil {
-		return errors.New("user does is not existing")
+		return errors.New("user is not existing")
 	}
 	err := u.Remove()
 	return err
