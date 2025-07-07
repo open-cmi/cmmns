@@ -177,6 +177,36 @@
             "fuzzy": true
         },
         {
+            "id": "rdb is not available now",
+            "message": "rdb is not available now",
+            "translation": "rdb is not available now",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "your account has been locked, please try again 10 miniutes later",
+            "message": "your account has been locked, please try again 10 miniutes later",
+            "translation": "your account has been locked, please try again 10 miniutes later",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "username and password not match, you have {Integer} times tried left",
+            "message": "username and password not match, you have {Integer} times tried left",
+            "translation": "username and password not match, you have {Integer} times tried left",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Integer",
+                    "string": "%[1]d",
+                    "type": "",
+                    "underlyingType": "int",
+                    "argNum": 1
+                }
+            ],
+            "fuzzy": true
+        },
+        {
             "id": "login",
             "message": "login",
             "translation": "login",

@@ -127,6 +127,30 @@
             "translation": "获取用户列表失败"
         },
         {
+            "id": "rdb is not available now",
+            "message": "rdb is not available now",
+            "translation": "缓存当前不可用"
+        },
+        {
+            "id": "your account has been locked, please try again 10 miniutes later",
+            "message": "your account has been locked, please try again 10 miniutes later",
+            "translation": "您的账户已被锁定，请10分钟后再试"
+        },
+        {
+            "id": "username and password not match, you have {Integer} times tried left",
+            "message": "username and password not match, you have {Integer} times tried left",
+            "translation": "用户名密码不匹配，您还能尝试{Integer}次",
+            "placeholders": [
+                {
+                    "id": "Integer",
+                    "string": "%[1]d",
+                    "type": "",
+                    "underlyingType": "int",
+                    "argNum": 1
+                }
+            ]
+        },
+        {
             "id": "login",
             "message": "login",
             "translation": "登陆"

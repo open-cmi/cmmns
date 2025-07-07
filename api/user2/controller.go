@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/open-cmi/cmmns/module/setting/email"
 	"github.com/open-cmi/cmmns/module/user"
+	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/rdb"
 	"github.com/open-cmi/gobase/essential/webserver"
 	"github.com/open-cmi/gobase/pkg/verify"
@@ -49,12 +50,18 @@ func Register(c *gin.Context) {
 	err := user.Register(&apimsg)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
 	}
 
 	code := uuid.New()
-	cache := rdb.GetClient("user")
+	rcli := rdb.GetClient(0)
+	if rcli == nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": i18n.Sprintf("rdb is not available now")})
+		return
+	}
+
 	activateCode := fmt.Sprintf("activate_code_%s", code.String())
-	err = cache.Set(context.TODO(), activateCode, apimsg.UserName, time.Hour*24).Err()
+	err = rcli.Conn.Set(context.TODO(), activateCode, apimsg.UserName, time.Hour*24).Err()
 	if err != nil {
 		user.DeleteByName(apimsg.UserName)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "code generate failed"})
@@ -84,9 +91,14 @@ func Activate(c *gin.Context) {
 		return
 	}
 
-	cache := rdb.GetClient("user")
+	rcli := rdb.GetClient(0)
+	if rcli == nil {
+		c.String(200, i18n.Sprintf("rdb is not available now"))
+		return
+	}
+
 	activateCode := fmt.Sprintf("activate_code_%s", code)
-	username, err := cache.Get(context.TODO(), activateCode).Result()
+	username, err := rcli.Conn.Get(context.TODO(), activateCode).Result()
 	if err != nil {
 		c.String(200, "activate code is is not existing")
 		return

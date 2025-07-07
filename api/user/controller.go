@@ -1,18 +1,24 @@
 package user
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/dchest/captcha"
+	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/sessions"
 	"github.com/open-cmi/cmmns/module/setting/pubnet"
 	"github.com/open-cmi/cmmns/module/token"
+	"github.com/open-cmi/gobase/essential/i18n"
+	"github.com/open-cmi/gobase/essential/logger"
+	"github.com/open-cmi/gobase/essential/rdb"
 	"github.com/open-cmi/gobase/essential/sqldb"
 	"github.com/open-cmi/gobase/essential/webserver"
 	"github.com/open-cmi/gobase/pkg/goparam"
@@ -22,8 +28,6 @@ import (
 	"github.com/open-cmi/cmmns/module/user"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/logger"
 )
 
 // CheckAuth get userinfo
@@ -201,14 +205,42 @@ func Login(c *gin.Context) {
 
 	// 验证验证码的有效性
 	if !apimsg.IgnoreCaptcha && !captcha.VerifyString(apimsg.CaptchaID, apimsg.Captcha) {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "captcha is incorrect"})
+		c.JSON(http.StatusOK, gin.H{"ret": -2, "msg": "captcha is incorrect"})
 		return
 	}
+
+	rcli := rdb.GetClient(0)
+	if rcli == nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -3, "msg": i18n.Sprintf("rdb is not available now")})
+		return
+	}
+
+	loginTriedKey := fmt.Sprintf("login_tried_%s", apimsg.UserName)
+	tried, err := rcli.Conn.Get(context.TODO(), loginTriedKey).Int()
+	if err != nil && err != redis.Nil {
+		rcli.Reconnect()
+		c.JSON(http.StatusOK, gin.H{"ret": -4, "msg": i18n.Sprintf("rdb is not available now")})
+		return
+	}
+
+	if tried >= 5 {
+		logger.Warnf("account %s has been locked\n", apimsg.UserName)
+		c.JSON(http.StatusOK, gin.H{"ret": -5, "msg": i18n.Sprintf("your account has been locked, please try again 10 miniutes later")})
+		return
+	}
+
 	ah := auditlog.NewAuditHandler(c)
 
-	user, err := user.Login(&apimsg)
+	userinfo, err := user.Login(&apimsg)
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		// 如果登陆失败
+		tried++
+		rcli.Conn.Set(context.TODO(), loginTriedKey, tried, 10*time.Minute).Err()
+		if tried < user.UserLoginMaxTried {
+			c.JSON(http.StatusOK, gin.H{"ret": -6, "msg": i18n.Sprintf("username and password not match, you have %d times tried left", user.UserLoginMaxTried-tried)})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"ret": -7, "msg": i18n.Sprintf("your account has been locked, please try again 10 miniutes later")})
 		ah.InsertLoginLog(apimsg.UserName, i18n.Sprintf("login"), false)
 		return
 	}
@@ -217,18 +249,18 @@ func Login(c *gin.Context) {
 	session, ok := s.(*sessions.Session)
 	if ok {
 		session.Values["user"] = map[string]interface{}{
-			"username": user.UserName,
-			"id":       user.ID,
-			"email":    user.Email,
-			"status":   user.Status,
-			"role":     user.Role,
+			"username": userinfo.UserName,
+			"id":       userinfo.ID,
+			"email":    userinfo.Email,
+			"status":   userinfo.Status,
+			"role":     userinfo.Role,
 		}
 	}
 
 	// 写日志操作
-	ah.InsertLoginLog(user.UserName, i18n.Sprintf("login"), true)
+	ah.InsertLoginLog(userinfo.UserName, i18n.Sprintf("login"), true)
 
-	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": *user})
+	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": *userinfo})
 
 	// 记录公网ip
 	m := pubnet.Get()
