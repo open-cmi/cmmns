@@ -115,19 +115,11 @@ func SetProductSerial(serial string, prod string) error {
 	lic.Customer = "local_user"
 	lic.Prod = prod
 	lic.Version = version
-	lic.Modules = "par,apr"
 	lic.ExpireTime = expireTime
 	lic.MCode = mcode
 	lic.Model = model
-	err := lic.Save()
-	if err != nil {
-		logger.Errorf("create license failed:%s\n", err.Error())
-		return err
-	}
 
-	// 本地不保存license列表信息
-	defer lic.Remove()
-	content, err := licmng.CreateLicenseContent(lic.ID)
+	content, err := licmng.CreateLicenseContent(lic)
 	if err != nil {
 		logger.Errorf("create license content failed: %s\n", err.Error())
 		return err

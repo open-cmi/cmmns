@@ -158,7 +158,7 @@ func DownloadLicense(c *gin.Context) {
 		return
 	}
 
-	content, err := licmng.CreateLicenseContent(id)
+	content, err := licmng.CreateLicenseContent(m)
 	if err != nil {
 		ah.InsertOperationLog(i18n.Sprintf("download license"), false)
 

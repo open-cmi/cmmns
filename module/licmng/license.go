@@ -101,14 +101,13 @@ func Sign(ori string, pemContent []byte) (string, error) {
 	return str, nil
 }
 
-func CreateLicenseContent(id string) (string, error) {
-	m := Get(id)
-	if m == nil {
-		return "", errors.New("license is not existing")
-	}
-
+func CreateLicenseContent(m *LicenseModel) (string, error) {
 	var lic LicenseInfo
-	lic.Modules = []string{"par", "apr"}
+	if m.Prod == "asset" || m.Prod == "xsnos" {
+		lic.Modules = []string{"par", "apr"}
+	} else {
+		lic.Modules = []string{}
+	}
 	lic.Version = m.Version
 	lic.ExpireTime = m.ExpireTime
 	lic.MCode = m.MCode
