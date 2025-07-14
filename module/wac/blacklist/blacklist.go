@@ -78,16 +78,12 @@ func New() *Blacklist {
 	}
 }
 
-func List(query *goparam.Param) (int, []Blacklist, error) {
+func QueryList(query *goparam.Param) (int, []Blacklist, error) {
 	db := sqldb.GetDB()
 
 	var users []Blacklist = []Blacklist{}
 	countClause := "select count(*) from wac_blacklist"
-
-	whereClause, args := goparam.BuildWhereClause(query)
-
-	countClause += whereClause
-	row := db.QueryRow(countClause, args...)
+	row := db.QueryRow(countClause)
 
 	var count int
 	err := row.Scan(&count)
@@ -98,8 +94,8 @@ func List(query *goparam.Param) (int, []Blacklist, error) {
 
 	queryClause := `select * from wac_blacklist`
 	finalClause := goparam.BuildFinalClause(query)
-	queryClause += (whereClause + finalClause)
-	rows, err := db.Queryx(queryClause, args...)
+	queryClause += finalClause
+	rows, err := db.Queryx(queryClause)
 	if err != nil {
 		// 没有的话，也不需要报错
 		return count, users, nil
@@ -116,4 +112,29 @@ func List(query *goparam.Param) (int, []Blacklist, error) {
 		users = append(users, item)
 	}
 	return count, users, err
+}
+
+func ListAll() ([]Blacklist, error) {
+	db := sqldb.GetDB()
+
+	var users []Blacklist = []Blacklist{}
+
+	queryClause := `select * from wac_blacklist`
+	rows, err := db.Queryx(queryClause)
+	if err != nil {
+		// 没有的话，也不需要报错
+		return users, nil
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var item Blacklist
+		err := rows.StructScan(&item)
+		if err != nil {
+			logger.Errorf("blacklist struct scan failed %s\n", err.Error())
+			break
+		}
+
+		users = append(users, item)
+	}
+	return users, err
 }

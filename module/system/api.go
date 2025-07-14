@@ -124,9 +124,7 @@ func List(option *goparam.Param) (int, []Model, error) {
 	var results []Model = []Model{}
 
 	countClause := "select count(*) from system_status"
-	whereClause, args := goparam.BuildWhereClause(option)
-	countClause += whereClause
-	row := db.QueryRow(countClause, args...)
+	row := db.QueryRow(countClause)
 
 	var count int
 	err := row.Scan(&count)
@@ -137,8 +135,8 @@ func List(option *goparam.Param) (int, []Model, error) {
 	columns := goparam.GetColumn(Model{}, []string{})
 	queryClause := fmt.Sprintf(`select %s from system_status`, strings.Join(columns, ","))
 	finalClause := goparam.BuildFinalClause(option)
-	queryClause += (whereClause + finalClause)
-	rows, err := db.Queryx(queryClause, args...)
+	queryClause += finalClause
+	rows, err := db.Queryx(queryClause)
 	if err != nil {
 		// 没有的话，也不需要报错
 		logger.Error(err.Error())

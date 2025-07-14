@@ -39,10 +39,7 @@ func RoleList(option *goparam.Param) (int, []Role, error) {
 	var roles []Role = []Role{}
 	countClause := "select count(*) from roles"
 
-	whereClause, args := goparam.BuildWhereClause(option)
-
-	countClause += whereClause
-	row := db.QueryRow(countClause, args...)
+	row := db.QueryRow(countClause)
 
 	var count int
 	err := row.Scan(&count)
@@ -53,8 +50,8 @@ func RoleList(option *goparam.Param) (int, []Role, error) {
 
 	queryClause := `select * from roles`
 	finalClause := goparam.BuildFinalClause(option)
-	queryClause += (whereClause + finalClause)
-	rows, err := db.Queryx(queryClause, args...)
+	queryClause += finalClause
+	rows, err := db.Queryx(queryClause)
 	if err != nil {
 		// 没有的话，也不需要报错
 		return count, roles, nil

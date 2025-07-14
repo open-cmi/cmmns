@@ -9,13 +9,12 @@ import (
 	"github.com/open-cmi/cmmns/module/licmng"
 	"github.com/open-cmi/cmmns/module/user"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/sqldb"
 	"github.com/open-cmi/gobase/essential/webserver"
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 // List list license
-func ListLicense(c *gin.Context) {
+func QueryLicenseList(c *gin.Context) {
 
 	query := goparam.ParseParams(c)
 
@@ -23,39 +22,21 @@ func ListLicense(c *gin.Context) {
 	username := userparam["username"].(string)
 	role := userparam["role"].(string)
 
-	var paramnum int = 1
-	var whereClause string
-	var whereArgs []interface{}
-
+	var filter licmng.QueryFilter
 	if role != "admin" {
-		if whereClause != "" {
-			whereClause += " and "
-		}
-		whereClause += fmt.Sprintf(" username=$%d", paramnum)
-		paramnum += 1
-		whereArgs = append(whereArgs, username)
+		filter.User = username
 	}
 
 	customer := c.Query("customer")
 	if customer != "" {
-		if whereClause != "" {
-			whereClause += " and "
-		}
-		whereClause += fmt.Sprintf(" customer like %s", sqldb.LikePlaceHolder(paramnum))
-		paramnum += 1
-		whereArgs = append(whereArgs, username)
+		filter.Customer = customer
 	}
 
-	if paramnum != 1 {
-		query.WhereClause = " where " + whereClause
-		query.WhereArgs = whereArgs
-	}
-
-	count, lics, err := licmng.ListLicense(query)
+	count, lics, err := licmng.QueryLicenseList(query, &filter)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
-			"msg": i18n.Sprintf("list license failed"),
+			"msg": i18n.Sprintf("query license list failed"),
 		})
 		return
 	}
@@ -182,7 +163,7 @@ func DownloadLicense(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterMustAuthAPI("system", "GET", "/licmng/", ListLicense)
+	webserver.RegisterMustAuthAPI("system", "GET", "/licmng/", QueryLicenseList)
 	webserver.RegisterMustAuthAPI("system", "POST", "/licmng/", CreateLicense)
 	webserver.RegisterMustAuthAPI("system", "GET", "/licmng/download/", DownloadLicense)
 	webserver.RegisterMustAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense)

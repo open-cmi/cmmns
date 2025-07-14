@@ -12,7 +12,7 @@ func Init() error {
 	m := Get()
 	if m != nil {
 		if m.Enable {
-			_, lists, err := blacklist.List(nil)
+			lists, err := blacklist.ListAll()
 			if err != nil {
 				return err
 			}
@@ -26,7 +26,7 @@ func Init() error {
 			}
 
 			// 白名单
-			_, wlists, err := whitelist.List(nil)
+			wlists, err := whitelist.ListAll()
 			if err != nil {
 				return err
 			}

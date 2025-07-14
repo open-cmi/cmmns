@@ -12,14 +12,46 @@ import (
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
-func ListLicense(query *goparam.Param) (int, []LicenseModel, error) {
+type QueryFilter struct {
+	User     string
+	Customer string
+}
+
+func QueryLicenseList(query *goparam.Param, filter *QueryFilter) (int, []LicenseModel, error) {
 	db := sqldb.GetDB()
 
 	var lics []LicenseModel = []LicenseModel{}
+
+	var paramnum int = 1
+	var whereClause string
+	var whereArgs []interface{}
+
+	if filter.User != "" {
+		if whereClause != "" {
+			whereClause += " and "
+		} else {
+			whereClause += " where "
+		}
+		whereClause += fmt.Sprintf(" username=$%d", paramnum)
+		paramnum += 1
+		whereArgs = append(whereArgs, filter.User)
+	}
+
+	if filter.Customer != "" {
+		if whereClause != "" {
+			whereClause += " and "
+		} else {
+			whereClause += " where "
+		}
+		whereClause += fmt.Sprintf(" customer like %s", sqldb.LikePlaceHolder(paramnum))
+		paramnum += 1
+		whereArgs = append(whereArgs, filter.Customer)
+	}
+
 	countClause := "select count(*) from license"
 
-	countClause += query.WhereClause
-	row := db.QueryRow(countClause, query.WhereArgs...)
+	countClause += whereClause
+	row := db.QueryRow(countClause, whereArgs...)
 
 	var count int
 	err := row.Scan(&count)
@@ -30,8 +62,8 @@ func ListLicense(query *goparam.Param) (int, []LicenseModel, error) {
 
 	queryClause := `select * from license`
 	finalClause := goparam.BuildFinalClause(query)
-	queryClause += (query.WhereClause + finalClause)
-	rows, err := db.Queryx(queryClause, query.WhereArgs...)
+	queryClause += (whereClause + finalClause)
+	rows, err := db.Queryx(queryClause, whereArgs...)
 	if err != nil {
 		// 没有的话，也不需要报错
 		return count, lics, nil

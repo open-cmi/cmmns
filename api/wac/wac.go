@@ -32,7 +32,7 @@ func SetWAC(c *gin.Context) {
 	}
 	if req.Enable {
 		if req.Mode == "blacklist" {
-			count, _, err := blacklist.List(nil)
+			count, _, err := blacklist.QueryList(nil)
 			if err != nil {
 				ah.InsertOperationLog(i18n.Sprintf("set web access control"), false)
 				c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
@@ -44,7 +44,7 @@ func SetWAC(c *gin.Context) {
 				return
 			}
 		} else {
-			count, _, err := whitelist.List(nil)
+			count, _, err := whitelist.QueryList(nil)
 			if err != nil {
 				ah.InsertOperationLog(i18n.Sprintf("set web access control"), false)
 				c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
@@ -117,7 +117,7 @@ func DelWhitelist(c *gin.Context) {
 func ListWhitelist(c *gin.Context) {
 	param := goparam.ParseParams(c)
 
-	count, lists, err := whitelist.List(param)
+	count, lists, err := whitelist.QueryList(param)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -182,7 +182,7 @@ func DelBlacklist(c *gin.Context) {
 func ListBlacklist(c *gin.Context) {
 	param := goparam.ParseParams(c)
 
-	count, lists, err := blacklist.List(param)
+	count, lists, err := blacklist.QueryList(param)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return

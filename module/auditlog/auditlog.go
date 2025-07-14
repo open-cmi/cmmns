@@ -60,16 +60,46 @@ func NewLogRecord(ip string, logtype int, username string, action string, succes
 }
 
 // List list
-func List(p *goparam.Param) (int, []Model, error) {
+type QueryFilter struct {
+	IP        string
+	TimeStart int64
+	TimeEnd   int64
+}
+
+func QueryList(p *goparam.Param, filter *QueryFilter) (int, []Model, error) {
 	db := sqldb.GetDB()
 
 	var logs []Model = []Model{}
 
+	var paramnum int = 1
+	var whereClause string
+	var whereArgs []interface{}
+
+	if filter.IP != "" {
+		if whereClause != "" {
+			whereClause += " and "
+		} else {
+			whereClause += " where "
+		}
+		whereClause += fmt.Sprintf(`ip like %s`, sqldb.LikePlaceHolder(paramnum))
+		whereArgs = append(whereArgs, filter.IP)
+		paramnum += 1
+	}
+
+	if filter.TimeStart != 0 && filter.TimeEnd != 0 {
+		if whereClause != "" {
+			whereClause += " and "
+		} else {
+			whereClause += " where "
+		}
+		whereClause += fmt.Sprintf(`timestamp > %d and timestamp < %d`, paramnum, paramnum+1)
+		whereArgs = append(whereArgs, filter.TimeStart, filter.TimeEnd)
+		paramnum += 2
+	}
+
 	countClause := "select count(*) from audit_log"
-	whereClause := p.WhereClause
-	args := p.WhereArgs
 	countClause += whereClause
-	row := db.QueryRow(countClause, args...)
+	row := db.QueryRow(countClause, whereArgs...)
 
 	var count int
 	err := row.Scan(&count)
@@ -83,7 +113,7 @@ func List(p *goparam.Param) (int, []Model, error) {
 	queryClause += whereClause
 	finalClause := goparam.BuildFinalClause(p)
 	queryClause += finalClause
-	rows, err := db.Queryx(queryClause, args...)
+	rows, err := db.Queryx(queryClause, whereArgs...)
 	if err != nil {
 		logger.Errorf("audit log queryx failed: %s\n", err.Error())
 		// 没有的话，也不需要报错

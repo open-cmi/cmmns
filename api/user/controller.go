@@ -19,7 +19,6 @@ import (
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/rdb"
-	"github.com/open-cmi/gobase/essential/sqldb"
 	"github.com/open-cmi/gobase/essential/webserver"
 	"github.com/open-cmi/gobase/pkg/goparam"
 	"github.com/open-cmi/gobase/pkg/verify"
@@ -141,26 +140,13 @@ func ChangePassword(c *gin.Context) {
 // List list user
 func List(c *gin.Context) {
 	query := goparam.ParseParams(c)
-	var paramnum int = 1
-	var whereClause string
-	var whereArgs []interface{}
-
+	var filter user.QueryFilter
 	username := c.Query("username")
 	if username != "" {
-		if whereClause != "" {
-			whereClause += " and "
-		}
-		whereClause += fmt.Sprintf(`username like %s`, sqldb.LikePlaceHolder(paramnum))
-		whereArgs = append(whereArgs, username)
-		paramnum += 1
+		filter.Username = username
 	}
 
-	if paramnum != 1 {
-		query.WhereClause = " where " + whereClause
-		query.WhereArgs = whereArgs
-	}
-
-	count, users, err := user.List(query)
+	count, users, err := user.QueryList(query, &filter)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,

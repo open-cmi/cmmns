@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,18 +16,34 @@ import (
 
 const UserLoginMaxTried = 5
 
+type QueryFilter struct {
+	Username string
+}
+
 // List list func
-func List(query *goparam.Param) (int, []User, error) {
+func QueryList(query *goparam.Param, filter *QueryFilter) (int, []User, error) {
 	db := sqldb.GetDB()
 
 	var users []User = []User{}
+	var paramnum int = 1
+	var whereClause string
+	var whereArgs []interface{}
+
+	if filter.Username != "" {
+		if whereClause != "" {
+			whereClause += " and "
+		} else {
+			whereClause += " and "
+		}
+		whereClause += fmt.Sprintf(`username like %s`, sqldb.LikePlaceHolder(paramnum))
+		whereArgs = append(whereArgs, filter.Username)
+		paramnum += 1
+	}
+
 	countClause := "select count(*) from users"
 
-	whereClause := query.WhereClause
-	args := query.WhereArgs
-
 	countClause += whereClause
-	row := db.QueryRow(countClause, args...)
+	row := db.QueryRow(countClause, whereArgs...)
 
 	var count int
 	err := row.Scan(&count)
@@ -38,7 +55,7 @@ func List(query *goparam.Param) (int, []User, error) {
 	queryClause := `select * from users`
 	finalClause := goparam.BuildFinalClause(query)
 	queryClause += (whereClause + finalClause)
-	rows, err := db.Queryx(queryClause, args...)
+	rows, err := db.Queryx(queryClause, whereArgs...)
 	if err != nil {
 		// 没有的话，也不需要报错
 		return count, users, nil

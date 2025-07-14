@@ -22,7 +22,7 @@ func AddBlacklist(address string) error {
 		return err
 	}
 	// 这里重新应用nginx配置
-	_, lists, err := List(nil)
+	lists, err := ListAll()
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func DelBlacklist(address string) error {
 		return err
 	}
 	// 这里重新应用nginx配置
-	_, lists, err := List(nil)
+	lists, err := ListAll()
 	if err != nil {
 		return err
 	}
