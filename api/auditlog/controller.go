@@ -25,6 +25,11 @@ func List(c *gin.Context) {
 		filter.IP = addr
 	}
 
+	username := c.Query("username")
+	if username != "" {
+		filter.Username = username
+	}
+
 	timeStartStr := c.Query("time_start")
 	timeEndStr := c.Query("time_end")
 	if timeStartStr != "" && timeEndStr != "" {

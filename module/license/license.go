@@ -62,6 +62,7 @@ func GetLicenseInfo() (licmng.LicenseInfo, error) {
 	if err != nil {
 		return mess, err
 	}
+	CheckLicenseValid()
 	return mess, err
 }
 

@@ -62,6 +62,7 @@ func NewLogRecord(ip string, logtype int, username string, action string, succes
 // List list
 type QueryFilter struct {
 	IP        string
+	Username  string
 	TimeStart int64
 	TimeEnd   int64
 }
@@ -83,6 +84,17 @@ func QueryList(p *goparam.Param, filter *QueryFilter) (int, []Model, error) {
 		}
 		whereClause += fmt.Sprintf(`ip like %s`, sqldb.LikePlaceHolder(paramnum))
 		whereArgs = append(whereArgs, filter.IP)
+		paramnum += 1
+	}
+
+	if filter.Username != "" {
+		if whereClause != "" {
+			whereClause += " and "
+		} else {
+			whereClause += " where "
+		}
+		whereClause += fmt.Sprintf(`username like %s`, sqldb.LikePlaceHolder(paramnum))
+		whereArgs = append(whereArgs, filter.Username)
 		paramnum += 1
 	}
 
