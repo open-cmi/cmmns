@@ -97,6 +97,10 @@ func Login(m *LoginMsg) (authuser *User, err error) {
 	if !user.Activate {
 		return nil, errors.New("user has not been activated")
 	}
+	// 登陆时提示用户修改密码
+	if user.PasswordChangeTime == 0 {
+		user.NeedChangePassword = true
+	}
 	return &user, nil
 }
 

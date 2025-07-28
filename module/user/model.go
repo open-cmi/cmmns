@@ -23,7 +23,8 @@ type User struct {
 	Status             string `json:"status" db:"status"`
 	CreatedTime        int64  `json:"created_time" db:"itime"`
 	UpdatedTime        int64  `json:"updated_time" db:"utime"`
-	PasswordChangeTime int64  `json:"password_change_time" db:"password_change_time"`
+	PasswordChangeTime int64  `json:"-" db:"password_change_time"`
+	NeedChangePassword bool   `json:"need_change_password"`
 	isNew              bool
 }
 
