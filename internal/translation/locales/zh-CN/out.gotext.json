@@ -269,6 +269,11 @@
             "translation": "失败"
         },
         {
+            "id": "ntp server should not be empty",
+            "message": "ntp server should not be empty",
+            "translation": "NTP服务器不能为空"
+        },
+        {
             "id": "address {Arg_1} is existing",
             "message": "address {Arg_1} is existing",
             "translation": "地址{Arg_1}已经存在了",

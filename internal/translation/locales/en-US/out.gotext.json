@@ -365,6 +365,13 @@
             "fuzzy": true
         },
         {
+            "id": "ntp server should not be empty",
+            "message": "ntp server should not be empty",
+            "translation": "ntp server should not be empty",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "address {Arg_1} is existing",
             "message": "address {Arg_1} is existing",
             "translation": "address {Arg_1} is existing",
