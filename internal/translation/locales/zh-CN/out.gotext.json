@@ -27,9 +27,9 @@
             "translation": "设置产品序列号"
         },
         {
-            "id": "list license failed",
-            "message": "list license failed",
-            "translation": "获取授权列表失败"
+            "id": "query license list failed",
+            "message": "query license list failed",
+            "translation": "查询授权列表失败"
         },
         {
             "id": "create license",
@@ -272,20 +272,6 @@
             "id": "address {Arg_1} is existing",
             "message": "address {Arg_1} is existing",
             "translation": "地址{Arg_1}已经存在了",
-            "placeholders": [
-                {
-                    "id": "Arg_1",
-                    "string": "%[1]s",
-                    "type": "",
-                    "underlyingType": "string",
-                    "argNum": 1
-                }
-            ]
-        },
-        {
-            "id": "event handler {Arg_1} is existing",
-            "message": "event handler {Arg_1} is existing",
-            "translation": "事件句柄{Arg_1}已经存在了",
             "placeholders": [
                 {
                     "id": "Arg_1",

@@ -37,9 +37,9 @@
             "fuzzy": true
         },
         {
-            "id": "list license failed",
-            "message": "list license failed",
-            "translation": "list license failed",
+            "id": "query license list failed",
+            "message": "query license list failed",
+            "translation": "query license list failed",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -368,22 +368,6 @@
             "id": "address {Arg_1} is existing",
             "message": "address {Arg_1} is existing",
             "translation": "address {Arg_1} is existing",
-            "translatorComment": "Copied from source.",
-            "placeholders": [
-                {
-                    "id": "Arg_1",
-                    "string": "%[1]s",
-                    "type": "",
-                    "underlyingType": "string",
-                    "argNum": 1
-                }
-            ],
-            "fuzzy": true
-        },
-        {
-            "id": "event handler {Arg_1} is existing",
-            "message": "event handler {Arg_1} is existing",
-            "translation": "event handler {Arg_1} is existing",
             "translatorComment": "Copied from source.",
             "placeholders": [
                 {
