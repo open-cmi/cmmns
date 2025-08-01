@@ -69,20 +69,19 @@ func (mi UserInstance) SyncAdminData(db *sqlx.DB) error {
 func (mi UserInstance) Up(db *sqlx.DB) error {
 
 	_, err := db.Exec(`
-	CREATE TABLE IF NOT EXISTS users (
-		id varchar(36) primary key,
-		username varchar(100) NOT NULL UNIQUE,
-		password varchar(100) NOT NULL,
-		email varchar(100) UNIQUE NOT NULL,
-		role varchar(32) NOT NULL default '',
-		status varchar(32) NOT NULL default 'offline',
-		activate bool not NULL default false,
-		itime integer NOT NULL default 0,
-		utime integer NOT NULL default 0,
-		password_change_time integer not NULL default 0,
-		description text NOT NULL DEFAULT ''
-      );
-	`)
+		CREATE TABLE IF NOT EXISTS users (
+			id varchar(36) primary key,
+			username varchar(100) NOT NULL UNIQUE,
+			password varchar(100) NOT NULL,
+			email varchar(100) NOT NULL,
+			role varchar(32) NOT NULL default '',
+			status varchar(32) NOT NULL default 'offline',
+			activate bool not NULL default false,
+			itime integer NOT NULL default 0,
+			utime integer NOT NULL default 0,
+			password_change_time integer not NULL default 0,
+			description text NOT NULL DEFAULT ''
+    );`)
 	if err == nil {
 		errSync1 := mi.SyncAdminData(db)
 		if errSync1 != nil {

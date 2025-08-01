@@ -9,7 +9,6 @@ import (
 	"github.com/jameskeane/bcrypt"
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
-	"github.com/open-cmi/gobase/essential/pubsub"
 	"github.com/open-cmi/gobase/essential/sqldb"
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
@@ -75,15 +74,15 @@ func QueryList(query *goparam.Param, filter *QueryFilter) (int, []User, error) {
 }
 
 // Login  user login
-func Login(m *LoginMsg) (authuser *User, err error) {
+func Login(m *LoginMsg) (*User, error) {
 	// 先检查用户名是否存在
 	queryclause := `select * from users where username=$1`
 	var user User
 	db := sqldb.GetDB()
 	row := db.QueryRowx(queryclause, m.UserName)
-	err = row.StructScan(&user)
+	err := row.StructScan(&user)
 	if err != nil {
-		logger.Errorf("struct scan failed while login\n")
+		logger.Errorf("Login: struct scan failed: %s\n", err.Error())
 		return nil, err
 	}
 
@@ -106,15 +105,15 @@ func Login(m *LoginMsg) (authuser *User, err error) {
 
 func Create(m *CreateMsg) (err error) {
 	// 先检查用户名是否存在
-	queryclause := "select username from users where username=$1 or email=$2"
+	queryclause := "select username from users where username=$1"
 
 	var un string
 	db := sqldb.GetDB()
-	row := db.QueryRow(queryclause, m.UserName, m.Email)
+	row := db.QueryRow(queryclause, m.UserName)
 	err = row.Scan(&un)
 	if err == nil {
 		// 用户名已经被占用
-		return errors.New(i18n.Sprint("username or email is existing"))
+		return errors.New(i18n.Sprint("username is existing"))
 	}
 
 	id := uuid.New()
@@ -133,52 +132,6 @@ func Create(m *CreateMsg) (err error) {
 	user.PasswordChangeTime = time.Now().Unix()
 
 	err = user.Save()
-	if err == nil {
-		pubsub.Publish(pubsub.EventUserCreate, m.UserName)
-	}
-	return err
-}
-
-// Register register user
-func Register(m *RegisterMsg) (err error) {
-	// 先检查用户名是否存在
-	queryclause := "select username from users where username=$1"
-
-	var un string
-	db := sqldb.GetDB()
-	row := db.QueryRow(queryclause, m.UserName)
-	err = row.Scan(&un)
-	if err == nil {
-		// 用户名已经被占用
-		return errors.New("username has been registered")
-	}
-
-	queryclause = "select email from users where email=$1"
-
-	var email string
-	row = db.QueryRow(queryclause, m.Email)
-	err = row.Scan(&email)
-	if err == nil {
-		// 邮箱已经被占用
-		return errors.New("email has been registered")
-	}
-
-	id := uuid.New()
-	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash(m.Password, salt)
-
-	user := NewUser()
-	user.ID = id.String()
-	user.UserName = m.UserName
-	user.Password = hash
-	user.Email = m.Email
-	user.Description = m.Description
-	user.Activate = false
-	user.Role = "subscriber"
-	user.Status = "offline"
-
-	err = user.Save()
-
 	return err
 }
 

@@ -21,7 +21,6 @@ import (
 	"github.com/open-cmi/gobase/essential/rdb"
 	"github.com/open-cmi/gobase/essential/webserver"
 	"github.com/open-cmi/gobase/pkg/goparam"
-	"github.com/open-cmi/gobase/pkg/verify"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/user"
@@ -295,13 +294,6 @@ func Create(c *gin.Context) {
 	if err := c.ShouldBindJSON(&apimsg); err != nil {
 		ah.InsertOperationLog(i18n.Sprintf("create user"), false)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
-		return
-	}
-
-	// 验证邮箱格式
-	if !verify.EmailIsValid(apimsg.Email) {
-		ah.InsertOperationLog(i18n.Sprintf("create user %s", apimsg.UserName), false)
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "email is not valid"})
 		return
 	}
 
