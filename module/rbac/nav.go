@@ -19,7 +19,7 @@ func GetRoleMenus(roleName string) []Menu {
 		return []Menu{}
 	}
 
-	if role.Permisions == "*" {
+	if role.Permissions == "*" {
 		menus, ok := gRbacMenus.Roles[roleName]
 		if ok {
 			return menus
@@ -28,7 +28,7 @@ func GetRoleMenus(roleName string) []Menu {
 	}
 
 	var menus []Menu = []Menu{}
-	err := json.Unmarshal([]byte(role.Permisions), &menus)
+	err := json.Unmarshal([]byte(role.Permissions), &menus)
 	if err != nil {
 		logger.Errorf("get role menus unmarshal failed: %s\n", err.Error())
 	}

@@ -20,7 +20,7 @@ func (mi RBACInstance) SyncData(db *sqlx.DB) error {
 	now := time.Now().Unix()
 	// 添加admin用户
 	dbsql := fmt.Sprintf(`
-		INSERT INTO roles (id, name, created_time, updated_time, permisions, description) 
+		INSERT INTO roles (id, name, created_time, updated_time, permissions, description) 
 			values ('%s', 'admin', %d, %d, '*', 'administrators');`, id, now, now)
 	_, err := db.Exec(dbsql)
 	if err != nil {
@@ -30,7 +30,7 @@ func (mi RBACInstance) SyncData(db *sqlx.DB) error {
 	// 添加operator角色
 	id = uuid.New().String()
 	dbsql = fmt.Sprintf(`
-		INSERT INTO roles (id, name, created_time, updated_time, permisions, description) 
+		INSERT INTO roles (id, name, created_time, updated_time, permissions, description) 
 			values ('%s', 'operator', %d, %d, '*', 'operator');`, id, now, now)
 	_, err = db.Exec(dbsql)
 	if err != nil {
@@ -40,7 +40,7 @@ func (mi RBACInstance) SyncData(db *sqlx.DB) error {
 	// 添加auditor角色
 	id = uuid.New().String()
 	dbsql = fmt.Sprintf(`
-		INSERT INTO roles (id, name, created_time, updated_time, permisions, description) 
+		INSERT INTO roles (id, name, created_time, updated_time, permissions, description) 
 			values ('%s', 'auditor', %d, %d, '*', 'auditor');`, id, now, now)
 	_, err = db.Exec(dbsql)
 	if err != nil {
@@ -58,7 +58,7 @@ func (mi RBACInstance) Up(db *sqlx.DB) error {
 		created_time integer NOT NULL default 0,
 		updated_time integer NOT NULL default 0,
 		description text NOT NULL DEFAULT '',
-		permisions text NOT NULL default '*'
+		permissions text NOT NULL default '*'
       );
 	`)
 	if err == nil {

@@ -3,6 +3,7 @@ package rbac
 import (
 	"errors"
 
+	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
 	"github.com/open-cmi/gobase/pkg/goparam"
@@ -70,22 +71,26 @@ func RoleList(option *goparam.Param) (int, []RoleModel, error) {
 	return count, roles, err
 }
 
-func DeleteRole(option *goparam.Param, id string) error {
+type RoleDeleteRequest struct {
+	ID string `json:"id"`
+}
+
+func DeleteRole(id string) error {
 	role := GetByID(id)
 	if role == nil {
-		return errors.New("role is not existing")
+		return errors.New(i18n.Sprintf("role is not existing"))
 	}
 	if role.Name == "admin" {
-		return errors.New("admin should not be deleted")
+		return errors.New(i18n.Sprintf("admin can not be delete"))
 	}
 	err := role.Remove()
 	return err
 }
 
-func GetPermisions(roleName string) (string, error) {
+func GetPermissions(roleName string) (string, error) {
 	role := GetByName(roleName)
 	if role == nil {
 		return "", errors.New("role is not existing")
 	}
-	return role.Permisions, nil
+	return role.Permissions, nil
 }
