@@ -12,7 +12,8 @@ import (
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
-type User struct {
+type UserModel struct {
+	Index              int    `json:"index"`
 	UserName           string `json:"username" db:"username"`
 	ID                 string `json:"id" db:"id"`
 	Email              string `json:"email" db:"email"`
@@ -28,11 +29,11 @@ type User struct {
 	isNew              bool
 }
 
-func (u *User) Save() error {
+func (u *UserModel) Save() error {
 	db := sqldb.GetDB()
 
 	if u.isNew {
-		columns := goparam.GetColumn(User{}, []string{})
+		columns := goparam.GetColumn(UserModel{}, []string{})
 		values := goparam.GetColumnInsertNamed(columns)
 
 		insertClause := fmt.Sprintf("insert into users(%s) values(%s)",
@@ -43,7 +44,7 @@ func (u *User) Save() error {
 			return errors.New("create user failed")
 		}
 	} else {
-		columns := goparam.GetColumn(User{}, []string{})
+		columns := goparam.GetColumn(UserModel{}, []string{})
 		values := goparam.GetColumnUpdateNamed(columns)
 
 		updateClause := fmt.Sprintf("update users set %s where id=:id",
@@ -58,7 +59,7 @@ func (u *User) Save() error {
 	return nil
 }
 
-func (m *User) Remove() error {
+func (m *UserModel) Remove() error {
 	deleteClause := "delete from users where id=$1"
 	db := sqldb.GetDB()
 	_, err := db.Exec(deleteClause, m.ID)
@@ -69,12 +70,12 @@ func (m *User) Remove() error {
 }
 
 // Get get id
-func Get(id string) (user *User) {
+func Get(id string) (user *UserModel) {
 	queryClause := `select * from users where id=$1`
 	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, id)
 
-	var mdl User
+	var mdl UserModel
 	err := row.StructScan(&mdl)
 	if err != nil {
 		logger.Errorf("user %s not found: %s\n", id, err.Error())
@@ -124,9 +125,9 @@ func DeleteByName(username string) error {
 	return err
 }
 
-func NewUser() *User {
+func NewUser() *UserModel {
 	n := time.Now().Unix()
-	return &User{
+	return &UserModel{
 		isNew:       true,
 		CreatedTime: n,
 		UpdatedTime: n,

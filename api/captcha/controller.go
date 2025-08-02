@@ -26,7 +26,7 @@ func GetPic(c *gin.Context) {
 	var content bytes.Buffer
 	c.Header("Content-Type", "image/png")
 	id := c.Param("id")
-	captcha.WriteImage(&content, id, 80, 60)
+	captcha.WriteImage(&content, id, 120, 56)
 	reader := bytes.NewReader(content.Bytes())
 
 	c.DataFromReader(http.StatusOK, int64(len(content.Bytes())), "image/png", reader, nil)

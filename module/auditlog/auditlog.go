@@ -123,7 +123,7 @@ func QueryList(p *goparam.Param, filter *QueryFilter) (int, []Model, error) {
 
 	queryClause := `select * from audit_log`
 	queryClause += whereClause
-	finalClause := goparam.BuildFinalClause(p)
+	finalClause := goparam.BuildFinalClause(p, []string{"timestamp"})
 	queryClause += finalClause
 	rows, err := db.Queryx(queryClause, whereArgs...)
 	if err != nil {

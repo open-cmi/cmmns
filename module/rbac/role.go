@@ -10,7 +10,7 @@ import (
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
-type Role struct {
+type RoleModel struct {
 	ID          string `json:"id" db:"id"`
 	Name        string `json:"name" db:"name"`
 	CreatedTime int64  `json:"created_time" db:"created_time"`
@@ -20,11 +20,11 @@ type Role struct {
 	isNew       bool
 }
 
-func (r *Role) Save() error {
+func (r *RoleModel) Save() error {
 	db := sqldb.GetDB()
 
 	if r.isNew {
-		columns := goparam.GetColumn(Role{}, []string{})
+		columns := goparam.GetColumn(RoleModel{}, []string{})
 		values := goparam.GetColumnInsertNamed(columns)
 
 		insertClause := fmt.Sprintf("insert into roles(%s) values(%s)",
@@ -35,7 +35,7 @@ func (r *Role) Save() error {
 			return errors.New("create role failed")
 		}
 	} else {
-		columns := goparam.GetColumn(Role{}, []string{})
+		columns := goparam.GetColumn(RoleModel{}, []string{})
 		values := goparam.GetColumnUpdateNamed(columns)
 
 		insertClause := fmt.Sprintf("update roles set %s where id=:id",
@@ -49,7 +49,7 @@ func (r *Role) Save() error {
 	return nil
 }
 
-func (r *Role) Remove() error {
+func (r *RoleModel) Remove() error {
 	deleteClause := "delete from roles where id=$1"
 	db := sqldb.GetDB()
 	_, err := db.Exec(deleteClause, r.ID)
@@ -59,14 +59,14 @@ func (r *Role) Remove() error {
 	return err
 }
 
-func GetByName(name string) *Role {
+func GetByName(name string) *RoleModel {
 	queryClause := `select * from roles where name=$1`
 	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, name)
 	if row == nil {
 		return nil
 	}
-	var r Role
+	var r RoleModel
 	err := row.StructScan(&r)
 	if err != nil {
 		logger.Errorf("struct scan role %s\n", err.Error())
@@ -75,14 +75,14 @@ func GetByName(name string) *Role {
 	return &r
 }
 
-func GetByID(id string) *Role {
+func GetByID(id string) *RoleModel {
 	queryClause := `select * from roles where id=$1`
 	db := sqldb.GetDB()
 	row := db.QueryRowx(queryClause, id)
 	if row == nil {
 		return nil
 	}
-	var r Role
+	var r RoleModel
 	err := row.StructScan(&r)
 	if err != nil {
 		logger.Errorf("struct scan role %s\n", err.Error())

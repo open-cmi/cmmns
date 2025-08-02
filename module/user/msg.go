@@ -11,7 +11,7 @@ type CreateMsg struct {
 	UserName    string `json:"username"`
 	Email       string `json:"email"`
 	Password    string `json:"password"`
-	Confirmpass string `json:"confirmpass"`
+	ConfirmPass string `json:"confirmpass"`
 	Role        string `json:"role"`
 	Description string `json:"description,omitempty"`
 }
@@ -34,7 +34,11 @@ type EditMsg struct {
 }
 
 type ResetPasswdRequest struct {
-	ID        string `json:"id"`
-	Password  string `json:"password"`
-	Password2 string `json:"confirm_password"`
+	ID              string `json:"id"`
+	Password        string `json:"password"`
+	ConfirmPassword string `json:"confirmpass"`
+}
+
+type DeleteUserRequest struct {
+	ID string `json:"id"`
 }

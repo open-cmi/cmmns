@@ -134,7 +134,7 @@ func List(option *goparam.Param) (int, []Model, error) {
 
 	columns := goparam.GetColumn(Model{}, []string{})
 	queryClause := fmt.Sprintf(`select %s from system_status`, strings.Join(columns, ","))
-	finalClause := goparam.BuildFinalClause(option)
+	finalClause := goparam.BuildFinalClause(option, []string{})
 	queryClause += finalClause
 	rows, err := db.Queryx(queryClause)
 	if err != nil {

@@ -7,12 +7,10 @@ import (
 )
 
 type Menu struct {
-	Path         string `json:"path"`
-	Name         string `json:"name"`
-	Icon         string `json:"icon,omitempty"`
-	Require      bool   `json:"require,omitempty"`
-	Experimental bool   `json:"experimental,omitempty"`
-	Children     []Menu `json:"children,omitempty"`
+	Path     string `json:"path"`
+	Name     string `json:"name"`
+	Icon     string `json:"icon,omitempty"`
+	Children []Menu `json:"children,omitempty"`
 }
 
 type RbacMenu struct {

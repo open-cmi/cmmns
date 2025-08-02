@@ -313,16 +313,25 @@ func Create(c *gin.Context) {
 func Delete(c *gin.Context) {
 	ah := auditlog.NewAuditHandler(c)
 	param := goparam.ParseParams(c)
-	id := c.Param("id")
+
+	var apimsg user.DeleteUserRequest
+	if err := c.ShouldBindJSON(&apimsg); err != nil {
+		ah.InsertOperationLog(i18n.Sprintf("delete user"), false)
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	id := apimsg.ID
 	userID := param.UserID
 	if id == userID {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": -1,
-			"msg": "can't delete youself",
+			"msg": i18n.Sprintf("can't delete youself"),
 		})
 		ah.InsertOperationLog(i18n.Sprintf("delete user"), false)
 		return
 	}
+
 	role := param.Role
 	if role != "admin" {
 		c.JSON(http.StatusOK, gin.H{
@@ -443,15 +452,6 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	if req.Password != req.Password2 {
-		c.JSON(http.StatusOK, gin.H{
-			"ret": 1,
-			"msg": i18n.Sprintf("password confirmation doesn't match the password"),
-		})
-		ah.InsertOperationLog(i18n.Sprintf("reset password"), false)
-		return
-	}
-
 	err := user.ResetPasswd(&req)
 	if err != nil {
 		ah.InsertOperationLog(i18n.Sprintf("reset password"), false)
@@ -487,19 +487,19 @@ func QueryTokenList(c *gin.Context) {
 // v1 user适用于普通的后台管理系统，用户由管理员创建管理，不支持自注册用户
 func init() {
 	webserver.RegisterMustAuthRouter("user", "/api/user/v1")
-	webserver.RegisterMustAuthAPI("user", "GET", "/checkauth", CheckAuth)
+	webserver.RegisterMustAuthAPI("user", "GET", "/checkauth/", CheckAuth)
 	webserver.RegisterMustAuthAPI("user", "GET", "/", List)
 	webserver.RegisterMustAuthAPI("user", "POST", "/", Create)
-	webserver.RegisterMustAuthAPI("user", "POST", "/change-passwd", ChangePassword)
-	webserver.RegisterMustAuthAPI("user", "POST", "/reset-passwd", ResetPassword)
-	webserver.RegisterMustAuthAPI("user", "POST", "/logout", Logout)
+	webserver.RegisterMustAuthAPI("user", "POST", "/change-passwd/", ChangePassword)
+	webserver.RegisterMustAuthAPI("user", "POST", "/reset-passwd/", ResetPassword)
+	webserver.RegisterMustAuthAPI("user", "POST", "/logout/", Logout)
 	webserver.RegisterMustAuthAPI("user", "GET", "/:id", Get)
-	webserver.RegisterMustAuthAPI("user", "PUT", "/:id", Edit)
-	webserver.RegisterMustAuthAPI("user", "DELETE", "/:id", Delete)
+	webserver.RegisterMustAuthAPI("user", "POST", "/edit/", Edit)
+	webserver.RegisterMustAuthAPI("user", "POST", "/delete/", Delete)
 	webserver.RegisterMustAuthAPI("user", "POST", "/jwt-token/", CreateToken)
 	webserver.RegisterMustAuthAPI("user", "POST", "/jwt-token/delete/", DeleteToken)
 	webserver.RegisterMustAuthAPI("user", "GET", "/jwt-token/", QueryTokenList)
 
 	webserver.RegisterUnauthRouter("user", "/api/user/v1")
-	webserver.RegisterUnauthAPI("user", "POST", "/login", Login)
+	webserver.RegisterUnauthAPI("user", "POST", "/login/", Login)
 }

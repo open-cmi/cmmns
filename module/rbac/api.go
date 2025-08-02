@@ -33,10 +33,10 @@ func GetAllRoleNames() ([]string, error) {
 	return roles, err
 }
 
-func RoleList(option *goparam.Param) (int, []Role, error) {
+func RoleList(option *goparam.Param) (int, []RoleModel, error) {
 	db := sqldb.GetDB()
 
-	var roles []Role = []Role{}
+	var roles []RoleModel = []RoleModel{}
 	countClause := "select count(*) from roles"
 
 	row := db.QueryRow(countClause)
@@ -49,7 +49,7 @@ func RoleList(option *goparam.Param) (int, []Role, error) {
 	}
 
 	queryClause := `select * from roles`
-	finalClause := goparam.BuildFinalClause(option)
+	finalClause := goparam.BuildFinalClause(option, []string{})
 	queryClause += finalClause
 	rows, err := db.Queryx(queryClause)
 	if err != nil {
@@ -58,7 +58,7 @@ func RoleList(option *goparam.Param) (int, []Role, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var item Role
+		var item RoleModel
 		err := rows.StructScan(&item)
 		if err != nil {
 			logger.Errorf("role struct scan failed %s\n", err.Error())

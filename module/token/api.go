@@ -29,7 +29,7 @@ func QueryTokenList(option *goparam.Param) (int, []TokenRecord, error) {
 
 	columns := goparam.GetColumn(TokenRecord{}, []string{})
 	queryClause := fmt.Sprintf(`select %s from token_record`, strings.Join(columns, ","))
-	finalClause := goparam.BuildFinalClause(option)
+	finalClause := goparam.BuildFinalClause(option, []string{})
 	queryClause += finalClause
 	rows, err := db.Queryx(queryClause)
 	if err != nil {

@@ -44,7 +44,7 @@
     "server": [
       {
         "address": "0.0.0.0",
-        "port": 30000,
+        "port": 30001,
         "proto": "http"
       },
       {
@@ -125,12 +125,12 @@
           ]
         },
         {
-          "path": "/main/log",
-          "name": "log",
-          "icon": "log",
+          "path": "/main/system-log",
+          "name": "system log",
+          "icon": "system-log",
           "children": [
             {
-              "path": "/main/log/operate",
+              "path": "/main/system-log/operate",
               "name": "operate log"
             }
           ]

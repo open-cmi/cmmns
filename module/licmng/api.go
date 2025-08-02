@@ -61,7 +61,7 @@ func QueryLicenseList(query *goparam.Param, filter *QueryFilter) (int, []License
 	}
 
 	queryClause := `select * from license`
-	finalClause := goparam.BuildFinalClause(query)
+	finalClause := goparam.BuildFinalClause(query, []string{"created_time", "expire_time"})
 	queryClause += (whereClause + finalClause)
 	rows, err := db.Queryx(queryClause, whereArgs...)
 	if err != nil {

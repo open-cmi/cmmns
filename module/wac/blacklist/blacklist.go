@@ -93,7 +93,7 @@ func QueryList(query *goparam.Param) (int, []Blacklist, error) {
 	}
 
 	queryClause := `select * from wac_blacklist`
-	finalClause := goparam.BuildFinalClause(query)
+	finalClause := goparam.BuildFinalClause(query, []string{"timestamp"})
 	queryClause += finalClause
 	rows, err := db.Queryx(queryClause)
 	if err != nil {
