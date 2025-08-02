@@ -13,7 +13,6 @@ import (
 )
 
 type UserModel struct {
-	Index              int    `json:"index"`
 	UserName           string `json:"username" db:"username"`
 	ID                 string `json:"id" db:"id"`
 	Email              string `json:"email" db:"email"`

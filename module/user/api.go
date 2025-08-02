@@ -20,12 +20,17 @@ type QueryFilter struct {
 	Username string
 }
 
+type QueryUserModelItem struct {
+	Index int `json:"index"`
+	UserModel
+}
+
 // List list func
-func QueryList(query *goparam.Param, filter *QueryFilter) (int, []UserModel, error) {
+func QueryList(query *goparam.Param, filter *QueryFilter) (int, []QueryUserModelItem, error) {
 	db := sqldb.GetDB()
 
-	startIndex := query.PageParam.Page * query.PageParam.PageSize
-	var users []UserModel = []UserModel{}
+	startIndex := query.PageParam.Page*query.PageParam.PageSize + 1
+	var users []QueryUserModelItem = []QueryUserModelItem{}
 	var paramnum int = 1
 	var whereClause string
 	var whereArgs []interface{}
@@ -63,14 +68,14 @@ func QueryList(query *goparam.Param, filter *QueryFilter) (int, []UserModel, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var item UserModel
+		var item QueryUserModelItem
 		err := rows.StructScan(&item)
 		if err != nil {
 			logger.Errorf("user struct scan failed %s\n", err.Error())
 			break
 		}
-		startIndex += 1
 		item.Index = startIndex
+		startIndex += 1
 
 		users = append(users, item)
 	}
