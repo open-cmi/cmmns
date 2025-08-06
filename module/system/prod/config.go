@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	Name   string `json:"name"`
-	Footer string `json:"footer"`
+	Name     string `json:"name"`
+	NameDesc string `json:"name_desc"`
+	Footer   string `json:"footer"`
 }
 
 var gConf Config

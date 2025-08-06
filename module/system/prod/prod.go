@@ -11,9 +11,10 @@ import (
 )
 
 type ProdModel struct {
-	Name   string `json:"name"`
-	Footer string `json:"footer"`
-	isNew  bool
+	Name     string `json:"name"`
+	NameDesc string `json:"name_desc"`
+	Footer   string `json:"footer"`
+	isNew    bool
 }
 
 func (m *ProdModel) Key() string {
@@ -90,16 +91,18 @@ func GetProdBasisInfo() ProdModel {
 	m := GetProdModel()
 	if m == nil {
 		return ProdModel{
-			Name:   gConf.Name,
-			Footer: gConf.Footer,
+			Name:     gConf.Name,
+			NameDesc: gConf.NameDesc,
+			Footer:   gConf.Footer,
 		}
 	}
 	return *m
 }
 
 type ProdInfoSetRequest struct {
-	Name   string `json:"name"`
-	Footer string `json:"footer"`
+	Name     string `json:"name"`
+	NameDesc string `json:"name_desc"`
+	Footer   string `json:"footer"`
 }
 
 func SetProdBasisInfo(req *ProdInfoSetRequest) error {
@@ -109,5 +112,6 @@ func SetProdBasisInfo(req *ProdInfoSetRequest) error {
 	}
 	m.Name = req.Name
 	m.Footer = req.Footer
+	m.NameDesc = req.NameDesc
 	return m.Save()
 }
