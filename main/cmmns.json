@@ -39,7 +39,7 @@
     "footer": "通用管理平台"
   },
   "webserver": {
-    "strict_auth": true,
+    "option_auth": true,
     "debug": true,
     "server": [
       {
@@ -127,7 +127,7 @@
         {
           "path": "/main/system-log",
           "name": "system log",
-          "icon": "system-log",
+          "icon": "log",
           "children": [
             {
               "path": "/main/system-log/operate",
@@ -138,7 +138,7 @@
         {
           "path": "/main/my",
           "name": "my",
-          "icon": "user",
+          "icon": "my",
           "children": [
             {
               "path": "/main/my/change-password",
