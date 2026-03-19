@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/rbac"
-	"github.com/open-cmi/gobase/essential/webserver"
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
@@ -21,5 +20,5 @@ func GetRoleMenus(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterMustAuthAPI("rbac", "GET", "/nav-menu/", GetRoleMenus)
+	rbac.MustAuthAPI("rbac", "GET", "/nav-menu/", GetRoleMenus, rbac.GetInitRoles())
 }

@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/licmng"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/user"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
@@ -163,8 +163,8 @@ func DownloadLicense(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterMustAuthAPI("system", "GET", "/licmng/", QueryLicenseList)
-	webserver.RegisterMustAuthAPI("system", "POST", "/licmng/", CreateLicense)
-	webserver.RegisterMustAuthAPI("system", "GET", "/licmng/download/", DownloadLicense)
-	webserver.RegisterMustAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense)
+	rbac.MustAuthAPI("system", "GET", "/licmng/", QueryLicenseList, rbac.GetInitRoles())
+	rbac.MustAuthAPI("system", "POST", "/licmng/", CreateLicense, rbac.GetInitRoles())
+	rbac.MustAuthAPI("system", "GET", "/licmng/download/", DownloadLicense, rbac.GetInitRoles())
+	rbac.MustAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense, rbac.GetInitRoles())
 }

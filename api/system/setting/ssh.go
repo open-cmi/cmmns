@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/setting/service/ssh"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetSSHService(c *gin.Context) {
@@ -39,6 +39,6 @@ func SetSSHService(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "POST", "/service/ssh-setting/", SetSSHService)
-	webserver.RegisterAuthAPI("system", "GET", "/service/ssh-setting/", GetSSHService)
+	rbac.OptionAuthAPI("system", "POST", "/service/ssh-setting/", SetSSHService, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "GET", "/service/ssh-setting/", GetSSHService, rbac.GetInitRoles())
 }

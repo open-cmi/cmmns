@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/setting/pubnet"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func SetPublicNet(c *gin.Context) {
@@ -42,6 +42,6 @@ func GetPublicNet(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "GET", "/pubnet/", GetPublicNet)
-	webserver.RegisterAuthAPI("system", "POST", "/pubnet/", SetPublicNet)
+	rbac.OptionAuthAPI("system", "GET", "/pubnet/", GetPublicNet, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/pubnet/", SetPublicNet, rbac.GetInitRoles())
 }

@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/system/locale"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func ChangeLang(c *gin.Context) {
@@ -39,6 +39,6 @@ func GetLang(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "PUT", "/locale/", ChangeLang)
-	webserver.RegisterAuthAPI("system", "GET", "/locale/", GetLang)
+	rbac.OptionAuthAPI("system", "PUT", "/locale/", ChangeLang, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "GET", "/locale/", GetLang, rbac.GetInitRoles())
 }

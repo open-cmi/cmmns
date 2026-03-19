@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/gobase/essential/webserver"
+	"github.com/open-cmi/cmmns/module/rbac"
 )
 
 type MD5Request struct {
@@ -26,5 +26,5 @@ func MD5Encode(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("tools", "POST", "/md5/encode/", MD5Encode)
+	rbac.OptionAuthAPI("tools", "POST", "/md5/encode/", MD5Encode, rbac.GetInitRoles())
 }

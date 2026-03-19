@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func Reboot(c *gin.Context) {
@@ -31,6 +31,6 @@ func ShutDown(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "POST", "/reboot/", Reboot)
-	webserver.RegisterAuthAPI("system", "POST", "/shutdown/", ShutDown)
+	rbac.OptionAuthAPI("system", "POST", "/reboot/", Reboot, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/shutdown/", ShutDown, rbac.GetInitRoles())
 }

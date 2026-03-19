@@ -72,7 +72,7 @@ type CreateTokenRequest struct {
 	ExpireDay int    `json:"expire_day"`
 }
 
-func CreateToken(name string, username string, id string, email string, role int, status int, expireDay int) error {
+func CreateToken(name string, username string, id string, email string, role string, status int, expireDay int) error {
 	token, err := middleware.GenerateAuthToken(username, id, email, role, status, expireDay)
 	if err != nil {
 		return err

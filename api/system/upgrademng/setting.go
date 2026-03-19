@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/system/upgrademng"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func SetUpgradeSetting(c *gin.Context) {
@@ -43,6 +43,6 @@ func GetUpgradeSetting(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "GET", "/upgrade-mng/setting/", GetUpgradeSetting)
-	webserver.RegisterAuthAPI("system", "POST", "/upgrade-mng/setting/", SetUpgradeSetting)
+	rbac.OptionAuthAPI("system", "GET", "/upgrade-mng/setting/", GetUpgradeSetting, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/setting/", SetUpgradeSetting, rbac.GetInitRoles())
 }

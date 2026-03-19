@@ -8,7 +8,7 @@ import (
 )
 
 func TestGenerateToken(t *testing.T) {
-	err := CreateToken("test", "frank", "10001", "frank@163.com", 0, 1, 1)
+	err := CreateToken("test", "frank", "10001", "frank@163.com", "admin", 1, 1)
 	if err != nil {
 		t.Errorf("user generate token failed")
 	}
@@ -33,7 +33,7 @@ func TestGenerateToken(t *testing.T) {
 	if claims.Status != 1 {
 		t.Errorf("status is invalid")
 	}
-	if claims.Role != 0 {
+	if claims.Role != "admin" {
 		t.Errorf("role is invalid")
 	}
 	time.Sleep(2 * time.Second)

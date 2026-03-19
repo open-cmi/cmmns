@@ -8,11 +8,11 @@ import (
 	_ "github.com/open-cmi/cmmns/api/system/setting"
 	_ "github.com/open-cmi/cmmns/api/system/sysinfo"
 	_ "github.com/open-cmi/cmmns/api/system/upgrademng"
-	"github.com/open-cmi/gobase/essential/webserver"
+	"github.com/open-cmi/cmmns/module/rbac"
 )
 
 func init() {
-	webserver.RegisterMustAuthRouter("system", "/api/system/v1")
-	webserver.RegisterAuthRouter("system", "/api/system/v1")
-	webserver.RegisterUnauthRouter("system", "/api/system/v1")
+	rbac.RegisterMustAuthRouter("system", "/api/system/v1")
+	rbac.RegisterOptionAuthRouter("system", "/api/system/v1")
+	rbac.RegisterUnauthRouter("system", "/api/system/v1")
 }

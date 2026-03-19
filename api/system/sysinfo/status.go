@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/system"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetSystemStatusInfo(c *gin.Context) {
@@ -18,5 +18,5 @@ func GetSystemStatusInfo(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "GET", "/system-status/", GetSystemStatusInfo)
+	rbac.OptionAuthAPI("system", "GET", "/system-status/", GetSystemStatusInfo, rbac.GetInitRoles())
 }

@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/network"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func SetNetwork(c *gin.Context) {
@@ -109,11 +109,11 @@ func GetAvailableManagementInterface(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterMustAuthRouter("network", "/api/network/v1/")
-	webserver.RegisterMustAuthAPI("network", "GET", "/", GetNetwork)
-	webserver.RegisterMustAuthAPI("network", "POST", "/", SetNetwork)
-	webserver.RegisterMustAuthAPI("network", "GET", "/status/", GetNetworkStatus)
-	webserver.RegisterMustAuthAPI("network", "POST", "/blinking/", BlinkingNetworkInterface)
-	webserver.RegisterMustAuthAPI("network", "POST", "/management-interface/", SetManagementInterface)
-	webserver.RegisterMustAuthAPI("network", "GET", "/available-management-interface/", GetAvailableManagementInterface)
+	rbac.RegisterMustAuthRouter("network", "/api/network/v1/")
+	rbac.MustAuthAPI("network", "GET", "/", GetNetwork, rbac.GetInitRoles())
+	rbac.MustAuthAPI("network", "POST", "/", SetNetwork, rbac.GetInitRoles())
+	rbac.MustAuthAPI("network", "GET", "/status/", GetNetworkStatus, rbac.GetInitRoles())
+	rbac.MustAuthAPI("network", "POST", "/blinking/", BlinkingNetworkInterface, rbac.GetInitRoles())
+	rbac.MustAuthAPI("network", "POST", "/management-interface/", SetManagementInterface, rbac.GetInitRoles())
+	rbac.MustAuthAPI("network", "GET", "/available-management-interface/", GetAvailableManagementInterface, rbac.GetInitRoles())
 }

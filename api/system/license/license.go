@@ -8,10 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/license"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/gobase/essential/events"
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetLicenseInfo(c *gin.Context) {
@@ -110,7 +110,7 @@ func SetProductSerial(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "GET", "/license/", GetLicenseInfo)
-	webserver.RegisterAuthAPI("system", "POST", "/license/upload/", UploadLicenseFile)
-	webserver.RegisterUnauthAPI("system", "POST", "/license/product-serial/", SetProductSerial)
+	rbac.OptionAuthAPI("system", "GET", "/license/", GetLicenseInfo, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/license/upload/", UploadLicenseFile, rbac.GetInitRoles())
+	rbac.UnauthAPI("system", "POST", "/license/product-serial/", SetProductSerial)
 }

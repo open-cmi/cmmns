@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/setting/service/web"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetServicePort(c *gin.Context) {
@@ -40,6 +40,6 @@ func SetServicePort(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "POST", "/service/web-setting/", SetServicePort)
-	webserver.RegisterAuthAPI("system", "GET", "/service/web-setting/", GetServicePort)
+	rbac.OptionAuthAPI("system", "POST", "/service/web-setting/", SetServicePort, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "GET", "/service/web-setting/", GetServicePort, rbac.GetInitRoles())
 }

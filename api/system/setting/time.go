@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/setting/time"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetNtpSetting(c *gin.Context) {
@@ -45,8 +45,8 @@ func SetTimeSetting(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "GET", "/time-setting/", GetNtpSetting)
-	webserver.RegisterAuthAPI("system", "POST", "/time-setting/", SetTimeSetting)
+	rbac.OptionAuthAPI("system", "GET", "/time-setting/", GetNtpSetting, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/time-setting/", SetTimeSetting, rbac.GetInitRoles())
 
-	webserver.RegisterAuthAPI("system", "GET", "/time-setting/tz/", GetTimeZoneList)
+	rbac.OptionAuthAPI("system", "GET", "/time-setting/tz/", GetTimeZoneList, rbac.GetInitRoles())
 }

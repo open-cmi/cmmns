@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/system"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetBasicHostInfo(c *gin.Context) {
@@ -18,5 +18,5 @@ func GetBasicHostInfo(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "GET", "/basic-info/", GetBasicHostInfo)
+	rbac.OptionAuthAPI("system", "GET", "/basic-info/", GetBasicHostInfo, rbac.GetInitRoles())
 }

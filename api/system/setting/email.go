@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/setting/email"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetEmail(c *gin.Context) {
@@ -55,7 +55,7 @@ func CheckEmail(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "POST", "/email-setting/", SetEmail)
-	webserver.RegisterAuthAPI("system", "GET", "/email-setting/", GetEmail)
-	webserver.RegisterAuthAPI("system", "POST", "/check-email-setting/", CheckEmail)
+	rbac.OptionAuthAPI("system", "POST", "/email-setting/", SetEmail, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "GET", "/email-setting/", GetEmail, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/check-email-setting/", CheckEmail, rbac.GetInitRoles())
 }

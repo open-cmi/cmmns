@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/system/upgrademng"
 	"github.com/open-cmi/gobase/essential/logger"
-	"github.com/open-cmi/gobase/essential/webserver"
 	"github.com/open-cmi/gobase/pkg/eyas"
 )
 
@@ -120,7 +120,7 @@ func StartUpgrade(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "POST", "/upgrade-mng/upload-upgrade-meta/", UploadMetaFile)
-	webserver.RegisterAuthAPI("system", "POST", "/upgrade-mng/upload-upgrade-package/", UploadPackage)
-	webserver.RegisterAuthAPI("system", "POST", "/upgrade-mng/upgrade-start/", StartUpgrade)
+	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/upload-upgrade-meta/", UploadMetaFile, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/upload-upgrade-package/", UploadPackage, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/upgrade-start/", StartUpgrade, rbac.GetInitRoles())
 }

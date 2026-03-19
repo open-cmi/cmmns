@@ -1,8 +1,6 @@
 package rbac
 
 import (
-	"encoding/json"
-
 	"github.com/open-cmi/cmmns/module/license"
 	"github.com/open-cmi/gobase/essential/logger"
 )
@@ -19,20 +17,11 @@ func GetRoleMenus(roleName string) []Menu {
 		return []Menu{}
 	}
 
-	if role.Permissions == "*" {
-		menus, ok := gRbacMenus.Roles[roleName]
-		if ok {
-			return menus
-		}
-		return []Menu{}
+	menus, ok := gRbacMenus.Roles[roleName]
+	if ok {
+		return menus
 	}
-
-	var menus []Menu = []Menu{}
-	err := json.Unmarshal([]byte(role.Permissions), &menus)
-	if err != nil {
-		logger.Errorf("get role menus unmarshal failed: %s\n", err.Error())
-	}
-	return menus
+	return []Menu{}
 }
 
 func GetMenusWhileNoLicense() []Menu {

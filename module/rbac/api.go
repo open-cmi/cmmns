@@ -9,6 +9,10 @@ import (
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
+func GetInitRoles() []string {
+	return []string{"admin", "operator", "auditor"}
+}
+
 func GetAllRoleNames() ([]string, error) {
 	db := sqldb.GetDB()
 
@@ -85,12 +89,4 @@ func DeleteRole(id string) error {
 	}
 	err := role.Remove()
 	return err
-}
-
-func GetPermissions(roleName string) (string, error) {
-	role := GetByName(roleName)
-	if role == nil {
-		return "", errors.New("role is not existing")
-	}
-	return role.Permissions, nil
 }

@@ -5,11 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/setting/time"
 	"github.com/open-cmi/cmmns/module/system/locale"
 	"github.com/open-cmi/cmmns/module/system/prod"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func SetProdBasisInfo(c *gin.Context) {
@@ -57,6 +57,6 @@ func GetProdBasisInfo(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterUnauthAPI("system", "GET", "/prod/basis/", GetProdBasisInfo)
-	webserver.RegisterUnauthAPI("system", "POST", "/prod/basis/", SetProdBasisInfo)
+	rbac.UnauthAPI("system", "GET", "/prod/basis/", GetProdBasisInfo)
+	rbac.UnauthAPI("system", "POST", "/prod/basis/", SetProdBasisInfo)
 }

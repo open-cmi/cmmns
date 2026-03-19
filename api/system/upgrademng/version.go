@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/gobase/essential/webserver"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/gobase/pkg/eyas"
 )
 
@@ -22,5 +22,5 @@ func GetCurrentVersion(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "GET", "/upgrade-mng/current-version/", GetCurrentVersion)
+	rbac.OptionAuthAPI("system", "GET", "/upgrade-mng/current-version/", GetCurrentVersion, rbac.GetInitRoles())
 }

@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/pkg/dev"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetDevID(c *gin.Context) {
@@ -23,5 +23,5 @@ func GetDevID(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "GET", "/device/", GetDevID)
+	rbac.OptionAuthAPI("system", "GET", "/device/", GetDevID, rbac.GetInitRoles())
 }

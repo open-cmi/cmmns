@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/pkg/dev"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func GetDeviceInfo(c *gin.Context) {
@@ -14,5 +14,5 @@ func GetDeviceInfo(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterUnauthAPI("system", "GET", "/mcode/", GetDeviceInfo)
+	rbac.UnauthAPI("system", "GET", "/mcode/", GetDeviceInfo)
 }

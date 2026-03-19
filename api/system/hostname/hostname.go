@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/system/hostname"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 )
 
 func SetHostname(c *gin.Context) {
@@ -35,5 +35,5 @@ func SetHostname(c *gin.Context) {
 }
 
 func init() {
-	webserver.RegisterAuthAPI("system", "POST", "/hostname/", SetHostname)
+	rbac.OptionAuthAPI("system", "POST", "/hostname/", SetHostname, rbac.GetInitRoles())
 }

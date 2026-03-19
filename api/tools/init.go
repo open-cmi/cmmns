@@ -1,9 +1,7 @@
 package tools
 
-import (
-	"github.com/open-cmi/gobase/essential/webserver"
-)
+import "github.com/open-cmi/cmmns/module/rbac"
 
 func init() {
-	webserver.RegisterAuthRouter("tools", "/api/tools/v1")
+	rbac.RegisterOptionAuthRouter("tools", "/api/tools/v1")
 }

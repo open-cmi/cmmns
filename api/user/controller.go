@@ -19,10 +19,10 @@ import (
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/rdb"
-	"github.com/open-cmi/gobase/essential/webserver"
 	"github.com/open-cmi/gobase/pkg/goparam"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/user"
 
 	"github.com/gin-gonic/gin"
@@ -375,7 +375,7 @@ func CreateToken(c *gin.Context) {
 	username, _ := user["username"].(string)
 	userid, _ := user["id"].(string)
 	email, _ := user["email"].(string)
-	role, _ := user["role"].(int)
+	role, _ := user["role"].(string)
 	status, _ := user["status"].(int)
 	err := token.CreateToken(req.Name, username, userid, email, role, status, req.ExpireDay)
 	if err != nil {
@@ -486,20 +486,20 @@ func QueryTokenList(c *gin.Context) {
 
 // v1 user适用于普通的后台管理系统，用户由管理员创建管理，不支持自注册用户
 func init() {
-	webserver.RegisterMustAuthRouter("user", "/api/user/v1")
-	webserver.RegisterMustAuthAPI("user", "GET", "/checkauth/", CheckAuth)
-	webserver.RegisterMustAuthAPI("user", "GET", "/", List)
-	webserver.RegisterMustAuthAPI("user", "POST", "/", Create)
-	webserver.RegisterMustAuthAPI("user", "POST", "/change-passwd/", ChangePassword)
-	webserver.RegisterMustAuthAPI("user", "POST", "/reset-passwd/", ResetPassword)
-	webserver.RegisterMustAuthAPI("user", "POST", "/logout/", Logout)
-	webserver.RegisterMustAuthAPI("user", "GET", "/:id", Get)
-	webserver.RegisterMustAuthAPI("user", "POST", "/edit/", Edit)
-	webserver.RegisterMustAuthAPI("user", "POST", "/delete/", Delete)
-	webserver.RegisterMustAuthAPI("user", "POST", "/jwt-token/", CreateToken)
-	webserver.RegisterMustAuthAPI("user", "POST", "/jwt-token/delete/", DeleteToken)
-	webserver.RegisterMustAuthAPI("user", "GET", "/jwt-token/", QueryTokenList)
+	rbac.RegisterMustAuthRouter("user", "/api/user/v1")
+	rbac.MustAuthAPI("user", "GET", "/checkauth/", CheckAuth, rbac.GetInitRoles())
+	rbac.MustAuthAPI("user", "GET", "/", List, rbac.GetInitRoles())
+	rbac.MustAuthAPI("user", "POST", "/", Create, rbac.GetInitRoles())
+	rbac.MustAuthAPI("user", "POST", "/change-passwd/", ChangePassword, rbac.GetInitRoles())
+	rbac.MustAuthAPI("user", "POST", "/reset-passwd/", ResetPassword, rbac.GetInitRoles())
+	rbac.MustAuthAPI("user", "POST", "/logout/", Logout, rbac.GetInitRoles())
+	rbac.MustAuthAPI("user", "GET", "/:id", Get, rbac.GetInitRoles())
+	rbac.MustAuthAPI("user", "POST", "/edit/", Edit, rbac.GetInitRoles())
+	rbac.MustAuthAPI("user", "POST", "/delete/", Delete, rbac.GetInitRoles())
+	rbac.MustAuthAPI("user", "POST", "/jwt-token/", CreateToken, rbac.GetInitRoles())
+	rbac.MustAuthAPI("user", "POST", "/jwt-token/delete/", DeleteToken, rbac.GetInitRoles())
+	rbac.MustAuthAPI("user", "GET", "/jwt-token/", QueryTokenList, rbac.GetInitRoles())
 
-	webserver.RegisterUnauthRouter("user", "/api/user/v1")
-	webserver.RegisterUnauthAPI("user", "POST", "/login/", Login)
+	rbac.RegisterUnauthRouter("user", "/api/user/v1")
+	rbac.UnauthAPI("user", "POST", "/login/", Login)
 }

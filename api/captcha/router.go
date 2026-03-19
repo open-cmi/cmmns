@@ -1,11 +1,11 @@
 package captcha
 
 import (
-	"github.com/open-cmi/gobase/essential/webserver"
+	"github.com/open-cmi/cmmns/module/rbac"
 )
 
 func init() {
-	webserver.RegisterUnauthRouter("captcha", "/api/captcha/v1")
-	webserver.RegisterUnauthAPI("captcha", "GET", "/", GetID)
-	webserver.RegisterUnauthAPI("captcha", "GET", "/:id", GetPic)
+	rbac.RegisterUnauthRouter("captcha", "/api/captcha/v1")
+	rbac.UnauthAPI("captcha", "GET", "/", GetID)
+	rbac.UnauthAPI("captcha", "GET", "/:id", GetPic)
 }
