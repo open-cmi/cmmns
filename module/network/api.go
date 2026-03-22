@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"sort"
 
-	netio "github.com/shirou/gopsutil/net"
+	netio "github.com/shirou/gopsutil/v4/net"
 
 	"github.com/open-cmi/gobase/essential/logger"
 )

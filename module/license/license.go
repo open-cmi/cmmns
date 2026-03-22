@@ -16,7 +16,7 @@ import (
 	"github.com/open-cmi/cmmns/pkg/dev"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/pkg/eyas"
-	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/v4/mem"
 )
 
 func GetLicensePath() string {
