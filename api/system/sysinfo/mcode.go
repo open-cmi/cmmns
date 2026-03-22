@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/rbac"
-	"github.com/open-cmi/cmmns/pkg/dev"
+	"github.com/open-cmi/gobase/pkg/dev"
 )
 
 func GetDeviceInfo(c *gin.Context) {

@@ -16,11 +16,11 @@ import (
 	"time"
 
 	"github.com/open-cmi/cmmns/module/licmng"
-	"github.com/open-cmi/cmmns/pkg/dev"
 	"github.com/open-cmi/gobase/essential/events"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/ticker"
 	"github.com/open-cmi/gobase/initial"
+	"github.com/open-cmi/gobase/pkg/dev"
 )
 
 func VerifySigned(origin string, signed string) error {

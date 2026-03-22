@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/open-cmi/cmmns/module/licmng"
-	"github.com/open-cmi/cmmns/pkg/dev"
 	"github.com/open-cmi/gobase/essential/logger"
+	"github.com/open-cmi/gobase/pkg/dev"
 	"github.com/open-cmi/gobase/pkg/eyas"
 	"github.com/shirou/gopsutil/v4/mem"
 )
