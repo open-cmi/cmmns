@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
+	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/user"
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
@@ -52,4 +53,8 @@ func List(c *gin.Context) {
 			"count":   count,
 			"results": list,
 		}})
+}
+
+func init() {
+	rbac.MustAuthAPI("auditlog", "GET", "/", List, rbac.GetInitRoles())
 }
