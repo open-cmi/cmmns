@@ -22,6 +22,7 @@ import (
 func GetLicensePath() string {
 	if gConf.Lic == "" {
 		confDir := eyas.GetDataDir()
+		os.MkdirAll(confDir, 0755)
 		mcode := dev.GetDeviceID()
 		return path.Join(confDir, fmt.Sprintf("%s.lic", mcode))
 	}
@@ -32,6 +33,7 @@ func GetLicensePath() string {
 		return gConf.Lic
 	}
 	confDir := eyas.GetDataDir()
+	os.MkdirAll(confDir, 0755)
 	return path.Join(confDir, gConf.Lic)
 }
 
