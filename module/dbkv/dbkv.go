@@ -29,22 +29,22 @@ func Set(key string, value string) error {
 	return nil
 }
 
-func Get(key string) (string, error) {
+func Get(key string) (string, bool) {
 	db := sqldb.GetDB()
 	if db == nil {
-		return "", errors.New("database not initialized")
+		return "", false
 	}
 
 	var value string
 	queryClause := `SELECT value FROM k_v_table WHERE key=$1`
 	row := db.QueryRow(queryClause, key)
 	if row == nil {
-		return "", fmt.Errorf("key '%s' not found", key)
+		return "", false
 	}
 	err := row.Scan(&value)
 	if err != nil {
-		logger.Errorf("row scan failed: %s\n", err.Error())
-		return "", fmt.Errorf("failed to scan value: %w", err)
+		logger.Debugf("dbkv Get row scan failed: %s\n", err.Error())
+		return "", false
 	}
-	return value, nil
+	return value, true
 }
