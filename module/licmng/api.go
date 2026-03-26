@@ -15,6 +15,10 @@ import (
 type QueryFilter struct {
 	User     string
 	Customer string
+	Prod     string
+	Version  string
+	Model    string
+	MCode    string
 }
 
 func QueryLicenseList(query *goparam.Param, filter *QueryFilter) (int, []LicenseModel, error) {
@@ -46,6 +50,50 @@ func QueryLicenseList(query *goparam.Param, filter *QueryFilter) (int, []License
 		whereClause += fmt.Sprintf(" customer like %s", sqldb.LikePlaceHolder(paramnum))
 		paramnum += 1
 		whereArgs = append(whereArgs, filter.Customer)
+	}
+
+	if filter.Prod != "" {
+		if whereClause != "" {
+			whereClause += " and "
+		} else {
+			whereClause += " where "
+		}
+		whereClause += fmt.Sprintf(" prod like %s", sqldb.LikePlaceHolder(paramnum))
+		paramnum += 1
+		whereArgs = append(whereArgs, filter.Prod)
+	}
+
+	if filter.Version != "" {
+		if whereClause != "" {
+			whereClause += " and "
+		} else {
+			whereClause += " where "
+		}
+		whereClause += fmt.Sprintf(" version=$%d", paramnum)
+		paramnum += 1
+		whereArgs = append(whereArgs, filter.Version)
+	}
+
+	if filter.Model != "" {
+		if whereClause != "" {
+			whereClause += " and "
+		} else {
+			whereClause += " where "
+		}
+		whereClause += fmt.Sprintf(" model=$%d", paramnum)
+		paramnum += 1
+		whereArgs = append(whereArgs, filter.Model)
+	}
+
+	if filter.MCode != "" {
+		if whereClause != "" {
+			whereClause += " and "
+		} else {
+			whereClause += " where "
+		}
+		whereClause += fmt.Sprintf(" mcode like %s", sqldb.LikePlaceHolder(paramnum))
+		paramnum += 1
+		whereArgs = append(whereArgs, filter.MCode)
 	}
 
 	countClause := "select count(*) from license"

@@ -3,6 +3,7 @@ package licmng
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
@@ -30,6 +31,26 @@ func QueryLicenseList(c *gin.Context) {
 	customer := c.Query("customer")
 	if customer != "" {
 		filter.Customer = customer
+	}
+
+	prod := c.Query("prod")
+	if prod != "" {
+		filter.Prod = prod
+	}
+
+	version := c.Query("version")
+	if version != "" {
+		filter.Version = version
+	}
+
+	model := c.Query("model")
+	if model != "" {
+		filter.Model = model
+	}
+
+	mcode := c.Query("mcode")
+	if mcode != "" {
+		filter.MCode = mcode
 	}
 
 	count, lics, err := licmng.QueryLicenseList(query, &filter)
@@ -162,8 +183,49 @@ func DownloadLicense(c *gin.Context) {
 	ah.InsertOperationLog(i18n.Sprintf("download license"), true)
 }
 
+func GetStatistics(c *gin.Context) {
+	yearStr := c.Query("year")
+	product := c.Query("product")
+
+	year, _ := strconv.Atoi(yearStr)
+
+	stats, err := licmng.GetStatistics(year, product)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret":  0,
+		"msg":  "",
+		"data": stats,
+	})
+}
+
+func GetMonthlyStatistics(c *gin.Context) {
+	monthsStr := c.DefaultQuery("months", "12")
+	months, _ := strconv.Atoi(monthsStr)
+	if months <= 0 {
+		months = 12
+	}
+
+	stats, err := licmng.GetMonthlyStatistics(months)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret":  0,
+		"msg":  "",
+		"data": stats,
+	})
+}
+
 func init() {
 	rbac.MustAuthAPI("system", "GET", "/licmng/", QueryLicenseList, rbac.GetInitRoles())
+	rbac.MustAuthAPI("system", "GET", "/licmng/statistics/", GetStatistics, rbac.GetInitRoles())
+	rbac.MustAuthAPI("system", "GET", "/licmng/monthly-statistics/", GetMonthlyStatistics, rbac.GetInitRoles())
 	rbac.MustAuthAPI("system", "POST", "/licmng/", CreateLicense, rbac.GetInitRoles())
 	rbac.MustAuthAPI("system", "GET", "/licmng/download/", DownloadLicense, rbac.GetInitRoles())
 	rbac.MustAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense, rbac.GetInitRoles())

@@ -44,7 +44,7 @@
     "server": [
       {
         "address": "0.0.0.0",
-        "port": 30001,
+        "port": 30002,
         "proto": "http"
       },
       {
@@ -73,6 +73,16 @@
     ],
     "roles": {
       "admin": [
+        {
+          "path": "/main/license-manager/dashboard",
+          "name": "dashboard",
+          "icon": "dashboard"
+        },
+        {
+          "path": "/main/license-manager/list-view",
+          "name": "license manager",
+          "icon": "license"
+        },
         {
           "path": "/main/system",
           "name": "system management",
@@ -103,7 +113,7 @@
               "name": "service setting"
             },
             {
-              "path": "/main/system/management-interface",
+              "path": "/main/system/network-setting",
               "name": "network setting"
             },
             {
@@ -117,10 +127,6 @@
             {
               "path": "/main/system/license",
               "name": "license"
-            },
-            {
-              "path": "/main/system/license-manager",
-              "name": "license manager"
             }
           ]
         },
@@ -138,7 +144,7 @@
         {
           "path": "/main/my",
           "name": "my",
-          "icon": "my",
+          "icon": "user",
           "children": [
             {
               "path": "/main/my/change-password",
