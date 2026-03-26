@@ -54,24 +54,25 @@
     ]
   },
   "rbac": {
-    "nolic": [
-      {
-        "path": "/main/system",
-        "name": "system management",
-        "icon": "system",
-        "children": [
-          {
-            "path": "/main/system/sysinfo",
-            "name": "system info"
-          },
-          {
-            "path": "/main/system/license",
-            "name": "license"
-          }
-        ]
-      }
-    ],
+    "ignore_lic": true,
     "roles": {
+      "nolic": [
+        {
+          "path": "/main/system",
+          "name": "system management",
+          "icon": "system",
+          "children": [
+            {
+              "path": "/main/system/sysinfo",
+              "name": "system info"
+            },
+            {
+              "path": "/main/system/license",
+              "name": "license"
+            }
+          ]
+        }
+      ],
       "admin": [
         {
           "path": "/main/license-manager/dashboard",

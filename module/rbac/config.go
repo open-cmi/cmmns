@@ -14,20 +14,20 @@ type Menu struct {
 }
 
 type RbacMenu struct {
-	NoLic []Menu            `json:"nolic"`
-	Roles map[string][]Menu `json:"roles"`
+	IgnoreLic bool              `json:"ignore_lic"`
+	Roles     map[string][]Menu `json:"roles"`
 }
 
-var gRbacMenus RbacMenu
+var gRbacMenuConf RbacMenu
 
 func Parse(mess json.RawMessage) error {
-	err := json.Unmarshal(mess, &gRbacMenus)
+	err := json.Unmarshal(mess, &gRbacMenuConf)
 
 	return err
 }
 
 func Save() json.RawMessage {
-	v, _ := json.Marshal(gRbacMenus)
+	v, _ := json.Marshal(gRbacMenuConf)
 	return v
 }
 
