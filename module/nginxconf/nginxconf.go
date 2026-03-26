@@ -205,13 +205,6 @@ func CancelNginxAccessControl() error {
 func ApplyServicePort(httpPort int, httpsPort int) error {
 	var err error
 
-	m := GetServiceModel()
-	if m == nil {
-		m = NewServiceModel()
-		m.HttpPort = 80
-		m.HttpsPort = 443
-	}
-
 	if gConf.Path == "" {
 		logger.Errorf("nginx path is not set, please set it in config file first\n")
 		return nil
@@ -228,38 +221,29 @@ func ApplyServicePort(httpPort int, httpsPort int) error {
 		logger.Errorf("read %s failed\n", nginxConf)
 		return err
 	}
-	var newContent string
-	if strings.Contains(string(content), "listen 80;") {
-		newHttpString := fmt.Sprintf("listen %d;", httpPort)
-		newContent = strings.Replace(string(content), "listen 80;", newHttpString, -1)
-	} else {
-		oldHttpString := fmt.Sprintf("listen %d;", m.HttpPort)
-		newHttpString := fmt.Sprintf("listen %d;", httpPort)
-		newContent = strings.Replace(string(content), oldHttpString, newHttpString, -1)
-	}
-	if strings.Contains(newContent, "listen 443 ssl;") {
-		newHttpsString := fmt.Sprintf("listen %d ssl;", httpsPort)
-		newContent = strings.Replace(newContent, "listen 443 ssl;", newHttpsString, -1)
-
-		if httpsPort != 443 {
-			newRedirectString := fmt.Sprintf("return 301 https://$host:%d$request_uri;", httpsPort)
-			newContent = strings.Replace(newContent, "return 301 https://$host$request_uri;", newRedirectString, -1)
-		}
-	} else {
-		oldHttpsString := fmt.Sprintf("listen %d ssl;", m.HttpsPort)
-		newHttpsString := fmt.Sprintf("listen %d ssl;", httpsPort)
-		newContent = strings.Replace(newContent, oldHttpsString, newHttpsString, -1)
-
-		var newRedirectString string
-		oldRedirectString := fmt.Sprintf("return 301 https://$host:%d$request_uri;", m.HttpsPort)
-
-		if httpsPort == 443 {
-			newRedirectString = "return 301 https://$host$request_uri;"
+	lines := strings.Split(string(content), "\n")
+	newLines := []string{}
+	for _, line := range lines {
+		if strings.Contains(line, "listen ") {
+			if strings.Contains(line, "ssl") {
+				line = fmt.Sprintf("listen %d ssl;", httpsPort)
+			} else {
+				line = fmt.Sprintf("listen %d;", httpPort)
+			}
+			newLines = append(newLines, line)
+		} else if strings.Contains(line, "return 301") {
+			if httpsPort == 443 {
+				line = "return 301 https://$host$request_uri;"
+			} else {
+				line = fmt.Sprintf("return 301 https://$host%d$request_uri;", httpsPort)
+			}
+			newLines = append(newLines, line)
 		} else {
-			newRedirectString = fmt.Sprintf("return 301 https://$host:%d$request_uri;", httpsPort)
+			newLines = append(newLines, line)
 		}
-		newContent = strings.Replace(newContent, oldRedirectString, newRedirectString, -1)
 	}
+
+	newContent := strings.Join(newLines, "\n")
 
 	// 写文件
 	wf, err := os.OpenFile(nginxConf, os.O_RDWR|os.O_TRUNC, 0644)
@@ -272,12 +256,6 @@ func ApplyServicePort(httpPort int, httpsPort int) error {
 	if err != nil {
 		logger.Errorf("write %s failed\n", nginxConf)
 		return err
-	}
-	m.HttpPort = httpPort
-	m.HttpsPort = httpsPort
-	err = m.Save()
-	if err != nil {
-		logger.Errorf("nginx conf service model save failed: %s\n", err.Error())
 	}
 	//
 	if gConf.Reload != "" {
