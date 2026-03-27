@@ -14,7 +14,7 @@ import (
 )
 
 func ApplyNginxBlackConf(blacklists []string) error {
-	blkConf := path.Join(gConf.Path, "ngx_blacklist.conf")
+	blkConf := path.Join(gConf.Conf, "ngx_blacklist.conf")
 	wf, err := os.OpenFile(blkConf, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 	if err != nil {
 		logger.Errorf("open %s for writing failed\n", blkConf)
@@ -37,7 +37,7 @@ func ApplyNginxBlackConf(blacklists []string) error {
 }
 
 func ApplyNginxWhiteConf(whitelists []string) error {
-	whiteConf := path.Join(gConf.Path, "ngx_whitelist.conf")
+	whiteConf := path.Join(gConf.Conf, "ngx_whitelist.conf")
 	wf, err := os.OpenFile(whiteConf, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 	if err != nil {
 		logger.Errorf("open %s for writing failed\n", whiteConf)
@@ -62,11 +62,11 @@ func ApplyNginxWhiteConf(whitelists []string) error {
 func applyAccessControl(mode string) error {
 	var err error
 
-	if gConf.Path == "" {
+	if gConf.Conf == "" {
 		return errors.New("nginx path is not set, please set it in config file first")
 	}
 
-	nginxConf := filepath.Join(gConf.Path, "nginx.conf")
+	nginxConf := filepath.Join(gConf.Conf, "nginx.conf")
 	rf, err := os.Open(nginxConf)
 	if err != nil {
 		logger.Errorf("open %s failed\n", nginxConf)
@@ -160,12 +160,12 @@ func ApplyNginxAccessControl(mode string) error {
 func CancelNginxAccessControl() error {
 	var err error
 
-	if gConf.Path == "" {
+	if gConf.Conf == "" {
 		logger.Errorf("nginx path is not set, please set it in config file first\n")
 		return nil
 	}
 
-	nginxConf := filepath.Join(gConf.Path, "nginx.conf")
+	nginxConf := filepath.Join(gConf.Conf, "nginx.conf")
 	rf, err := os.Open(nginxConf)
 	if err != nil {
 		logger.Errorf("open %s failed\n", nginxConf)
@@ -205,11 +205,11 @@ func CancelNginxAccessControl() error {
 func ApplyServicePort(httpPort int, httpsPort int) error {
 	var err error
 
-	if gConf.Path == "" {
+	if gConf.Conf == "" {
 		logger.Errorf("nginx path is not set, please set it in config file first\n")
 		return nil
 	}
-	nginxConf := filepath.Join(gConf.Path, "nginx.conf")
+	nginxConf := filepath.Join(gConf.Conf, "nginx.conf")
 	rf, err := os.Open(nginxConf)
 	if err != nil {
 		logger.Errorf("open %s failed\n", nginxConf)

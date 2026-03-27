@@ -19,7 +19,7 @@
     "devices": []
   },
   "nginx": {
-    "conf_path": "",
+    "conf": "",
     "reload": ""
   },
   "rdb": {

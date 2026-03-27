@@ -9,7 +9,7 @@ import (
 var gConf Config
 
 type Config struct {
-	Path   string `json:"conf_path"`
+	Conf   string `json:"conf"`
 	Reload string `json:"reload"`
 }
 
