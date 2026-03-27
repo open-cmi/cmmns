@@ -102,10 +102,6 @@
               "name": "time setting"
             },
             {
-              "path": "/main/system/shutdown-reboot",
-              "name": "shutdown reboot"
-            },
-            {
               "path": "/main/system/notify-setting",
               "name": "notify setting"
             },
@@ -165,18 +161,18 @@
           "icon": "system",
           "children": [
             {
-              "path": "/main/system/license-manager",
-              "name": "license manager"
+              "path": "/main/system/sysinfo",
+              "name": "system info"
             }
           ]
         },
         {
-          "path": "/main/log",
-          "name": "log",
+          "path": "/main/system-log",
+          "name": "system log",
           "icon": "log",
           "children": [
             {
-              "path": "/main/log/operate",
+              "path": "/main/system-log/operate",
               "name": "operate log"
             }
           ]
@@ -195,12 +191,12 @@
       ],
       "auditor": [
         {
-          "path": "/main/log",
-          "name": "log",
+          "path": "/main/system-log",
+          "name": "system-log",
           "icon": "log",
           "children": [
             {
-              "path": "/main/log/operate",
+              "path": "/main/system-log/operate",
               "name": "operate log"
             }
           ]
