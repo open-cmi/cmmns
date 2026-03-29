@@ -1,4 +1,4 @@
-package setting
+package powermanagement
 
 import (
 	"net/http"
@@ -49,6 +49,6 @@ func ShutDown(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "POST", "/reboot/", Reboot, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "POST", "/shutdown/", ShutDown, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/power-management/reboot/", Reboot, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/power-management/shutdown/", ShutDown, rbac.GetInitRoles())
 }
