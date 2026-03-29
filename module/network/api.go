@@ -5,6 +5,7 @@ import (
 	"net"
 	"os/exec"
 	"sort"
+	"strings"
 
 	netio "github.com/shirou/gopsutil/v4/net"
 
@@ -69,14 +70,19 @@ func GetStatus() (int, []InterfaceStatus, error) {
 		return 0, resp, err
 	}
 
-	for _, dev := range gConf.Devices {
-		var status InterfaceStatus
-		status.Dev = dev
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return 0, resp, err
+	}
 
-		intf, err := net.InterfaceByName(dev)
-		if err != nil {
-			return 0, resp, err
+	for _, intf := range interfaces {
+		if strings.HasPrefix(intf.Name, "lo") {
+			continue
 		}
+
+		var status InterfaceStatus
+		status.Dev = intf.Name
+
 		addrs, err := intf.Addrs()
 		if err != nil {
 			return 0, resp, err
@@ -100,7 +106,7 @@ func GetStatus() (int, []InterfaceStatus, error) {
 		}
 		// 取网卡的统计信息
 		for _, counter := range counters {
-			if counter.Name == dev {
+			if counter.Name == intf.Name {
 				status.BytesRecv = counter.BytesRecv
 				status.BytesSent = counter.BytesSent
 				status.PacketsRecv = counter.PacketsRecv
