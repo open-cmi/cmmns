@@ -3,7 +3,6 @@ package license
 import (
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -37,35 +36,47 @@ func GetLicensePath() string {
 	return path.Join(confDir, gConf.Lic)
 }
 
-func GetLicenseInfo() (licmng.LicenseInfo, error) {
-	var mess licmng.LicenseInfo
+type LicenseInfo struct {
+	licmng.LicenseInfo
+	IsValid bool `json:"is_valid"`
+}
+
+func GetLicenseInfo() LicenseInfo {
+	var mess LicenseInfo
 	mess.Version = "none"
+	mess.MCode = dev.GetDeviceID()
 
 	licFile := GetLicensePath()
 	rd, err := os.Open(licFile)
 	if err != nil {
-		return mess, err
+		logger.Errorf("open license file failed: %s\n", err.Error())
+		return mess
 	}
 	content, err := io.ReadAll(rd)
 	if err != nil {
-		return mess, err
+		logger.Errorf("read license file failed: %s\n", err.Error())
+		return mess
 	}
 	arr := strings.SplitN(string(content), "\n", 2)
 	if len(arr) != 2 {
-		return mess, errors.New("license content error")
+		logger.Errorf("license content error\n")
+		return mess
 	}
 	licBase64 := arr[0]
 
 	data, err := base64.StdEncoding.DecodeString(licBase64)
 	if err != nil {
-		return mess, err
+		logger.Errorf("license base64 decode failed: %s\n", err.Error())
+		return mess
 	}
 	err = json.Unmarshal(data, &mess)
 	if err != nil {
-		return mess, err
+		logger.Errorf("license json decode failed: %s\n", err.Error())
+		return mess
 	}
 	CheckLicenseValid()
-	return mess, err
+	mess.IsValid = LicenseCheckError() == nil
+	return mess
 }
 
 func SetProductSerial(serial string, prod string) error {

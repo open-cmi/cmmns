@@ -94,6 +94,10 @@
               "name": "system info"
             },
             {
+              "path": "/main/system/power-management",
+              "name": "power management"
+            },
+            {
               "path": "/main/system/security-setting",
               "name": "security setting"
             },

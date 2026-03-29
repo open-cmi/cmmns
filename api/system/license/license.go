@@ -16,13 +16,7 @@ import (
 
 func GetLicenseInfo(c *gin.Context) {
 
-	licInfo, err := license.GetLicenseInfo()
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
-		return
-	}
-
-	// 返回LAN参数
+	licInfo := license.GetLicenseInfo()
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,
 		"msg":  "",
