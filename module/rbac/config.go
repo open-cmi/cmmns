@@ -13,12 +13,13 @@ type Menu struct {
 	Children []Menu `json:"children,omitempty"`
 }
 
-type RbacMenu struct {
+type RbacConf struct {
+	Strict    bool              `json:"strict"`
 	IgnoreLic bool              `json:"ignore_lic"`
 	Roles     map[string][]Menu `json:"roles"`
 }
 
-var gRbacMenuConf RbacMenu
+var gRbacMenuConf RbacConf
 
 func Parse(mess json.RawMessage) error {
 	err := json.Unmarshal(mess, &gRbacMenuConf)

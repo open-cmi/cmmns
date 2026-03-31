@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/open-cmi/cmmns/module/rbac/middleware"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/essential/webserver/middleware"
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
 

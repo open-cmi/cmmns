@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/essential/webserver"
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
@@ -30,7 +29,7 @@ func PermCode(prod, method, path string) string {
 }
 
 func UnauthAPI(prod, method, path string, handler gin.HandlerFunc) error {
-	return webserver.RegisterUnauthAPI(prod, method, path, handler)
+	return RegisterUnauthAPI(prod, method, path, handler)
 }
 
 // MustAuthAPI registers a must-auth API and enforces permission codes.
@@ -63,7 +62,7 @@ func MustAuthAPI(prod, method, path string, handler gin.HandlerFunc, initRoles [
 		handler(c)
 	}
 
-	return webserver.RegisterMustAuthAPI(prod, method, path, wrapped)
+	return RegisterMustAuthAPI(prod, method, path, wrapped)
 }
 
 // AuthAPI registers an auth API and enforces permission codes.
@@ -96,7 +95,7 @@ func OptionAuthAPI(prod, method, path string, handler gin.HandlerFunc, initRoles
 		handler(c)
 	}
 
-	return webserver.RegisterOptionAuthAPI(prod, method, path, wrapped)
+	return RegisterOptionAuthAPI(prod, method, path, wrapped)
 }
 
 func GetAPIPerms() []APIPermDef {
