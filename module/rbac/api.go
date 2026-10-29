@@ -2,16 +2,14 @@ package rbac
 
 import (
 	"errors"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
-
-func GetInitRoles() []string {
-	return []string{"admin", "operator", "auditor"}
-}
 
 func GetAllRoleNames() ([]string, error) {
 	db := sqldb.GetDB()
@@ -89,4 +87,35 @@ func DeleteRole(id string) error {
 	}
 	err := role.Remove()
 	return err
+}
+
+func CreateRole(name string, description string, perms []string) error {
+	if name == "" {
+		return errors.New(i18n.Sprintf("role name cannot be empty"))
+	}
+	r := GetByName(name)
+	if r != nil {
+		return errors.New(i18n.Sprintf("role already exists"))
+	}
+	now := time.Now().Unix()
+	newRole := RoleModel{
+		ID:          uuid.New().String(),
+		Name:        name,
+		CreatedTime: now,
+		UpdatedTime: now,
+		Description: description,
+		Preset:      false,
+		isNew:       true,
+	}
+	err := newRole.Save()
+	if err != nil {
+		return err
+	}
+	if len(perms) > 0 {
+		err = UpdateRolePerms(name, perms)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

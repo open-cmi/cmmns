@@ -40,6 +40,6 @@ func SetServicePort(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "POST", "/service/web-setting/", SetServicePort, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "GET", "/service/web-setting/", GetServicePort, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/service/web-setting/", SetServicePort, rbac.PermCode("system", rbac.PermWrite))
+	rbac.OptionAuthAPI("system", "GET", "/service/web-setting/", GetServicePort, rbac.PermCode("system", rbac.PermView))
 }

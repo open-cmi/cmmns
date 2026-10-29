@@ -223,10 +223,10 @@ func GetMonthlyStatistics(c *gin.Context) {
 }
 
 func init() {
-	rbac.MustAuthAPI("system", "GET", "/licmng/", QueryLicenseList, rbac.GetInitRoles())
-	rbac.MustAuthAPI("system", "GET", "/licmng/statistics/", GetStatistics, rbac.GetInitRoles())
-	rbac.MustAuthAPI("system", "GET", "/licmng/monthly-statistics/", GetMonthlyStatistics, rbac.GetInitRoles())
-	rbac.MustAuthAPI("system", "POST", "/licmng/", CreateLicense, rbac.GetInitRoles())
-	rbac.MustAuthAPI("system", "GET", "/licmng/download/", DownloadLicense, rbac.GetInitRoles())
-	rbac.MustAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense, rbac.GetInitRoles())
+	rbac.MustAuthAPI("system", "GET", "/licmng/", QueryLicenseList, rbac.PermCode("licmng", rbac.PermView))
+	rbac.MustAuthAPI("system", "GET", "/licmng/statistics/", GetStatistics, rbac.PermCode("licmng", rbac.PermView))
+	rbac.MustAuthAPI("system", "GET", "/licmng/monthly-statistics/", GetMonthlyStatistics, rbac.PermCode("licmng", rbac.PermView))
+	rbac.MustAuthAPI("system", "POST", "/licmng/", CreateLicense, rbac.PermCode("licmng", rbac.PermWrite))
+	rbac.MustAuthAPI("system", "GET", "/licmng/download/", DownloadLicense, rbac.PermCode("licmng", rbac.PermExport))
+	rbac.MustAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense, rbac.PermCode("licmng", rbac.PermWrite))
 }

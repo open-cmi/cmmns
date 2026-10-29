@@ -39,6 +39,6 @@ func SetSSHService(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "POST", "/service/ssh-setting/", SetSSHService, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "GET", "/service/ssh-setting/", GetSSHService, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/service/ssh-setting/", SetSSHService, rbac.PermCode("system", rbac.PermWrite))
+	rbac.OptionAuthAPI("system", "GET", "/service/ssh-setting/", GetSSHService, rbac.PermCode("system", rbac.PermView))
 }

@@ -66,9 +66,41 @@ func DeleteRole(c *gin.Context) {
 	})
 }
 
+func CreateRole(c *gin.Context) {
+	var apimsg struct {
+		Name        string   `json:"name"`
+		Description string   `json:"description"`
+		Permissions []string `json:"permissions"`
+	}
+	if err := c.ShouldBindJSON(&apimsg); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	user := goparam.GetUser(c)
+	curRole, _ := user["role"].(string)
+	if curRole != "admin" {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": i18n.Sprintf("no permission")})
+		return
+	}
+
+	err := rbac.CreateRole(apimsg.Name, apimsg.Description, apimsg.Permissions)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
+	})
+}
+
 func init() {
 	rbac.RegisterMustAuthRouter("rbac", "/api/rbac/v1")
-	rbac.MustAuthAPI("rbac", "GET", "/role/", RoleList, rbac.GetInitRoles())
-	rbac.MustAuthAPI("rbac", "POST", "/role/delete/", DeleteRole, rbac.GetInitRoles())
-	rbac.MustAuthAPI("rbac", "GET", "/role/name-list/", GetAllRoleNames, rbac.GetInitRoles())
+	rbac.MustAuthAPI("rbac", "GET", "/role/", RoleList, rbac.PermCode("rbac", rbac.PermView))
+	rbac.MustAuthAPI("rbac", "POST", "/role/", CreateRole, rbac.PermCode("rbac", rbac.PermWrite))
+	rbac.MustAuthAPI("rbac", "POST", "/role/create/", CreateRole, rbac.PermCode("rbac", rbac.PermWrite))
+	rbac.MustAuthAPI("rbac", "POST", "/role/delete/", DeleteRole, rbac.PermCode("rbac", rbac.PermDelete))
+	rbac.MustAuthAPI("rbac", "GET", "/role/name-list/", GetAllRoleNames, rbac.PermCode("rbac", rbac.PermView))
 }

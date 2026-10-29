@@ -42,6 +42,6 @@ func GetPublicNet(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "GET", "/pubnet/", GetPublicNet, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "POST", "/pubnet/", SetPublicNet, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "GET", "/pubnet/", GetPublicNet, rbac.PermCode("system", rbac.PermView))
+	rbac.OptionAuthAPI("system", "POST", "/pubnet/", SetPublicNet, rbac.PermCode("system", rbac.PermWrite))
 }

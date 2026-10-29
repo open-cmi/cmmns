@@ -120,7 +120,7 @@ func StartUpgrade(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/upload-upgrade-meta/", UploadMetaFile, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/upload-upgrade-package/", UploadPackage, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/upgrade-start/", StartUpgrade, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/upload-upgrade-meta/", UploadMetaFile, rbac.PermCode("upgrade", rbac.PermImport))
+	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/upload-upgrade-package/", UploadPackage, rbac.PermCode("upgrade", rbac.PermWrite))
+	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/upgrade-start/", StartUpgrade, rbac.PermCode("upgrade", rbac.PermWrite))
 }

@@ -16,6 +16,7 @@ type RoleModel struct {
 	CreatedTime int64  `json:"created_time" db:"created_time"`
 	UpdatedTime int64  `json:"updated_time" db:"updated_time"`
 	Description string `json:"description" db:"description"`
+	Preset      bool   `json:"preset" db:"preset"`
 	isNew       bool
 }
 

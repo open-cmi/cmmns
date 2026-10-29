@@ -22,5 +22,5 @@ func GetCurrentVersion(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "GET", "/upgrade-mng/current-version/", GetCurrentVersion, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "GET", "/upgrade-mng/current-version/", GetCurrentVersion, rbac.PermCode("upgrade", rbac.PermView))
 }

@@ -200,14 +200,14 @@ func ListBlacklist(c *gin.Context) {
 
 func init() {
 	rbac.RegisterMustAuthRouter("wac", "/api/wac/v1/")
-	rbac.MustAuthAPI("wac", "GET", "/", GetWAC, rbac.GetInitRoles())
-	rbac.MustAuthAPI("wac", "POST", "/", SetWAC, rbac.GetInitRoles())
+	rbac.MustAuthAPI("wac", "GET", "/", GetWAC, "wac:view")
+	rbac.MustAuthAPI("wac", "POST", "/", SetWAC, "wac:edit")
 
-	rbac.MustAuthAPI("wac", "POST", "/blacklist/add/", AddBlacklist, rbac.GetInitRoles())
-	rbac.MustAuthAPI("wac", "POST", "/blacklist/delete/", DelBlacklist, rbac.GetInitRoles())
-	rbac.MustAuthAPI("wac", "GET", "/blacklist/", ListBlacklist, rbac.GetInitRoles())
+	rbac.MustAuthAPI("wac", "POST", "/blacklist/add/", AddBlacklist, "wac:edit")
+	rbac.MustAuthAPI("wac", "POST", "/blacklist/delete/", DelBlacklist, "wac:edit")
+	rbac.MustAuthAPI("wac", "GET", "/blacklist/", ListBlacklist, "wac:view")
 
-	rbac.MustAuthAPI("wac", "POST", "/whitelist/add/", AddWhitelist, rbac.GetInitRoles())
-	rbac.MustAuthAPI("wac", "POST", "/whitelist/delete/", DelWhitelist, rbac.GetInitRoles())
-	rbac.MustAuthAPI("wac", "GET", "/whitelist/", ListWhitelist, rbac.GetInitRoles())
+	rbac.MustAuthAPI("wac", "POST", "/whitelist/add/", AddWhitelist, "wac:edit")
+	rbac.MustAuthAPI("wac", "POST", "/whitelist/delete/", DelWhitelist, "wac:edit")
+	rbac.MustAuthAPI("wac", "GET", "/whitelist/", ListWhitelist, "wac:view")
 }

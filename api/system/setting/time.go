@@ -45,8 +45,7 @@ func SetTimeSetting(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "GET", "/time-setting/", GetNtpSetting, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "POST", "/time-setting/", SetTimeSetting, rbac.GetInitRoles())
-
-	rbac.OptionAuthAPI("system", "GET", "/time-setting/tz/", GetTimeZoneList, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "GET", "/time-setting/", GetNtpSetting, rbac.PermCode("system", rbac.PermView))
+	rbac.OptionAuthAPI("system", "POST", "/time-setting/", SetTimeSetting, rbac.PermCode("system", rbac.PermWrite))
+	rbac.OptionAuthAPI("system", "GET", "/time-setting/tz/", GetTimeZoneList, rbac.PermCode("system", rbac.PermView))
 }

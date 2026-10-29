@@ -20,29 +20,9 @@ func (mi RBACInstance) SyncData(db *sqlx.DB) error {
 	now := time.Now().Unix()
 	// 添加admin用户
 	dbsql := fmt.Sprintf(`
-		INSERT INTO roles (id, name, created_time, updated_time, description) 
-			values ('%s', 'admin', %d, %d, 'administrators');`, id, now, now)
+		INSERT INTO roles (id, name, created_time, updated_time, description, preset) 
+			values ('%s', 'admin', %d, %d, 'administrators', true);`, id, now, now)
 	_, err := db.Exec(dbsql)
-	if err != nil {
-		return err
-	}
-
-	// 添加operator角色
-	id = uuid.New().String()
-	dbsql = fmt.Sprintf(`
-		INSERT INTO roles (id, name, created_time, updated_time, description) 
-			values ('%s', 'operator', %d, %d, 'operator');`, id, now, now)
-	_, err = db.Exec(dbsql)
-	if err != nil {
-		return err
-	}
-
-	// 添加auditor角色
-	id = uuid.New().String()
-	dbsql = fmt.Sprintf(`
-		INSERT INTO roles (id, name, created_time, updated_time, description) 
-			values ('%s', 'auditor', %d, %d, 'auditor');`, id, now, now)
-	_, err = db.Exec(dbsql)
 	if err != nil {
 		return err
 	}
@@ -57,7 +37,8 @@ func (mi RBACInstance) Up(db *sqlx.DB) error {
 		name varchar(32) NOT NULL UNIQUE,
 		created_time integer NOT NULL default 0,
 		updated_time integer NOT NULL default 0,
-		description text NOT NULL DEFAULT ''
+		description text NOT NULL DEFAULT '',
+		preset boolean NOT NULL DEFAULT false
       );
 	`)
 	if err == nil {

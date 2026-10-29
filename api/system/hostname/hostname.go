@@ -35,5 +35,5 @@ func SetHostname(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "POST", "/hostname/", SetHostname, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/hostname/", SetHostname, rbac.PermCode("system", rbac.PermWrite))
 }
