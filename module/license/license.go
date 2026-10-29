@@ -74,6 +74,7 @@ func GetLicenseInfo() LicenseInfo {
 		logger.Errorf("license json decode failed: %s\n", err.Error())
 		return mess
 	}
+	mess.MCode = dev.GetDeviceID()
 	CheckLicenseValid()
 	mess.IsValid = LicenseCheckError() == nil
 	return mess
