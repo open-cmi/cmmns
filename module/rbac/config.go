@@ -7,8 +7,7 @@ import (
 )
 
 type RbacConf struct {
-	Strict    bool `json:"strict"`
-	IgnoreLic bool `json:"ignore_lic"`
+	Strict bool `json:"strict"`
 }
 
 var gRbacMenuConf RbacConf

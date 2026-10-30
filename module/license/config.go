@@ -9,6 +9,7 @@ import (
 var gConf Config
 
 type Config struct {
+	Ignore     bool   `json:"ignore"`
 	Lic        string `json:"lic"`
 	PublicFile string `json:"public_file"`
 }
