@@ -18,5 +18,8 @@ func GetSystemStatusInfo(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "GET", "/system-status/", GetSystemStatusInfo, rbac.PermCode("system:sysinfo", rbac.PermView))
+	rbac.OptionAuthAPI("system", "GET", "/system-status/", GetSystemStatusInfo,
+		rbac.PermCode("cmmns:sysinfo", rbac.PermView),
+		rbac.PermCode("cmmns:status", rbac.PermView),
+	)
 }

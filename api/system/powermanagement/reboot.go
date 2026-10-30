@@ -49,6 +49,6 @@ func ShutDown(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "POST", "/power-management/reboot/", Reboot, rbac.PermCode("system", rbac.PermWrite))
-	rbac.OptionAuthAPI("system", "POST", "/power-management/shutdown/", ShutDown, rbac.PermCode("system", rbac.PermWrite))
+	rbac.OptionAuthAPI("system", "POST", "/power-management/reboot/", Reboot, rbac.PermCode("cmmns:power_management", rbac.PermWrite))
+	rbac.OptionAuthAPI("system", "POST", "/power-management/shutdown/", ShutDown, rbac.PermCode("cmmns:power_management", rbac.PermWrite))
 }

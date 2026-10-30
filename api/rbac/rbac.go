@@ -114,9 +114,13 @@ func CreateRole(c *gin.Context) {
 
 func init() {
 	rbac.RegisterMustAuthRouter("rbac", "/api/rbac/v1")
-	rbac.MustAuthAPI("rbac", "GET", "/role/", RoleList, rbac.PermCode("rbac", rbac.PermView))
-	rbac.MustAuthAPI("rbac", "POST", "/role/", CreateRole, rbac.PermCode("rbac", rbac.PermWrite))
-	rbac.MustAuthAPI("rbac", "POST", "/role/create/", CreateRole, rbac.PermCode("rbac", rbac.PermWrite))
-	rbac.MustAuthAPI("rbac", "POST", "/role/delete/", DeleteRole, rbac.PermCode("rbac", rbac.PermDelete))
-	rbac.MustAuthAPI("rbac", "GET", "/role/name-list/", GetAllRoleNames, rbac.PermCode("rbac", rbac.PermView))
+	rbac.MustAuthAPI("rbac", "GET", "/role/", RoleList,
+		rbac.PermCode("cmmns:rbac", rbac.PermView),
+		rbac.PermCode("cmmns:user", rbac.PermView),
+	)
+	rbac.MustAuthAPI("rbac", "POST", "/role/", CreateRole, rbac.PermCode("cmmns:rbac", rbac.PermWrite))
+	rbac.MustAuthAPI("rbac", "POST", "/role/create/", CreateRole, rbac.PermCode("cmmns:rbac", rbac.PermWrite))
+	rbac.MustAuthAPI("rbac", "POST", "/role/delete/", DeleteRole, rbac.PermCode("cmmns:rbac", rbac.PermDelete))
+	// GetAllRoleNames 属于纯只读元数据（供下拉框/筛选框使用），只要登录认证成功即可获取
+	rbac.MustAuthAPI("rbac", "GET", "/role/name-list/", GetAllRoleNames)
 }

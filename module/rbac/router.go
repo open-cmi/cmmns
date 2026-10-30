@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/gobase/essential/i18n"
@@ -157,14 +158,15 @@ func UnauthAPI(prod, method, path string, handler gin.HandlerFunc) error {
 }
 
 // MustAuthAPI registers a must-auth API and enforces permission codes.
-// If perms is empty, a default perm code is generated from (prod, method, path).
-func MustAuthAPI(prod, method, path string, handler gin.HandlerFunc, perm string) error {
+// Supports multiple permission codes (variadic, OR relation).
+func MustAuthAPI(prod, method, path string, handler gin.HandlerFunc, perms ...string) error {
+	permStr := strings.Join(perms, ",")
 	regMu.Lock()
 	regAll = append(regAll, APIPermDef{
 		Prod:   prod,
 		Method: method,
 		Path:   path,
-		Perm:   perm,
+		Perm:   permStr,
 	})
 	regMu.Unlock()
 
@@ -176,7 +178,7 @@ func MustAuthAPI(prod, method, path string, handler gin.HandlerFunc, perm string
 		}
 
 		role, _ := user["role"].(string)
-		allowed := AllowRole(role, perm)
+		allowed := AllowRole(role, perms...)
 		if !allowed {
 			c.String(http.StatusForbidden, i18n.Sprintf("no permission"))
 			return
@@ -201,15 +203,16 @@ func MustAuthAPI(prod, method, path string, handler gin.HandlerFunc, perm string
 	return nil
 }
 
-// AuthAPI registers an auth API and enforces permission codes.
-// If perms is empty, a default perm code is generated from (prod, method, path).
-func OptionAuthAPI(prod, method, path string, handler gin.HandlerFunc, perm string) error {
+// OptionAuthAPI registers an auth API and enforces permission codes.
+// Supports multiple permission codes (variadic, OR relation).
+func OptionAuthAPI(prod, method, path string, handler gin.HandlerFunc, perms ...string) error {
+	permStr := strings.Join(perms, ",")
 	regMu.Lock()
 	regAll = append(regAll, APIPermDef{
 		Prod:   prod,
 		Method: method,
 		Path:   path,
-		Perm:   perm,
+		Perm:   permStr,
 	})
 	regMu.Unlock()
 
@@ -221,7 +224,7 @@ func OptionAuthAPI(prod, method, path string, handler gin.HandlerFunc, perm stri
 		}
 
 		role, _ := user["role"].(string)
-		allowed := AllowRole(role, perm)
+		allowed := AllowRole(role, perms...)
 		if !allowed {
 			c.String(http.StatusForbidden, i18n.Sprintf("no permission"))
 			return

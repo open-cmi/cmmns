@@ -104,7 +104,10 @@ func SetProductSerial(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "GET", "/license/", GetLicenseInfo, rbac.PermCode("license", rbac.PermView))
-	rbac.OptionAuthAPI("system", "POST", "/license/upload/", UploadLicenseFile, rbac.PermCode("license", rbac.PermImport))
-	rbac.OptionAuthAPI("system", "POST", "/license/product-serial/", SetProductSerial, rbac.PermCode("license", rbac.PermWrite))
+	rbac.OptionAuthAPI("system", "GET", "/license/", GetLicenseInfo, rbac.PermCode("cmmns:license", rbac.PermView))
+	rbac.OptionAuthAPI("system", "POST", "/license/upload/", UploadLicenseFile,
+		rbac.PermCode("cmmns:license", rbac.PermImport),
+		rbac.PermCode("cmmns:license", rbac.PermWrite),
+	)
+	rbac.OptionAuthAPI("system", "POST", "/license/product-serial/", SetProductSerial, rbac.PermCode("cmmns:license", rbac.PermWrite))
 }
