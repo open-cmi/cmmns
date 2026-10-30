@@ -103,11 +103,34 @@ func SetProductSerial(c *gin.Context) {
 	})
 }
 
+func CheckLicense(c *gin.Context) {
+	err := license.LicenseCheckError()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"ret": -1,
+			"msg": err.Error(),
+			"data": gin.H{
+				"is_valid": false,
+				"error":    err.Error(),
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
+		"data": gin.H{
+			"is_valid": true,
+		},
+	})
+}
+
 func init() {
 	rbac.OptionAuthAPI("system", "GET", "/license/", GetLicenseInfo, rbac.PermCode("cmmns:license", rbac.PermView))
+	rbac.OptionAuthAPI("system", "GET", "/license/check/", CheckLicense, rbac.PermCode("cmmns:license", rbac.PermView))
 	rbac.OptionAuthAPI("system", "POST", "/license/upload/", UploadLicenseFile,
 		rbac.PermCode("cmmns:license", rbac.PermImport),
-		rbac.PermCode("cmmns:license", rbac.PermWrite),
 	)
 	rbac.OptionAuthAPI("system", "POST", "/license/product-serial/", SetProductSerial, rbac.PermCode("cmmns:license", rbac.PermWrite))
 }
