@@ -92,5 +92,9 @@ func UpdateRolePerms(role string, perms []string) error {
 		count++
 	}
 
-	return tx.Commit()
+	err = tx.Commit()
+	if err == nil {
+		InvalidateRolePermCache(role)
+	}
+	return err
 }

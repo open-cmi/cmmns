@@ -24,7 +24,7 @@ func AllowRole(role string, perm string) bool {
 		return false
 	}
 
-	if perm == "" {
+	if perm == "" || role == "admin" {
 		return true
 	}
 
@@ -37,7 +37,16 @@ func AllowRole(role string, perm string) bool {
 			return true
 		}
 	}
-	return true
+	return false
+}
+
+// GetRolePerms returns all permissions for a role.
+// Role "admin" returns ["*"] indicating full permissions.
+func GetRolePerms(role string) ([]string, error) {
+	if role == "admin" {
+		return []string{"*"}, nil
+	}
+	return getRolePerms(role)
 }
 
 func getRolePerms(role string) ([]string, error) {

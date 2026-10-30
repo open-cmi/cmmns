@@ -30,9 +30,31 @@ import (
 
 // CheckAuth get userinfo
 func CheckAuth(c *gin.Context) {
+	u := goparam.GetUser(c)
+	if u == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"ret": -1,
+			"msg": i18n.Sprintf("user is not authenticated"),
+		})
+		return
+	}
+
+	role, _ := u["role"].(string)
+	var perms []string = []string{}
+	if role == "admin" {
+		perms = []string{"*"}
+	} else {
+		perms, _ = rbac.GetRolePerms(role)
+		if perms == nil {
+			perms = []string{}
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"ret": 0,
-		"msg": "",
+		"ret":   0,
+		"msg":   "",
+		"user":  u,
+		"perms": perms,
 	})
 }
 
@@ -230,6 +252,13 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	var perms []string = []string{}
+	perms, _ = rbac.GetRolePerms(userinfo.Role)
+	if perms == nil {
+		perms = []string{}
+	}
+	userinfo.Perms = perms
+
 	s, _ := c.Get("session")
 	session, ok := s.(*sessions.Session)
 	if ok {
@@ -239,13 +268,19 @@ func Login(c *gin.Context) {
 			"email":    userinfo.Email,
 			"status":   userinfo.Status,
 			"role":     userinfo.Role,
+			"perms":    perms,
 		}
 	}
 
 	// 写日志操作
 	ah.InsertLoginLog(userinfo.UserName, i18n.Sprintf("login"), true)
 
-	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": *userinfo})
+	c.JSON(http.StatusOK, gin.H{
+		"ret":   0,
+		"msg":   "",
+		"perms": perms,
+		"data":  *userinfo,
+	})
 
 	// 记录公网ip
 	m := pubnet.Get()
