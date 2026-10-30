@@ -522,18 +522,24 @@ func QueryTokenList(c *gin.Context) {
 // v1 user适用于普通的后台管理系统，用户由管理员创建管理，不支持自注册用户
 func init() {
 	rbac.RegisterMustAuthRouter("user", "/api/user/v1")
-	rbac.MustAuthAPI("user", "GET", "/checkauth/", CheckAuth, "user:view")
-	rbac.MustAuthAPI("user", "GET", "/", List, "user:view")
-	rbac.MustAuthAPI("user", "POST", "/", Create, "user:edit")
-	rbac.MustAuthAPI("user", "POST", "/change-passwd/", ChangePassword, "user:edit")
-	rbac.MustAuthAPI("user", "POST", "/reset-passwd/", ResetPassword, "user:edit")
-	rbac.MustAuthAPI("user", "POST", "/logout/", Logout, "user:edit")
-	rbac.MustAuthAPI("user", "GET", "/:id", Get, "user:view")
-	rbac.MustAuthAPI("user", "POST", "/edit/", Edit, "user:edit")
-	rbac.MustAuthAPI("user", "POST", "/delete/", Delete, "user:edit")
-	rbac.MustAuthAPI("user", "POST", "/jwt-token/", CreateToken, "user:edit")
-	rbac.MustAuthAPI("user", "POST", "/jwt-token/delete/", DeleteToken, "user:edit")
-	rbac.MustAuthAPI("user", "GET", "/jwt-token/", QueryTokenList, "user:view")
+
+	// user manager
+	rbac.MustAuthAPI("user", "GET", "/", List, rbac.PermCode("system:user", rbac.PermView))
+	rbac.MustAuthAPI("user", "POST", "/", Create, rbac.PermCode("system:user", rbac.PermWrite))
+	rbac.MustAuthAPI("user", "POST", "/reset-passwd/", ResetPassword, rbac.PermCode("system:user", rbac.PermWrite))
+	rbac.MustAuthAPI("user", "GET", "/:id", Get, rbac.PermCode("system:user", rbac.PermView))
+	rbac.MustAuthAPI("user", "POST", "/edit/", Edit, rbac.PermCode("system:user", rbac.PermWrite))
+	rbac.MustAuthAPI("user", "POST", "/delete/", Delete, rbac.PermCode("system:user", rbac.PermDelete))
+
+	// api token
+	rbac.MustAuthAPI("user", "POST", "/jwt-token/", CreateToken, rbac.PermCode("mine:token", rbac.PermWrite))
+	rbac.MustAuthAPI("user", "POST", "/jwt-token/delete/", DeleteToken, rbac.PermCode("mine:token", rbac.PermDelete))
+	rbac.MustAuthAPI("user", "GET", "/jwt-token/", QueryTokenList, rbac.PermCode("mine:token", rbac.PermView))
+
+	// mine
+	rbac.MustAuthAPI("user", "GET", "/checkauth/", CheckAuth, "")
+	rbac.MustAuthAPI("user", "POST", "/change-passwd/", ChangePassword, "")
+	rbac.MustAuthAPI("user", "POST", "/logout/", Logout, "")
 
 	rbac.RegisterUnauthRouter("user", "/api/user/v1")
 	rbac.UnauthAPI("user", "POST", "/login/", Login)
