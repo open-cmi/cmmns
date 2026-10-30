@@ -58,5 +58,5 @@ func GetProdBasisInfo(c *gin.Context) {
 
 func init() {
 	rbac.UnauthAPI("system", "GET", "/prod/basis/", GetProdBasisInfo)
-	rbac.UnauthAPI("system", "POST", "/prod/basis/", SetProdBasisInfo)
+	rbac.OptionAuthAPI("system", "POST", "/prod/basis/", SetProdBasisInfo, rbac.PermCode("cmmns:prodinfo", rbac.PermWrite))
 }

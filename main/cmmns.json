@@ -28,7 +28,8 @@
     "password": "8ik,\u003cKI*"
   },
   "license": {
-    "public_file": ""
+    "public_file": "",
+    "ignore": true
   },
   "licmng": {
     "enable": true,
@@ -44,7 +45,7 @@
     "server": [
       {
         "address": "0.0.0.0",
-        "port": 30002,
+        "port": 30000,
         "proto": "http"
       },
       {
@@ -52,171 +53,5 @@
         "proto": "unix"
       }
     ]
-  },
-  "rbac": {
-    "ignore_lic": true,
-    "roles": {
-      "nolic": [
-        {
-          "path": "/main/system",
-          "name": "system management",
-          "icon": "system",
-          "children": [
-            {
-              "path": "/main/system/sysinfo",
-              "name": "system info"
-            },
-            {
-              "path": "/main/system/license",
-              "name": "license"
-            }
-          ]
-        }
-      ],
-      "admin": [
-        {
-          "path": "/main/license-manager/dashboard",
-          "name": "dashboard",
-          "icon": "dashboard"
-        },
-        {
-          "path": "/main/license-manager/list-view",
-          "name": "license manager",
-          "icon": "license"
-        },
-        {
-          "path": "/main/system",
-          "name": "system management",
-          "icon": "system",
-          "children": [
-            {
-              "path": "/main/system/sysinfo",
-              "name": "system info"
-            },
-            {
-              "path": "/main/system/power-management",
-              "name": "power management"
-            },
-            {
-              "path": "/main/system/security-setting",
-              "name": "security setting"
-            },
-            {
-              "path": "/main/system/time-setting",
-              "name": "time setting"
-            },
-            {
-              "path": "/main/system/notify-setting",
-              "name": "notify setting"
-            },
-            {
-              "path": "/main/system/service-setting",
-              "name": "service setting"
-            },
-            {
-              "path": "/main/system/network-setting",
-              "name": "network setting"
-            },
-            {
-              "path": "/main/system/users",
-              "name": "user manager"
-            },
-            {
-              "path": "/main/system/rbac",
-              "name": "RBAC"
-            },
-            {
-              "path": "/main/system/license",
-              "name": "license"
-            }
-          ]
-        },
-        {
-          "path": "/main/system-log",
-          "name": "system log",
-          "icon": "log",
-          "children": [
-            {
-              "path": "/main/system-log/operate",
-              "name": "operate log"
-            }
-          ]
-        },
-        {
-          "path": "/main/my",
-          "name": "my",
-          "icon": "user",
-          "children": [
-            {
-              "path": "/main/my/change-password",
-              "name": "change password"
-            },
-            {
-              "path": "/main/my/token",
-              "name": "api token"
-            }
-          ]
-        }
-      ],
-      "operator": [
-        {
-          "path": "/main/system",
-          "name": "system management",
-          "icon": "system",
-          "children": [
-            {
-              "path": "/main/system/sysinfo",
-              "name": "system info"
-            }
-          ]
-        },
-        {
-          "path": "/main/system-log",
-          "name": "system log",
-          "icon": "log",
-          "children": [
-            {
-              "path": "/main/system-log/operate",
-              "name": "operate log"
-            }
-          ]
-        },
-        {
-          "path": "/main/my",
-          "name": "my",
-          "icon": "user",
-          "children": [
-            {
-              "path": "/main/my/change-password",
-              "name": "change password"
-            }
-          ]
-        }
-      ],
-      "auditor": [
-        {
-          "path": "/main/system-log",
-          "name": "system-log",
-          "icon": "log",
-          "children": [
-            {
-              "path": "/main/system-log/operate",
-              "name": "operate log"
-            }
-          ]
-        },
-        {
-          "path": "/main/my",
-          "name": "my",
-          "icon": "user",
-          "children": [
-            {
-              "path": "/main/my/change-password",
-              "name": "change password"
-            }
-          ]
-        }
-      ]
-    }
   }
 }

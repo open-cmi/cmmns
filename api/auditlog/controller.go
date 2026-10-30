@@ -56,5 +56,7 @@ func List(c *gin.Context) {
 }
 
 func init() {
-	rbac.MustAuthAPI("auditlog", "GET", "/", List, rbac.GetInitRoles())
+	rbac.MustAuthAPI("auditlog", "GET", "/", List,
+		rbac.PermCode("cmmns:auditlog", rbac.PermView),
+	)
 }

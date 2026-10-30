@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
 	"github.com/open-cmi/gobase/pkg/goparam"
@@ -16,6 +17,7 @@ type RoleModel struct {
 	CreatedTime int64  `json:"created_time" db:"created_time"`
 	UpdatedTime int64  `json:"updated_time" db:"updated_time"`
 	Description string `json:"description" db:"description"`
+	Preset      bool   `json:"preset" db:"preset"`
 	isNew       bool
 }
 
@@ -49,11 +51,49 @@ func (r *RoleModel) Save() error {
 }
 
 func (r *RoleModel) Remove() error {
-	deleteClause := "delete from roles where id=$1"
 	db := sqldb.GetDB()
-	_, err := db.Exec(deleteClause, r.ID)
+	if db == nil {
+		return errors.New("db is not available")
+	}
+
+	tx, err := db.Beginx()
 	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 1. 检查是否有用户仍属于该角色，存在关联用户时禁止删除
+	var userCount int
+	err = tx.QueryRow("SELECT count(*) FROM users WHERE role=$1", r.Name).Scan(&userCount)
+	if err != nil {
+		logger.Errorf("count users with role %s failed: %s\n", r.Name, err.Error())
+		return errors.New("check role users failed")
+	}
+	if userCount > 0 {
+		return errors.New(i18n.Sprintf("role '%s' is in use by %d user(s) and cannot be deleted", r.Name, userCount))
+	}
+
+	// 2. 级联删除该角色关联的权限记录
+	_, err = tx.Exec("DELETE FROM role_permissions WHERE role=$1", r.Name)
+	if err != nil {
+		logger.Errorf("delete role_permissions with role %s failed: %s\n", r.Name, err.Error())
+		return errors.New("remove role permissions failed")
+	}
+
+	// 3. 删除角色记录
+	_, err = tx.Exec("DELETE FROM roles WHERE id=$1", r.ID)
+	if err != nil {
+		logger.Errorf("delete role %s failed: %s\n", r.ID, err.Error())
 		return errors.New("remove role failed")
+	}
+
+	err = tx.Commit()
+	if err == nil {
+		InvalidateRolePermCache(r.Name)
 	}
 	return err
 }

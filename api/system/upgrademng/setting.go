@@ -43,6 +43,10 @@ func GetUpgradeSetting(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "GET", "/upgrade-mng/setting/", GetUpgradeSetting, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/setting/", SetUpgradeSetting, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "GET", "/upgrade-mng/setting/", GetUpgradeSetting,
+		rbac.PermCode("cmmns:upgrade", rbac.PermView),
+	)
+	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/setting/", SetUpgradeSetting,
+		rbac.PermCode("cmmns:upgrade", rbac.PermWrite),
+	)
 }

@@ -110,10 +110,10 @@ func GetAvailableManagementInterface(c *gin.Context) {
 
 func init() {
 	rbac.RegisterMustAuthRouter("network", "/api/network/v1/")
-	rbac.MustAuthAPI("network", "GET", "/", GetNetwork, rbac.GetInitRoles())
-	rbac.MustAuthAPI("network", "POST", "/", SetNetwork, rbac.GetInitRoles())
-	rbac.MustAuthAPI("network", "GET", "/status/", GetNetworkStatus, rbac.GetInitRoles())
-	rbac.MustAuthAPI("network", "POST", "/blinking/", BlinkingNetworkInterface, rbac.GetInitRoles())
-	rbac.MustAuthAPI("network", "POST", "/management-interface/", SetManagementInterface, rbac.GetInitRoles())
-	rbac.MustAuthAPI("network", "GET", "/available-management-interface/", GetAvailableManagementInterface, rbac.GetInitRoles())
+	rbac.MustAuthAPI("network", "GET", "/", GetNetwork, rbac.PermCode("cmmns:network", rbac.PermView))
+	rbac.MustAuthAPI("network", "POST", "/", SetNetwork, rbac.PermCode("cmmns:network", rbac.PermWrite))
+	rbac.MustAuthAPI("network", "GET", "/status/", GetNetworkStatus, rbac.PermCode("cmmns:network", rbac.PermView))
+	rbac.MustAuthAPI("network", "POST", "/blinking/", BlinkingNetworkInterface, rbac.PermCode("cmmns:network", rbac.PermWrite))
+	rbac.MustAuthAPI("network", "POST", "/management-interface/", SetManagementInterface, rbac.PermCode("cmmns:network", rbac.PermWrite))
+	rbac.MustAuthAPI("network", "GET", "/available-management-interface/", GetAvailableManagementInterface, rbac.PermCode("cmmns:network", rbac.PermView))
 }

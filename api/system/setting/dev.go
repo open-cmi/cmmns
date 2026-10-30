@@ -23,5 +23,5 @@ func GetDevID(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "GET", "/device/", GetDevID, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "GET", "/device/", GetDevID, rbac.PermCode("cmmns:license", rbac.PermView))
 }

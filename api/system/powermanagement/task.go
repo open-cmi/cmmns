@@ -60,7 +60,10 @@ func DeleteSchedule(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "GET", "/power-management/schedule/", ListSchedules, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "POST", "/power-management/schedule/", CreateSchedule, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "POST", "/power-management/schedule/delete/", DeleteSchedule, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "GET", "/power-management/schedule/", ListSchedules, rbac.PermCode("cmmns:power_management", rbac.PermView))
+	rbac.OptionAuthAPI("system", "POST", "/power-management/schedule/", CreateSchedule, rbac.PermCode("cmmns:power_management", rbac.PermWrite))
+	rbac.OptionAuthAPI("system", "POST", "/power-management/schedule/delete/", DeleteSchedule,
+		rbac.PermCode("cmmns:power_management", rbac.PermDelete),
+		rbac.PermCode("cmmns:power_management", rbac.PermWrite),
+	)
 }

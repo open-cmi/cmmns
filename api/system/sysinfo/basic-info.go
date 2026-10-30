@@ -18,5 +18,5 @@ func GetBasicHostInfo(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "GET", "/basic-info/", GetBasicHostInfo, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "GET", "/basic-info/", GetBasicHostInfo, rbac.PermCode("cmmns:sysinfo", rbac.PermView))
 }

@@ -286,6 +286,27 @@
                     "argNum": 1
                 }
             ]
+        },
+        {
+            "id": "role '{Arg_1}' is in use by {Arg_2} user(s) and cannot be deleted",
+            "message": "role '{Arg_1}' is in use by {Arg_2} user(s) and cannot be deleted",
+            "translation": "角色 '{Arg_1}' 仍有 {Arg_2} 个用户在使用，无法删除",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                },
+                {
+                    "id": "Arg_2",
+                    "string": "%[2]d",
+                    "type": "",
+                    "underlyingType": "int",
+                    "argNum": 2
+                }
+            ]
         }
     ]
 }

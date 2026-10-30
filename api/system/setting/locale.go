@@ -39,6 +39,6 @@ func GetLang(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "PUT", "/locale/", ChangeLang, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "GET", "/locale/", GetLang, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "PUT", "/locale/", ChangeLang)
+	rbac.OptionAuthAPI("system", "GET", "/locale/", GetLang)
 }

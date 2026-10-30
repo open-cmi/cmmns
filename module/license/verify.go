@@ -129,6 +129,9 @@ func VerifyLicenseContent(content string) error {
 var gLicenseVerifyError error = nil
 
 func LicenseCheckError() error {
+	if gConf.Ignore {
+		return nil
+	}
 	return gLicenseVerifyError
 }
 

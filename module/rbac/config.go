@@ -6,17 +6,8 @@ import (
 	"github.com/open-cmi/gobase/essential/config"
 )
 
-type Menu struct {
-	Path     string `json:"path"`
-	Name     string `json:"name"`
-	Icon     string `json:"icon,omitempty"`
-	Children []Menu `json:"children,omitempty"`
-}
-
 type RbacConf struct {
-	Strict    bool              `json:"strict"`
-	IgnoreLic bool              `json:"ignore_lic"`
-	Roles     map[string][]Menu `json:"roles"`
+	Strict bool `json:"strict"`
 }
 
 var gRbacMenuConf RbacConf

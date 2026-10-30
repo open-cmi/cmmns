@@ -3,8 +3,12 @@ package rbac
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/gobase/essential/i18n"
+	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 // RouterGroup is a function to api group router
@@ -126,6 +130,7 @@ type API struct {
 	Prod     string
 	Method   string
 	Path     string
+	Perm     string
 	Callback func(c *gin.Context)
 }
 
@@ -133,25 +138,7 @@ var mustAuthAPIPath map[string][]API = make(map[string][]API)
 var optionAuthAPIPath map[string][]API = make(map[string][]API)
 var unauthAPIPath map[string][]API = make(map[string][]API)
 
-func RegisterOptionAuthAPI(prod string, method string, path string, proc func(c *gin.Context)) error {
-	modPath, found := optionAuthAPIPath[prod]
-	if !found {
-		optionAuthAPIPath[prod] = []API{}
-		modPath = optionAuthAPIPath[prod]
-	}
-
-	modPath = append(modPath, API{
-		Prod:     prod,
-		Method:   method,
-		Path:     path,
-		Callback: proc,
-	})
-	optionAuthAPIPath[prod] = modPath
-
-	return nil
-}
-
-func RegisterUnauthAPI(prod string, method string, path string, proc func(c *gin.Context)) error {
+func UnauthAPI(prod, method, path string, handler gin.HandlerFunc) error {
 	modPath, found := unauthAPIPath[prod]
 	if !found {
 		unauthAPIPath[prod] = []API{}
@@ -162,14 +149,43 @@ func RegisterUnauthAPI(prod string, method string, path string, proc func(c *gin
 		Prod:     prod,
 		Method:   method,
 		Path:     path,
-		Callback: proc,
+		Perm:     "",
+		Callback: handler,
 	})
 	unauthAPIPath[prod] = modPath
 
 	return nil
 }
 
-func RegisterMustAuthAPI(prod string, method string, path string, proc func(c *gin.Context)) error {
+// MustAuthAPI registers a must-auth API and enforces permission codes.
+// Supports multiple permission codes (variadic, OR relation).
+func MustAuthAPI(prod, method, path string, handler gin.HandlerFunc, perms ...string) error {
+	permStr := strings.Join(perms, ",")
+	regMu.Lock()
+	regAll = append(regAll, APIPermDef{
+		Prod:   prod,
+		Method: method,
+		Path:   path,
+		Perm:   permStr,
+	})
+	regMu.Unlock()
+
+	wrapped := func(c *gin.Context) {
+		user := goparam.GetUser(c)
+		if user == nil {
+			c.String(http.StatusUnauthorized, "authenticate is required")
+			return
+		}
+
+		role, _ := user["role"].(string)
+		allowed := AllowRole(role, perms...)
+		if !allowed {
+			c.String(http.StatusForbidden, i18n.Sprintf("no permission"))
+			return
+		}
+		handler(c)
+	}
+
 	modPath, found := mustAuthAPIPath[prod]
 	if !found {
 		mustAuthAPIPath[prod] = []API{}
@@ -180,9 +196,55 @@ func RegisterMustAuthAPI(prod string, method string, path string, proc func(c *g
 		Prod:     prod,
 		Method:   method,
 		Path:     path,
-		Callback: proc,
+		Callback: wrapped,
 	})
 	mustAuthAPIPath[prod] = modPath
+
+	return nil
+}
+
+// OptionAuthAPI registers an auth API and enforces permission codes.
+// Supports multiple permission codes (variadic, OR relation).
+func OptionAuthAPI(prod, method, path string, handler gin.HandlerFunc, perms ...string) error {
+	permStr := strings.Join(perms, ",")
+	regMu.Lock()
+	regAll = append(regAll, APIPermDef{
+		Prod:   prod,
+		Method: method,
+		Path:   path,
+		Perm:   permStr,
+	})
+	regMu.Unlock()
+
+	wrapped := func(c *gin.Context) {
+		user := goparam.GetUser(c)
+		if user == nil {
+			c.String(http.StatusUnauthorized, "authenticate is required")
+			return
+		}
+
+		role, _ := user["role"].(string)
+		allowed := AllowRole(role, perms...)
+		if !allowed {
+			c.String(http.StatusForbidden, i18n.Sprintf("no permission"))
+			return
+		}
+		handler(c)
+	}
+
+	modPath, found := optionAuthAPIPath[prod]
+	if !found {
+		optionAuthAPIPath[prod] = []API{}
+		modPath = optionAuthAPIPath[prod]
+	}
+
+	modPath = append(modPath, API{
+		Prod:     prod,
+		Method:   method,
+		Path:     path,
+		Callback: wrapped,
+	})
+	optionAuthAPIPath[prod] = modPath
 
 	return nil
 }

@@ -23,8 +23,9 @@ type UserModel struct {
 	Status             string `json:"status" db:"status"`
 	CreatedTime        int64  `json:"created_time" db:"itime"`
 	UpdatedTime        int64  `json:"updated_time" db:"utime"`
-	PasswordChangeTime int64  `json:"-" db:"password_change_time"`
-	NeedChangePassword bool   `json:"need_change_password"`
+	PasswordChangeTime int64    `json:"-" db:"password_change_time"`
+	NeedChangePassword bool     `json:"need_change_password"`
+	Perms              []string `json:"perms"`
 	isNew              bool
 }
 

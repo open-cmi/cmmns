@@ -55,7 +55,7 @@ func CheckEmail(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "POST", "/email-setting/", SetEmail, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "GET", "/email-setting/", GetEmail, rbac.GetInitRoles())
-	rbac.OptionAuthAPI("system", "POST", "/check-email-setting/", CheckEmail, rbac.GetInitRoles())
+	rbac.OptionAuthAPI("system", "POST", "/email-setting/", SetEmail, rbac.PermCode("cmmns:notify_setting", rbac.PermWrite))
+	rbac.OptionAuthAPI("system", "GET", "/email-setting/", GetEmail, rbac.PermCode("cmmns:notify_setting", rbac.PermView))
+	rbac.OptionAuthAPI("system", "POST", "/check-email-setting/", CheckEmail, rbac.PermCode("cmmns:notify_setting", rbac.PermView))
 }

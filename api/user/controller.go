@@ -30,9 +30,31 @@ import (
 
 // CheckAuth get userinfo
 func CheckAuth(c *gin.Context) {
+	u := goparam.GetUser(c)
+	if u == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"ret": -1,
+			"msg": i18n.Sprintf("user is not authenticated"),
+		})
+		return
+	}
+
+	role, _ := u["role"].(string)
+	var perms []string = []string{}
+	if role == "admin" {
+		perms = []string{"*"}
+	} else {
+		perms, _ = rbac.GetRolePerms(role)
+		if perms == nil {
+			perms = []string{}
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"ret": 0,
-		"msg": "",
+		"ret":   0,
+		"msg":   "",
+		"user":  u,
+		"perms": perms,
 	})
 }
 
@@ -230,6 +252,13 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	var perms []string = []string{}
+	perms, _ = rbac.GetRolePerms(userinfo.Role)
+	if perms == nil {
+		perms = []string{}
+	}
+	userinfo.Perms = perms
+
 	s, _ := c.Get("session")
 	session, ok := s.(*sessions.Session)
 	if ok {
@@ -239,13 +268,19 @@ func Login(c *gin.Context) {
 			"email":    userinfo.Email,
 			"status":   userinfo.Status,
 			"role":     userinfo.Role,
+			"perms":    perms,
 		}
 	}
 
 	// 写日志操作
 	ah.InsertLoginLog(userinfo.UserName, i18n.Sprintf("login"), true)
 
-	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": "", "data": *userinfo})
+	c.JSON(http.StatusOK, gin.H{
+		"ret":   0,
+		"msg":   "",
+		"perms": perms,
+		"data":  *userinfo,
+	})
 
 	// 记录公网ip
 	m := pubnet.Get()
@@ -487,18 +522,24 @@ func QueryTokenList(c *gin.Context) {
 // v1 user适用于普通的后台管理系统，用户由管理员创建管理，不支持自注册用户
 func init() {
 	rbac.RegisterMustAuthRouter("user", "/api/user/v1")
-	rbac.MustAuthAPI("user", "GET", "/checkauth/", CheckAuth, rbac.GetInitRoles())
-	rbac.MustAuthAPI("user", "GET", "/", List, rbac.GetInitRoles())
-	rbac.MustAuthAPI("user", "POST", "/", Create, rbac.GetInitRoles())
-	rbac.MustAuthAPI("user", "POST", "/change-passwd/", ChangePassword, rbac.GetInitRoles())
-	rbac.MustAuthAPI("user", "POST", "/reset-passwd/", ResetPassword, rbac.GetInitRoles())
-	rbac.MustAuthAPI("user", "POST", "/logout/", Logout, rbac.GetInitRoles())
-	rbac.MustAuthAPI("user", "GET", "/:id", Get, rbac.GetInitRoles())
-	rbac.MustAuthAPI("user", "POST", "/edit/", Edit, rbac.GetInitRoles())
-	rbac.MustAuthAPI("user", "POST", "/delete/", Delete, rbac.GetInitRoles())
-	rbac.MustAuthAPI("user", "POST", "/jwt-token/", CreateToken, rbac.GetInitRoles())
-	rbac.MustAuthAPI("user", "POST", "/jwt-token/delete/", DeleteToken, rbac.GetInitRoles())
-	rbac.MustAuthAPI("user", "GET", "/jwt-token/", QueryTokenList, rbac.GetInitRoles())
+
+	// user manager
+	rbac.MustAuthAPI("user", "GET", "/", List, rbac.PermCode("cmmns:user", rbac.PermView))
+	rbac.MustAuthAPI("user", "POST", "/", Create, rbac.PermCode("cmmns:user", rbac.PermWrite))
+	rbac.MustAuthAPI("user", "POST", "/reset-passwd/", ResetPassword, rbac.PermCode("cmmns:user", rbac.PermWrite))
+	rbac.MustAuthAPI("user", "GET", "/:id", Get, rbac.PermCode("cmmns:user", rbac.PermView))
+	rbac.MustAuthAPI("user", "POST", "/edit/", Edit, rbac.PermCode("cmmns:user", rbac.PermWrite))
+	rbac.MustAuthAPI("user", "POST", "/delete/", Delete, rbac.PermCode("cmmns:user", rbac.PermDelete))
+
+	// api token
+	rbac.MustAuthAPI("user", "POST", "/jwt-token/", CreateToken, rbac.PermCode("cmmns:token", rbac.PermWrite))
+	rbac.MustAuthAPI("user", "POST", "/jwt-token/delete/", DeleteToken, rbac.PermCode("cmmns:token", rbac.PermDelete))
+	rbac.MustAuthAPI("user", "GET", "/jwt-token/", QueryTokenList, rbac.PermCode("cmmns:token", rbac.PermView))
+
+	// mine
+	rbac.MustAuthAPI("user", "GET", "/checkauth/", CheckAuth)
+	rbac.MustAuthAPI("user", "POST", "/change-passwd/", ChangePassword)
+	rbac.MustAuthAPI("user", "POST", "/logout/", Logout)
 
 	rbac.RegisterUnauthRouter("user", "/api/user/v1")
 	rbac.UnauthAPI("user", "POST", "/login/", Login)
