@@ -49,12 +49,28 @@ func DeleteRole(c *gin.Context) {
 
 	user := goparam.GetUser(c)
 	curRole, _ := user["role"].(string)
-	if curRole != "admin" {
+	if curRole == apimsg.ID {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": i18n.Sprintf("no permission")})
 		return
 	}
 
-	err := rbac.DeleteRole(apimsg.ID)
+	role := rbac.GetByID(apimsg.ID)
+	if role == nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": i18n.Sprintf("role is not exist")})
+		return
+	}
+
+	if role.Name == curRole {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": i18n.Sprintf("the role can not be deleted")})
+		return
+	}
+
+	if role.Preset {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": i18n.Sprintf("preset role can not be deleted")})
+		return
+	}
+
+	err := role.Remove()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return

@@ -178,7 +178,7 @@ func MustAuthAPI(prod, method, path string, handler gin.HandlerFunc, perm string
 		role, _ := user["role"].(string)
 		allowed := AllowRole(role, perm)
 		if !allowed {
-			c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": i18n.Sprintf("no permission")})
+			c.String(http.StatusForbidden, i18n.Sprintf("no permission"))
 			return
 		}
 		handler(c)
@@ -223,7 +223,7 @@ func OptionAuthAPI(prod, method, path string, handler gin.HandlerFunc, perm stri
 		role, _ := user["role"].(string)
 		allowed := AllowRole(role, perm)
 		if !allowed {
-			c.JSON(http.StatusForbidden, gin.H{"ret": -1, "msg": i18n.Sprintf("no permission")})
+			c.String(http.StatusForbidden, i18n.Sprintf("no permission"))
 			return
 		}
 		handler(c)
