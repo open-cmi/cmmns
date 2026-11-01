@@ -1,47 +1,37 @@
 package setting
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/rbac"
-	"github.com/open-cmi/cmmns/module/setting/pubnet"
 )
 
-func SetPublicNet(c *gin.Context) {
-
-	var req pubnet.SetPublicNetRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": err.Error()})
-		return
+// GetFromRequest dynamically parses schema and host (including port if present) from http.Request
+func GetFromRequest(req *http.Request) string {
+	schema := "http"
+	if req.TLS != nil || req.Header.Get("X-Forwarded-Proto") == "https" {
+		schema = "https"
 	}
 
-	m := pubnet.Get()
-	if m == nil {
-		m = pubnet.New()
-	}
-	m.Host = req.Host
-	m.Port = req.Port
-	m.Schema = req.Schema
-	err := m.Save()
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": 1, "msg": err.Error()})
-		return
+	host := req.Header.Get("X-Forwarded-Host")
+	if host == "" {
+		host = req.Host
 	}
 
-	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
+	return fmt.Sprintf("%s:%s", schema, host)
 }
 
 func GetPublicNet(c *gin.Context) {
-	ex := pubnet.Get()
+	pn := GetFromRequest(c.Request)
 	c.JSON(http.StatusOK, gin.H{
 		"ret":  0,
 		"msg":  "",
-		"data": ex,
+		"data": pn,
 	})
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "GET", "/pubnet/", GetPublicNet, rbac.PermCode("cmmns:network", rbac.PermView))
-	rbac.OptionAuthAPI("system", "POST", "/pubnet/", SetPublicNet, rbac.PermCode("cmmns:network", rbac.PermWrite))
+	rbac.OptionAuthAPI("system", "GET", "/pubnet/", GetPublicNet)
 }

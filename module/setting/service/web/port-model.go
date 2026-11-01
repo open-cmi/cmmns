@@ -73,7 +73,7 @@ func GetServicePortModel() *ServicePortModel {
 	var m ServicePortModel
 	err = json.Unmarshal([]byte(v), &m)
 	if err != nil {
-		logger.Errorf("pubnet model unmarshal failed: %s\n", err.Error())
+		logger.Errorf("service port model unmarshal failed: %s\n", err.Error())
 		return nil
 	}
 	return &m

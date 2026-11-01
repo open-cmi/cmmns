@@ -6,15 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"strconv"
-	"strings"
 	"time"
 	"unicode"
 
 	"github.com/dchest/captcha"
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/sessions"
-	"github.com/open-cmi/cmmns/module/setting/pubnet"
 	"github.com/open-cmi/cmmns/module/token"
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
@@ -282,30 +279,6 @@ func Login(c *gin.Context) {
 		"data":  *userinfo,
 	})
 
-	// 记录公网ip
-	m := pubnet.Get()
-	if m == nil {
-		m = pubnet.New()
-		host := c.Request.Host
-		hostport := strings.Split(host, ":")
-		m.Host = hostport[0]
-		if hostport[1] != "" {
-			m.Port, _ = strconv.Atoi(hostport[1])
-		}
-
-		if c.Request.TLS != nil {
-			m.Schema = "https"
-		} else if proto := c.GetHeader("X-Forwarded-Proto"); proto == "https" {
-			m.Schema = "https"
-		} else {
-			m.Schema = "http"
-		}
-
-		err = m.Save()
-		if err != nil {
-			logger.Errorf("save pubnet failed: %s\n", err.Error())
-		}
-	}
 }
 
 func Logout(c *gin.Context) {
