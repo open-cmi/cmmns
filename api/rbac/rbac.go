@@ -112,6 +112,53 @@ func CreateRole(c *gin.Context) {
 	})
 }
 
+func EditRole(c *gin.Context) {
+	var apimsg struct {
+		ID          string   `json:"id"`
+		Name        string   `json:"name"`
+		Description string   `json:"description"`
+		Permissions []string `json:"permissions"`
+	}
+	if err := c.ShouldBindJSON(&apimsg); err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	user := goparam.GetUser(c)
+	curRole, _ := user["role"].(string)
+	if curRole != "admin" {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": i18n.Sprintf("no permission")})
+		return
+	}
+
+	err := rbac.EditRole(apimsg.ID, apimsg.Name, apimsg.Description, apimsg.Permissions)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
+	})
+}
+
+func GetRolePerms(c *gin.Context) {
+	id := c.Param("id")
+	perms, err := rbac.GetRolePermsByID(id)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"ret": 0,
+		"msg": "",
+		"data": gin.H{
+			"permissions": perms,
+		},
+	})
+}
+
 func init() {
 	rbac.RegisterMustAuthRouter("rbac", "/api/rbac/v1")
 	rbac.MustAuthAPI("rbac", "GET", "/role/", RoleList,
@@ -120,7 +167,10 @@ func init() {
 	)
 	rbac.MustAuthAPI("rbac", "POST", "/role/", CreateRole, rbac.PermCode("cmmns:rbac", rbac.PermWrite))
 	rbac.MustAuthAPI("rbac", "POST", "/role/create/", CreateRole, rbac.PermCode("cmmns:rbac", rbac.PermWrite))
+	rbac.MustAuthAPI("rbac", "POST", "/role/edit/", EditRole, rbac.PermCode("cmmns:rbac", rbac.PermWrite))
+	rbac.MustAuthAPI("rbac", "PUT", "/role/", EditRole, rbac.PermCode("cmmns:rbac", rbac.PermWrite))
 	rbac.MustAuthAPI("rbac", "POST", "/role/delete/", DeleteRole, rbac.PermCode("cmmns:rbac", rbac.PermDelete))
+	rbac.MustAuthAPI("rbac", "GET", "/role/perms/:id", GetRolePerms, rbac.PermCode("cmmns:rbac", rbac.PermView))
 	// GetAllRoleNames 属于纯只读元数据（供下拉框/筛选框使用），只要登录认证成功即可获取
 	rbac.MustAuthAPI("rbac", "GET", "/role/name-list/", GetAllRoleNames)
 }

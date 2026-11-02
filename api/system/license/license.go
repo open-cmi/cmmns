@@ -128,7 +128,7 @@ func CheckLicense(c *gin.Context) {
 
 func init() {
 	rbac.OptionAuthAPI("system", "GET", "/license/", GetLicenseInfo, rbac.PermCode("cmmns:license", rbac.PermView))
-	rbac.OptionAuthAPI("system", "GET", "/license/check/", CheckLicense, rbac.PermCode("cmmns:license", rbac.PermView))
+	rbac.OptionAuthAPI("system", "GET", "/license/check/", CheckLicense)
 	rbac.OptionAuthAPI("system", "POST", "/license/upload/", UploadLicenseFile,
 		rbac.PermCode("cmmns:license", rbac.PermImport),
 	)

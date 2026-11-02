@@ -11,6 +11,11 @@ import (
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
+type RoleDetail struct {
+	RoleModel
+	Permissions []string `json:"permissions"`
+}
+
 func GetAllRoleNames() ([]string, error) {
 	db := sqldb.GetDB()
 
@@ -36,10 +41,10 @@ func GetAllRoleNames() ([]string, error) {
 	return roles, err
 }
 
-func RoleList(option *goparam.Param) (int, []RoleModel, error) {
+func RoleList(option *goparam.Param) (int, []RoleDetail, error) {
 	db := sqldb.GetDB()
 
-	var roles []RoleModel = []RoleModel{}
+	var roles []RoleDetail = []RoleDetail{}
 	countClause := "select count(*) from roles"
 
 	row := db.QueryRow(countClause)
@@ -68,7 +73,11 @@ func RoleList(option *goparam.Param) (int, []RoleModel, error) {
 			break
 		}
 
-		roles = append(roles, item)
+		perms, _ := GetRolePerms(item.Name)
+		roles = append(roles, RoleDetail{
+			RoleModel:   item,
+			Permissions: perms,
+		})
 	}
 	return count, roles, err
 }
@@ -118,4 +127,57 @@ func CreateRole(name string, description string, perms []string) error {
 		}
 	}
 	return nil
+}
+
+func EditRole(id string, name string, description string, perms []string) error {
+	role := GetByID(id)
+	if role == nil {
+		return errors.New(i18n.Sprintf("role is not exist"))
+	}
+
+	if role.Name == "admin" {
+		return errors.New(i18n.Sprintf("admin role cannot be edited"))
+	}
+
+	now := time.Now().Unix()
+	oldName := role.Name
+
+	if name != "" && name != oldName {
+		existing := GetByName(name)
+		if existing != nil && existing.ID != role.ID {
+			return errors.New(i18n.Sprintf("role already exists"))
+		}
+		role.Name = name
+	}
+	role.Description = description
+	role.UpdatedTime = now
+	role.isNew = false
+
+	err := role.Save()
+	if err != nil {
+		return err
+	}
+
+	if oldName != role.Name {
+		db := sqldb.GetDB()
+		if db != nil {
+			_, _ = db.Exec("DELETE FROM role_permissions WHERE role=$1", oldName)
+		}
+		InvalidateRolePermCache(oldName)
+	}
+
+	err = UpdateRolePerms(role.Name, perms)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetRolePermsByID(id string) ([]string, error) {
+	role := GetByID(id)
+	if role == nil {
+		return nil, errors.New(i18n.Sprintf("role is not exist"))
+	}
+	return GetRolePerms(role.Name)
 }

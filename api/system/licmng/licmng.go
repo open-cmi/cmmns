@@ -122,11 +122,6 @@ func DeleteLicense(c *gin.Context) {
 		return
 	}
 
-	if param.Role != "admin" {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "no permission"})
-		return
-	}
-
 	ah := auditlog.NewAuditHandler(c)
 	id := c.Param("id")
 	if id == "" {
@@ -228,5 +223,5 @@ func init() {
 	rbac.MustAuthAPI("system", "GET", "/licmng/monthly-statistics/", GetMonthlyStatistics, rbac.PermCode("licmng:dashboard", rbac.PermView))
 	rbac.MustAuthAPI("system", "POST", "/licmng/", CreateLicense, rbac.PermCode("licmng", rbac.PermWrite))
 	rbac.MustAuthAPI("system", "GET", "/licmng/download/", DownloadLicense, rbac.PermCode("licmng", rbac.PermExport))
-	rbac.MustAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense, rbac.PermCode("licmng", rbac.PermWrite))
+	rbac.MustAuthAPI("system", "DELETE", "/licmng/:id", DeleteLicense, rbac.PermCode("licmng", rbac.PermDelete))
 }
