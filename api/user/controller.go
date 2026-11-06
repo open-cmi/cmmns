@@ -27,31 +27,9 @@ import (
 
 // CheckAuth get userinfo
 func CheckAuth(c *gin.Context) {
-	u := goparam.GetUser(c)
-	if u == nil {
-		c.JSON(http.StatusOK, gin.H{
-			"ret": -1,
-			"msg": i18n.Sprintf("user is not authenticated"),
-		})
-		return
-	}
-
-	role, _ := u["role"].(string)
-	var perms []string = []string{}
-	if role == "admin" {
-		perms = []string{"*"}
-	} else {
-		perms, _ = rbac.GetRolePerms(role)
-		if perms == nil {
-			perms = []string{}
-		}
-	}
-
 	c.JSON(http.StatusOK, gin.H{
-		"ret":   0,
-		"msg":   "",
-		"user":  u,
-		"perms": perms,
+		"ret": 0,
+		"msg": "",
 	})
 }
 
