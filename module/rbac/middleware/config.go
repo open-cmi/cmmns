@@ -20,6 +20,10 @@ type Config struct {
 
 var gConf Config
 
+func GetStoreType() string {
+	return gConf.Store
+}
+
 func Init() error {
 	var err error
 

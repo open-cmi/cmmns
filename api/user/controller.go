@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"sync"
 	"time"
 	"unicode"
 
@@ -20,10 +21,93 @@ import (
 
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/rbac"
+	"github.com/open-cmi/cmmns/module/rbac/middleware"
 	"github.com/open-cmi/cmmns/module/user"
 
 	"github.com/gin-gonic/gin"
 )
+
+type loginTriedEntry struct {
+	count    int
+	expireAt time.Time
+}
+
+var (
+	memLoginTriedMu sync.Mutex
+	memLoginTried   = make(map[string]loginTriedEntry)
+)
+
+func buildLoginTriedKey(username string) string {
+	return fmt.Sprintf("login_tried_%s", username)
+}
+
+func GetLoginTried(username string) (int, error) {
+	loginTriedKey := buildLoginTriedKey(username)
+	if middleware.GetStoreType() == "memory" {
+		memLoginTriedMu.Lock()
+		defer memLoginTriedMu.Unlock()
+
+		entry, ok := memLoginTried[loginTriedKey]
+		if !ok {
+			return 0, nil
+		}
+		if time.Now().After(entry.expireAt) {
+			delete(memLoginTried, loginTriedKey)
+			return 0, nil
+		}
+		return entry.count, nil
+	}
+
+	rcli := rdb.GetClient(0)
+	if rcli == nil {
+		return 0, errors.New("rdb is not available now")
+	}
+
+	tried, err := rcli.Conn.Get(context.TODO(), loginTriedKey).Int()
+	if err != nil {
+		if err == redis.Nil {
+			return 0, nil
+		}
+		rcli.Reconnect()
+		return 0, errors.New("rdb is not available now")
+	}
+	return tried, nil
+}
+
+func SetLoginTried(username string, count int, ttl time.Duration) error {
+	loginTriedKey := buildLoginTriedKey(username)
+	if middleware.GetStoreType() == "memory" {
+		memLoginTriedMu.Lock()
+		defer memLoginTriedMu.Unlock()
+
+		memLoginTried[loginTriedKey] = loginTriedEntry{
+			count:    count,
+			expireAt: time.Now().Add(ttl),
+		}
+		return nil
+	}
+
+	rcli := rdb.GetClient(0)
+	if rcli == nil {
+		return errors.New("rdb is not available now")
+	}
+	return rcli.Conn.Set(context.TODO(), loginTriedKey, count, ttl).Err()
+}
+
+func ClearLoginTried(username string) {
+	loginTriedKey := buildLoginTriedKey(username)
+	if middleware.GetStoreType() == "memory" {
+		memLoginTriedMu.Lock()
+		delete(memLoginTried, loginTriedKey)
+		memLoginTriedMu.Unlock()
+		return
+	}
+
+	rcli := rdb.GetClient(0)
+	if rcli != nil {
+		_ = rcli.Conn.Del(context.TODO(), loginTriedKey).Err()
+	}
+}
 
 // CheckAuth get userinfo
 func CheckAuth(c *gin.Context) {
@@ -191,17 +275,9 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	rcli := rdb.GetClient(0)
-	if rcli == nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -3, "msg": i18n.Sprintf("rdb is not available now")})
-		return
-	}
-
-	loginTriedKey := fmt.Sprintf("login_tried_%s", apimsg.UserName)
-	tried, err := rcli.Conn.Get(context.TODO(), loginTriedKey).Int()
-	if err != nil && err != redis.Nil {
-		rcli.Reconnect()
-		c.JSON(http.StatusOK, gin.H{"ret": -4, "msg": i18n.Sprintf("rdb is not available now")})
+	tried, err := GetLoginTried(apimsg.UserName)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -3, "msg": err.Error()})
 		return
 	}
 
@@ -217,7 +293,7 @@ func Login(c *gin.Context) {
 	if err != nil {
 		// 如果登陆失败
 		tried++
-		rcli.Conn.Set(context.TODO(), loginTriedKey, tried, 10*time.Minute).Err()
+		_ = SetLoginTried(apimsg.UserName, tried, 10*time.Minute)
 		if tried < user.UserLoginMaxTried {
 			c.JSON(http.StatusOK, gin.H{"ret": -6, "msg": i18n.Sprintf("username and password not match, you have %d times tried left", user.UserLoginMaxTried-tried)})
 			return
@@ -225,6 +301,10 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -7, "msg": i18n.Sprintf("your account has been locked, please try again 10 miniutes later")})
 		ah.InsertLoginLog(apimsg.UserName, i18n.Sprintf("login"), false)
 		return
+	}
+
+	if tried > 0 {
+		ClearLoginTried(apimsg.UserName)
 	}
 
 	var perms []string = []string{}
