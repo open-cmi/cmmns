@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/open-cmi/cmmns/module/rbac/middleware"
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/pkg/goparam"
 )
@@ -45,9 +46,15 @@ func UnauthInit(e *gin.Engine) {
 }
 
 // OptionAuthInit auth router init
-func OptionAuthInit(e *gin.Engine) {
+func OptionAuthInit(e *gin.Engine, strict bool) {
 	for mod, groupPath := range optionAuthGroup {
-		g := e.Group(groupPath)
+		var g *gin.RouterGroup
+		if strict {
+			g = e.Group(groupPath, middleware.AuthMiddleware())
+		} else {
+			g = e.Group(groupPath)
+		}
+
 		{
 			modPath, found := optionAuthAPIPath[mod]
 			if !found {

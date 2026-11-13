@@ -325,6 +325,8 @@ func Login(c *gin.Context) {
 			"role":     userinfo.Role,
 			"perms":    perms,
 		}
+		// if handler change session, save it
+		session.Save(c.Request, c.Writer)
 	}
 
 	// 写日志操作
@@ -348,6 +350,7 @@ func Logout(c *gin.Context) {
 
 	session.Options.MaxAge = -1 // aged
 	delete(session.Values, "user")
+	session.Save(c.Request, c.Writer)
 
 	c.JSON(http.StatusOK, gin.H{"ret": 0, "msg": ""})
 }

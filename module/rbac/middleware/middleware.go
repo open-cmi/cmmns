@@ -39,13 +39,6 @@ func SessionMiddleware(r *gin.Engine) {
 			c.Set("user", user)
 		}
 		c.Next()
-
-		// if handler change session, save it
-		s, _ := c.Get("session")
-		session2, ok := s.(*sessions.Session)
-		if ok {
-			session2.Save(c.Request, c.Writer)
-		}
 	})
 }
 
@@ -76,15 +69,16 @@ func JWTMiddleware(r *gin.Engine) {
 }
 
 // AuthMiddleware func
-func AuthMiddleware(r *gin.Engine) {
-	r.Use(func(c *gin.Context) {
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
 		_, exist := c.Get("user")
 		if !exist {
 			c.String(http.StatusUnauthorized, "authenticate is required")
 			c.Abort()
+			return
 		}
 		c.Next()
-	})
+	}
 }
 
 func DefaultMiddleware(r *gin.Engine) {
