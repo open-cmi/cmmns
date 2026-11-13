@@ -32,7 +32,7 @@ func (i *RBACAuth) Init(e *gin.Engine) {
 	e.NoRoute(func(c *gin.Context) {
 		path := c.Request.URL.Path
 		if strings.HasPrefix(path, "/api/") {
-			c.JSON(http.StatusNotFound, gin.H{"ret": -1, "msg": "api not found"})
+			c.String(http.StatusNotFound, "404 not found")
 			return
 		}
 
