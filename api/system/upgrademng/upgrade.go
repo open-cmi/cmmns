@@ -1,8 +1,6 @@
 package upgrademng
 
 import (
-	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -11,59 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/system/upgrademng"
-	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/pkg/eyas"
 )
-
-func UploadMetaFile(c *gin.Context) {
-	file, _ := c.FormFile("file")
-	src, err := file.Open()
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
-		return
-	}
-	defer src.Close()
-	content, err := io.ReadAll(src)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
-		return
-	}
-	os.Remove(file.Filename)
-
-	// 校验一下内容
-	var umi upgrademng.UpgradeMetaInfo
-	err = json.Unmarshal(content, &umi)
-	if err != nil {
-		logger.Errorf("unmarshall failed: %s\n", err.Error())
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "meta info file format invalid"})
-		return
-	}
-
-	// 保存
-	metaFile := fmt.Sprintf("%s.meta.json", umi.Prod)
-	upgradeDir := filepath.Join(eyas.GetDataDir(), "upgrades")
-	os.MkdirAll(upgradeDir, 0644)
-
-	dst := filepath.Join(upgradeDir, metaFile)
-	out, err := os.OpenFile(dst, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
-		return
-	}
-	defer out.Close()
-
-	_, err = out.Write(content)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"ret":  0,
-		"msg":  "",
-		"data": umi.Prod,
-	})
-}
 
 func UploadPackage(c *gin.Context) {
 	file, _ := c.FormFile("file")
@@ -77,7 +24,7 @@ func UploadPackage(c *gin.Context) {
 	// 打开meta文件，根据meta文件来保存package
 	// 保存
 	upgradeDir := filepath.Join(eyas.GetDataDir(), "upgrades")
-	os.MkdirAll(upgradeDir, 0644)
+	os.MkdirAll(upgradeDir, 0755)
 
 	dst := filepath.Join(upgradeDir, file.Filename)
 	out, err := os.OpenFile(dst, os.O_CREATE|os.O_RDWR, 0600)
@@ -120,10 +67,6 @@ func StartUpgrade(c *gin.Context) {
 }
 
 func init() {
-	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/upload-upgrade-meta/", UploadMetaFile,
-		rbac.PermCode("cmmns:upgrade", rbac.PermImport),
-		rbac.PermCode("cmmns:upgrade", rbac.PermWrite),
-	)
 	rbac.OptionAuthAPI("system", "POST", "/upgrade-mng/upload-upgrade-package/", UploadPackage,
 		rbac.PermCode("cmmns:upgrade", rbac.PermWrite),
 	)

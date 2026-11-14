@@ -13,7 +13,7 @@ require (
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
-	github.com/open-cmi/gobase v1.1.1-0.20261113075144-8308beba7bdf
+	github.com/open-cmi/gobase v1.1.1-0.20261114090901-0ea835acb82b
 	github.com/pkg/sftp v1.13.9
 	github.com/prometheus-community/pro-bing v0.7.0
 	github.com/shirou/gopsutil/v4 v4.26.2
