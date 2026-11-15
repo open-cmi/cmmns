@@ -13,11 +13,8 @@ require (
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
-	github.com/open-cmi/gobase v1.1.1-0.20261114090901-0ea835acb82b
-	github.com/pkg/sftp v1.13.9
-	github.com/prometheus-community/pro-bing v0.7.0
+	github.com/open-cmi/gobase v1.1.1-0.20261115055850-d440b8121260
 	github.com/shirou/gopsutil/v4 v4.26.2
-	golang.org/x/crypto v0.58.0
 	golang.org/x/text v0.43.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -42,7 +39,6 @@ require (
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.4.1 // indirect
-	github.com/kr/fs v0.1.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/leodido/go-urn v1.5.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
@@ -66,8 +62,8 @@ require (
 	go.mongodb.org/mongo-driver/v2 v2.9.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/arch v0.32.0 // indirect
+	golang.org/x/crypto v0.58.0 // indirect
 	golang.org/x/net v0.62.0 // indirect
-	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect

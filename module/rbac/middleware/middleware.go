@@ -26,9 +26,7 @@ func GetSession(c *gin.Context) (*sessions.Session, error) {
 
 // SessionMiddleware func
 func SessionMiddleware(r *gin.Engine) {
-
 	r.Use(func(c *gin.Context) {
-
 		session, _ := GetSession(c)
 
 		// Save it before we write to the response/return from the handler.
@@ -83,7 +81,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 func DefaultMiddleware(r *gin.Engine) {
 	r.Use(LoggerWithConfig(LoggerConfig{
-		Logger: logger.Logger,
+		Logger: logger.GetLogger(),
 	}), gin.Recovery())
 }
 
