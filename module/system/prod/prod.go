@@ -4,17 +4,27 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
+	"github.com/open-cmi/gobase/pkg/eyas"
 )
 
 type ProdModel struct {
-	Name     string `json:"name"`
-	NameDesc string `json:"name_desc"`
-	Footer   string `json:"footer"`
-	isNew    bool
+	Name                string `json:"name"`
+	NameDesc            string `json:"name_desc"`
+	Footer              string `json:"footer"`
+	LogoExt             string `json:"logo_ext,omitempty"`
+	LogoUpdatedAt       int64  `json:"logo_updated_at,omitempty"`
+	FaviconExt          string `json:"favicon_ext,omitempty"`
+	FaviconUpdatedAt    int64  `json:"favicon_updated_at,omitempty"`
+	BackgroundExt       string `json:"background_ext,omitempty"`
+	BackgroundUpdatedAt int64  `json:"background_updated_at,omitempty"`
+	isNew               bool
 }
 
 func (m *ProdModel) Key() string {
@@ -87,16 +97,12 @@ func NewProdModel() *ProdModel {
 	}
 }
 
-func GetProdBasisInfo() ProdModel {
+func GetProdBasisInfo() (ProdModel, bool) {
 	m := GetProdModel()
 	if m == nil {
-		return ProdModel{
-			Name:     gConf.Name,
-			NameDesc: gConf.NameDesc,
-			Footer:   gConf.Footer,
-		}
+		return ProdModel{}, false
 	}
-	return *m
+	return *m, true
 }
 
 type ProdInfoSetRequest struct {
@@ -114,4 +120,144 @@ func SetProdBasisInfo(req *ProdInfoSetRequest) error {
 	m.Footer = req.Footer
 	m.NameDesc = req.NameDesc
 	return m.Save()
+}
+
+func GetBrandingDir() string {
+	dir := filepath.Join(eyas.GetDataDir(), "branding")
+	_ = os.MkdirAll(dir, 0755)
+	return dir
+}
+
+func GetLogoPath() (string, bool) {
+	m := GetProdModel()
+	if m != nil && m.LogoExt != "" {
+		p := filepath.Join(GetBrandingDir(), "logo"+m.LogoExt)
+		if _, err := os.Stat(p); err == nil {
+			return p, true
+		}
+	}
+	// Fallback to legacy logo.png if present
+	legacy := filepath.Join(eyas.GetDataDir(), "logo.png")
+	if _, err := os.Stat(legacy); err == nil {
+		return legacy, true
+	}
+	return "", false
+}
+
+func SetLogoExt(ext string) error {
+	m := GetProdModel()
+	if m == nil {
+		m = NewProdModel()
+	}
+	if m.LogoExt != "" && m.LogoExt != ext {
+		_ = os.Remove(filepath.Join(GetBrandingDir(), "logo"+m.LogoExt))
+	}
+	m.LogoExt = ext
+	m.LogoUpdatedAt = time.Now().Unix()
+	return m.Save()
+}
+
+func DeleteLogo() error {
+	m := GetProdModel()
+	if m == nil {
+		return nil
+	}
+	if m.LogoExt != "" {
+		_ = os.Remove(filepath.Join(GetBrandingDir(), "logo"+m.LogoExt))
+		m.LogoExt = ""
+		m.LogoUpdatedAt = time.Now().Unix()
+	}
+	_ = os.Remove(filepath.Join(eyas.GetDataDir(), "logo.png"))
+	return m.Save()
+}
+
+func GetFaviconPath() (string, bool) {
+	m := GetProdModel()
+	if m != nil && m.FaviconExt != "" {
+		p := filepath.Join(GetBrandingDir(), "favicon"+m.FaviconExt)
+		if _, err := os.Stat(p); err == nil {
+			return p, true
+		}
+	}
+	return "", false
+}
+
+func SetFaviconExt(ext string) error {
+	m := GetProdModel()
+	if m == nil {
+		m = NewProdModel()
+	}
+	if m.FaviconExt != "" && m.FaviconExt != ext {
+		_ = os.Remove(filepath.Join(GetBrandingDir(), "favicon"+m.FaviconExt))
+	}
+	m.FaviconExt = ext
+	m.FaviconUpdatedAt = time.Now().Unix()
+	return m.Save()
+}
+
+func DeleteFavicon() error {
+	m := GetProdModel()
+	if m == nil {
+		return nil
+	}
+	if m.FaviconExt != "" {
+		_ = os.Remove(filepath.Join(GetBrandingDir(), "favicon"+m.FaviconExt))
+		m.FaviconExt = ""
+		m.FaviconUpdatedAt = time.Now().Unix()
+	}
+	return m.Save()
+}
+
+func GetBackgroundPath() (string, bool) {
+	m := GetProdModel()
+	if m != nil && m.BackgroundExt != "" {
+		p := filepath.Join(GetBrandingDir(), "background"+m.BackgroundExt)
+		if _, err := os.Stat(p); err == nil {
+			return p, true
+		}
+	}
+	// Fallback to legacy background.png if present
+	legacy := filepath.Join(eyas.GetDataDir(), "background.png")
+	if _, err := os.Stat(legacy); err == nil {
+		return legacy, true
+	}
+	return "", false
+}
+
+func SetBackgroundExt(ext string) error {
+	m := GetProdModel()
+	if m == nil {
+		m = NewProdModel()
+	}
+	if m.BackgroundExt != "" && m.BackgroundExt != ext {
+		_ = os.Remove(filepath.Join(GetBrandingDir(), "background"+m.BackgroundExt))
+	}
+	m.BackgroundExt = ext
+	m.BackgroundUpdatedAt = time.Now().Unix()
+	return m.Save()
+}
+
+func DeleteBackground() error {
+	m := GetProdModel()
+	if m == nil {
+		return nil
+	}
+	if m.BackgroundExt != "" {
+		_ = os.Remove(filepath.Join(GetBrandingDir(), "background"+m.BackgroundExt))
+		m.BackgroundExt = ""
+		m.BackgroundUpdatedAt = time.Now().Unix()
+	}
+	_ = os.Remove(filepath.Join(eyas.GetDataDir(), "background.png"))
+	return m.Save()
+}
+
+func ResetProdBasisInfo() error {
+	_ = DeleteLogo()
+	_ = DeleteFavicon()
+	_ = DeleteBackground()
+	_ = os.RemoveAll(GetBrandingDir())
+
+	db := sqldb.GetDB()
+	_, err := db.Exec("delete from k_v_table where key=$1", "prod-model-info")
+	return err
 }

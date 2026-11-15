@@ -35,10 +35,6 @@
     "enable": true,
     "private_file": ""
   },
-  "prod": {
-    "name": "通用管理平台",
-    "footer": "通用管理平台"
-  },
   "webserver": {
     "option_auth": true,
     "debug": true,
