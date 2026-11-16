@@ -8,11 +8,11 @@ import (
 	"github.com/open-cmi/cmmns/module/rbac/middleware"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 // List list
-func QueryTokenList(option *goparam.Param) (int, []TokenRecord, error) {
+func QueryTokenList(option *ginparam.ListOption) (int, []TokenRecord, error) {
 	db := sqldb.GetDB()
 
 	var results []TokenRecord = []TokenRecord{}
@@ -27,9 +27,9 @@ func QueryTokenList(option *goparam.Param) (int, []TokenRecord, error) {
 		return 0, results, errors.New("get count failed")
 	}
 
-	columns := goparam.GetColumn(TokenRecord{}, []string{})
+	columns := sqldb.ExtractDBColumns(TokenRecord{}, []string{})
 	queryClause := fmt.Sprintf(`select %s from token_record`, strings.Join(columns, ","))
-	finalClause := goparam.BuildFinalClause(option, []string{})
+	finalClause := sqldb.BuildFinalClause(option, []string{})
 	queryClause += finalClause
 	rows, err := db.Queryx(queryClause)
 	if err != nil {

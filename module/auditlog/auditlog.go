@@ -9,7 +9,7 @@ import (
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 type Model struct {
@@ -25,11 +25,11 @@ type Model struct {
 func (m *Model) Save() error {
 	db := sqldb.GetDB()
 
-	columns := goparam.GetColumn(*m, []string{})
-	values := goparam.GetColumnInsertNamed(columns)
+	columns := sqldb.ExtractDBColumns(*m)
+	values := sqldb.GetNamedInsertValuesClauses(columns)
 
 	insertClause := fmt.Sprintf("insert into audit_log(%s) values(%s)",
-		strings.Join(columns, ","), strings.Join(values, ","))
+		strings.Join(columns, ","), values)
 
 	logger.Debugf("start to exec sql clause: %s\n", insertClause)
 
@@ -67,7 +67,7 @@ type QueryFilter struct {
 	TimeEnd   int64
 }
 
-func QueryList(p *goparam.Param, filter *QueryFilter) (int, []Model, error) {
+func QueryList(p *ginparam.ListOption, filter *QueryFilter) (int, []Model, error) {
 	db := sqldb.GetDB()
 
 	var logs []Model = []Model{}
@@ -123,7 +123,7 @@ func QueryList(p *goparam.Param, filter *QueryFilter) (int, []Model, error) {
 
 	queryClause := `select * from audit_log`
 	queryClause += whereClause
-	finalClause := goparam.BuildFinalClause(p, []string{"timestamp"})
+	finalClause := sqldb.BuildFinalClause(p, []string{"timestamp"})
 	queryClause += finalClause
 	rows, err := db.Queryx(queryClause, whereArgs...)
 	if err != nil {

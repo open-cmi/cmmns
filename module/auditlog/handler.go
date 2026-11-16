@@ -2,7 +2,7 @@ package auditlog
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 type AuditLogHandler struct {
@@ -22,7 +22,7 @@ func NewAuditHandler(c *gin.Context) *AuditLogHandler {
 	ip := c.ClientIP()
 
 	var username string
-	usermap := goparam.GetUser(c)
+	usermap := ginparam.GetUser(c)
 	if usermap != nil {
 		username, _ = usermap["username"].(string)
 	}

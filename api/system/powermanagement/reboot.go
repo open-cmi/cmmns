@@ -8,13 +8,13 @@ import (
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 func Reboot(c *gin.Context) {
 	ah := auditlog.NewAuditHandler(c)
 
-	userparam := goparam.GetUser(c)
+	userparam := ginparam.GetUser(c)
 	role := userparam["role"].(string)
 	if role != "admin" {
 		ah.InsertOperationLog(i18n.Sprintf("reboot system"), false)
@@ -32,7 +32,7 @@ func Reboot(c *gin.Context) {
 
 func ShutDown(c *gin.Context) {
 	ah := auditlog.NewAuditHandler(c)
-	userparam := goparam.GetUser(c)
+	userparam := ginparam.GetUser(c)
 	role := userparam["role"].(string)
 	if role != "admin" {
 		ah.InsertOperationLog(i18n.Sprintf("shutdown system"), false)

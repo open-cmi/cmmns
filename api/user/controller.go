@@ -17,7 +17,7 @@ import (
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/rdb"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/rbac"
@@ -159,7 +159,7 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	usermap := goparam.GetUser(c)
+	usermap := ginparam.GetUser(c)
 	if usermap == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
@@ -219,14 +219,14 @@ func ChangePassword(c *gin.Context) {
 
 // List list user
 func List(c *gin.Context) {
-	query := goparam.ParseParams(c)
+	query := ginparam.ParseListOption(c)
 	var filter user.QueryFilter
 	username := c.Query("username")
 	if username != "" {
 		filter.Username = username
 	}
 
-	count, users, err := user.QueryList(query, &filter)
+	count, users, err := user.QueryList(&query, &filter)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
@@ -381,7 +381,15 @@ func Create(c *gin.Context) {
 // Delete delete user
 func Delete(c *gin.Context) {
 	ah := auditlog.NewAuditHandler(c)
-	param := goparam.ParseParams(c)
+	userMap := ginparam.GetUser(c)
+	if userMap == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"ret": -1,
+			"msg": i18n.Sprintf("user is not existing"),
+		})
+		ah.InsertOperationLog(i18n.Sprintf("delete user"), false)
+		return
+	}
 
 	var apimsg user.DeleteUserRequest
 	if err := c.ShouldBindJSON(&apimsg); err != nil {
@@ -391,7 +399,7 @@ func Delete(c *gin.Context) {
 	}
 
 	id := apimsg.ID
-	userID := param.UserID
+	userID, _ := userMap["id"].(string)
 	if id == userID {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": -1,
@@ -401,7 +409,7 @@ func Delete(c *gin.Context) {
 		return
 	}
 
-	role := param.Role
+	role, _ := userMap["role"].(string)
 	if role != "admin" {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": -1,
@@ -434,7 +442,7 @@ func CreateToken(c *gin.Context) {
 		return
 	}
 
-	user := goparam.GetUser(c)
+	user := ginparam.GetUser(c)
 	if user == nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "user data is empty"})
 		ah.InsertOperationLog(i18n.Sprintf("create token"), false)
@@ -511,7 +519,7 @@ func ResetPassword(c *gin.Context) {
 		ah.InsertOperationLog(i18n.Sprintf("reset password"), false)
 		return
 	}
-	usermap := goparam.GetUser(c)
+	usermap := ginparam.GetUser(c)
 	if usermap == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
@@ -532,9 +540,9 @@ func ResetPassword(c *gin.Context) {
 }
 
 func QueryTokenList(c *gin.Context) {
-	query := goparam.ParseParams(c)
+	query := ginparam.ParseListOption(c)
 
-	count, tokens, err := token.QueryTokenList(query)
+	count, tokens, err := token.QueryTokenList(&query)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,

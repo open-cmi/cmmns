@@ -7,7 +7,7 @@ import (
 
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 type Blacklist struct {
@@ -20,22 +20,22 @@ func (u *Blacklist) Save() error {
 	db := sqldb.GetDB()
 
 	if u.isNew {
-		columns := goparam.GetColumn(Blacklist{}, []string{})
-		values := goparam.GetColumnInsertNamed(columns)
+		columns := sqldb.ExtractDBColumns(Blacklist{}, []string{})
+		values := sqldb.GetNamedInsertValuesClauses(columns)
 
 		insertClause := fmt.Sprintf("insert into wac_blacklist(%s) values(%s)",
-			strings.Join(columns, ","), strings.Join(values, ","))
+			strings.Join(columns, ","), values)
 
 		_, err := db.NamedExec(insertClause, u)
 		if err != nil {
 			return errors.New("create blacklist failed")
 		}
 	} else {
-		columns := goparam.GetColumn(Blacklist{}, []string{})
-		values := goparam.GetColumnUpdateNamed(columns)
+		columns := sqldb.ExtractDBColumns(Blacklist{}, []string{})
+		values := sqldb.GetNamedUpdateSetClauses(columns)
 
 		updateClause := fmt.Sprintf("update wac_blacklist set %s where id=:id",
-			strings.Join(values, ","))
+			values)
 
 		_, err := db.NamedExec(updateClause, u)
 		if err != nil {
@@ -78,7 +78,7 @@ func New() *Blacklist {
 	}
 }
 
-func QueryList(query *goparam.Param) (int, []Blacklist, error) {
+func QueryList(query *ginparam.ListOption) (int, []Blacklist, error) {
 	db := sqldb.GetDB()
 
 	var users []Blacklist = []Blacklist{}
@@ -93,7 +93,7 @@ func QueryList(query *goparam.Param) (int, []Blacklist, error) {
 	}
 
 	queryClause := `select * from wac_blacklist`
-	finalClause := goparam.BuildFinalClause(query, []string{"timestamp"})
+	finalClause := sqldb.BuildFinalClause(query, []string{"timestamp"})
 	queryClause += finalClause
 	rows, err := db.Queryx(queryClause)
 	if err != nil {

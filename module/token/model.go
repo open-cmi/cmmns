@@ -8,7 +8,6 @@ import (
 
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 type TokenRecord struct {
@@ -23,22 +22,22 @@ func (t *TokenRecord) Save() error {
 	db := sqldb.GetDB()
 
 	if t.isNew {
-		columns := goparam.GetColumn(*t, []string{})
-		values := goparam.GetColumnInsertNamed(columns)
+		columns := sqldb.ExtractDBColumns(*t, []string{})
+		values := sqldb.GetNamedInsertValuesClauses(columns)
 
 		insertClause := fmt.Sprintf("insert into token_record(%s) values(%s)",
-			strings.Join(columns, ","), strings.Join(values, ","))
+			strings.Join(columns, ","), values)
 
 		_, err := db.NamedExec(insertClause, t)
 		if err != nil {
 			return errors.New("create token record failed")
 		}
 	} else {
-		columns := goparam.GetColumn(*t, []string{})
-		values := goparam.GetColumnUpdateNamed(columns)
+		columns := sqldb.ExtractDBColumns(*t, []string{})
+		values := sqldb.GetNamedUpdateSetClauses(columns)
 
 		insertClause := fmt.Sprintf("update token_record set %s where name=:name",
-			strings.Join(values, ","))
+			values)
 
 		_, err := db.NamedExec(insertClause, t)
 		if err != nil {

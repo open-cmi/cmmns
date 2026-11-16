@@ -7,7 +7,6 @@ import (
 
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 type Whitelist struct {
@@ -20,22 +19,22 @@ func (u *Whitelist) Save() error {
 	db := sqldb.GetDB()
 
 	if u.isNew {
-		columns := goparam.GetColumn(Whitelist{}, []string{})
-		values := goparam.GetColumnInsertNamed(columns)
+		columns := sqldb.ExtractDBColumns(Whitelist{}, []string{})
+		values := sqldb.GetNamedInsertValuesClauses(columns)
 
 		insertClause := fmt.Sprintf("insert into wac_whitelist(%s) values(%s)",
-			strings.Join(columns, ","), strings.Join(values, ","))
+			strings.Join(columns, ","), values)
 
 		_, err := db.NamedExec(insertClause, u)
 		if err != nil {
 			return errors.New("create whitelist failed")
 		}
 	} else {
-		columns := goparam.GetColumn(Whitelist{}, []string{})
-		values := goparam.GetColumnUpdateNamed(columns)
+		columns := sqldb.ExtractDBColumns(Whitelist{}, []string{})
+		values := sqldb.GetNamedUpdateSetClauses(columns)
 
 		updateClause := fmt.Sprintf("update wac_whitelist set %s where id=:id",
-			strings.Join(values, ","))
+			values)
 
 		_, err := db.NamedExec(updateClause, u)
 		if err != nil {

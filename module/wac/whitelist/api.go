@@ -8,7 +8,7 @@ import (
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 func AddWhitelist(address string) error {
@@ -59,7 +59,7 @@ func DelWhitelist(address string) error {
 	return err
 }
 
-func QueryList(query *goparam.Param) (int, []Whitelist, error) {
+func QueryList(query *ginparam.ListOption) (int, []Whitelist, error) {
 	db := sqldb.GetDB()
 
 	var users []Whitelist = []Whitelist{}
@@ -74,7 +74,7 @@ func QueryList(query *goparam.Param) (int, []Whitelist, error) {
 	}
 
 	queryClause := `select * from wac_whitelist`
-	finalClause := goparam.BuildFinalClause(query, []string{"timestamp"})
+	finalClause := sqldb.BuildFinalClause(query, []string{"timestamp"})
 	queryClause += finalClause
 	rows, err := db.Queryx(queryClause)
 	if err != nil {

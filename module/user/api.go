@@ -11,7 +11,7 @@ import (
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 const UserLoginMaxTried = 5
@@ -21,7 +21,7 @@ type QueryFilter struct {
 }
 
 // List list func
-func QueryList(query *goparam.Param, filter *QueryFilter) (int, []UserModel, error) {
+func QueryList(query *ginparam.ListOption, filter *QueryFilter) (int, []UserModel, error) {
 	db := sqldb.GetDB()
 
 	var users []UserModel = []UserModel{}
@@ -53,7 +53,7 @@ func QueryList(query *goparam.Param, filter *QueryFilter) (int, []UserModel, err
 	}
 
 	queryClause := `select * from users`
-	finalClause := goparam.BuildFinalClause(query, []string{"created_time", "updated_time"})
+	finalClause := sqldb.BuildFinalClause(query, []string{"created_time", "updated_time"})
 	queryClause += (whereClause + finalClause)
 	rows, err := db.Queryx(queryClause, whereArgs...)
 	if err != nil {

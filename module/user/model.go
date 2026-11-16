@@ -9,20 +9,19 @@ import (
 	"github.com/jameskeane/bcrypt"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 type UserModel struct {
-	UserName           string `json:"username" db:"username"`
-	ID                 string `json:"id" db:"id"`
-	Email              string `json:"email" db:"email"`
-	Password           string `json:"-" db:"password"`
-	Role               string `json:"role" db:"role"`
-	Description        string `json:"description,omitempty" db:"description"`
-	Activate           bool   `json:"activate" db:"activate"`
-	Status             string `json:"status" db:"status"`
-	CreatedTime        int64  `json:"created_time" db:"itime"`
-	UpdatedTime        int64  `json:"updated_time" db:"utime"`
+	UserName           string   `json:"username" db:"username"`
+	ID                 string   `json:"id" db:"id"`
+	Email              string   `json:"email" db:"email"`
+	Password           string   `json:"-" db:"password"`
+	Role               string   `json:"role" db:"role"`
+	Description        string   `json:"description,omitempty" db:"description"`
+	Activate           bool     `json:"activate" db:"activate"`
+	Status             string   `json:"status" db:"status"`
+	CreatedTime        int64    `json:"created_time" db:"itime"`
+	UpdatedTime        int64    `json:"updated_time" db:"utime"`
 	PasswordChangeTime int64    `json:"-" db:"password_change_time"`
 	NeedChangePassword bool     `json:"need_change_password"`
 	Perms              []string `json:"perms"`
@@ -33,22 +32,22 @@ func (u *UserModel) Save() error {
 	db := sqldb.GetDB()
 
 	if u.isNew {
-		columns := goparam.GetColumn(UserModel{}, []string{})
-		values := goparam.GetColumnInsertNamed(columns)
+		columns := sqldb.ExtractDBColumns(UserModel{}, []string{})
+		values := sqldb.GetNamedInsertValuesClauses(columns)
 
 		insertClause := fmt.Sprintf("insert into users(%s) values(%s)",
-			strings.Join(columns, ","), strings.Join(values, ","))
+			strings.Join(columns, ","), values)
 
 		_, err := db.NamedExec(insertClause, u)
 		if err != nil {
 			return errors.New("create user failed")
 		}
 	} else {
-		columns := goparam.GetColumn(UserModel{}, []string{})
-		values := goparam.GetColumnUpdateNamed(columns)
+		columns := sqldb.ExtractDBColumns(UserModel{}, []string{})
+		values := sqldb.GetNamedUpdateSetClauses(columns)
 
 		updateClause := fmt.Sprintf("update users set %s where id=:id",
-			strings.Join(values, ","))
+			values)
 
 		_, err := db.NamedExec(updateClause, u)
 		if err != nil {

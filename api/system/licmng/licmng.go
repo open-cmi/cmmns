@@ -11,15 +11,15 @@ import (
 	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/cmmns/module/user"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 // List list license
 func QueryLicenseList(c *gin.Context) {
 
-	query := goparam.ParseParams(c)
+	query := ginparam.ParseListOption(c)
 
-	userparam := goparam.GetUser(c)
+	userparam := ginparam.GetUser(c)
 	username := userparam["username"].(string)
 	role := userparam["role"].(string)
 
@@ -53,7 +53,7 @@ func QueryLicenseList(c *gin.Context) {
 		filter.MCode = mcode
 	}
 
-	count, lics, err := licmng.QueryLicenseList(query, &filter)
+	count, lics, err := licmng.QueryLicenseList(&query, &filter)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"ret": 1,
@@ -88,7 +88,7 @@ func CreateLicense(c *gin.Context) {
 		return
 	}
 
-	userparam := goparam.GetUser(c)
+	userparam := ginparam.GetUser(c)
 	username := userparam["username"].(string)
 	role := userparam["role"].(string)
 
@@ -114,9 +114,14 @@ func CreateLicense(c *gin.Context) {
 }
 
 func DeleteLicense(c *gin.Context) {
-	param := goparam.ParseParams(c)
+	userMap := ginparam.GetUser(c)
+	if userMap == nil {
+		c.JSON(http.StatusForbidden, "")
+		return
+	}
 
-	usr := user.Get(param.UserID)
+	userID, _ := userMap["id"].(string)
+	usr := user.Get(userID)
 	if usr == nil {
 		c.JSON(http.StatusForbidden, "")
 		return

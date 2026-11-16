@@ -8,7 +8,6 @@ import (
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 type RoleModel struct {
@@ -25,22 +24,21 @@ func (r *RoleModel) Save() error {
 	db := sqldb.GetDB()
 
 	if r.isNew {
-		columns := goparam.GetColumn(RoleModel{}, []string{})
-		values := goparam.GetColumnInsertNamed(columns)
+		columns := sqldb.ExtractDBColumns(RoleModel{}, []string{})
+		values := sqldb.GetNamedInsertValuesClauses(columns)
 
 		insertClause := fmt.Sprintf("insert into roles(%s) values(%s)",
-			strings.Join(columns, ","), strings.Join(values, ","))
+			strings.Join(columns, ","), values)
 
 		_, err := db.NamedExec(insertClause, r)
 		if err != nil {
 			return errors.New("create role failed")
 		}
 	} else {
-		columns := goparam.GetColumn(RoleModel{}, []string{})
-		values := goparam.GetColumnUpdateNamed(columns)
+		columns := sqldb.ExtractDBColumns(RoleModel{}, []string{})
+		values := sqldb.GetNamedUpdateSetClauses(columns)
 
-		insertClause := fmt.Sprintf("update roles set %s where id=:id",
-			strings.Join(values, ","))
+		insertClause := fmt.Sprintf("update roles set %s where id=:id", values)
 
 		_, err := db.NamedExec(insertClause, r)
 		if err != nil {

@@ -8,7 +8,7 @@ import (
 	"github.com/open-cmi/gobase/essential/i18n"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 type RoleDetail struct {
@@ -41,7 +41,7 @@ func GetAllRoleNames() ([]string, error) {
 	return roles, err
 }
 
-func RoleList(option *goparam.Param) (int, []RoleDetail, error) {
+func RoleList(option *ginparam.ListOption) (int, []RoleDetail, error) {
 	db := sqldb.GetDB()
 
 	var roles []RoleDetail = []RoleDetail{}
@@ -57,7 +57,7 @@ func RoleList(option *goparam.Param) (int, []RoleDetail, error) {
 	}
 
 	queryClause := `select * from roles`
-	finalClause := goparam.BuildFinalClause(option, []string{})
+	finalClause := sqldb.BuildFinalClause(option, []string{})
 	queryClause += finalClause
 	rows, err := db.Queryx(queryClause)
 	if err != nil {

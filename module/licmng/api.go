@@ -9,7 +9,7 @@ import (
 
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 type QueryFilter struct {
@@ -21,7 +21,7 @@ type QueryFilter struct {
 	MCode    string
 }
 
-func QueryLicenseList(query *goparam.Param, filter *QueryFilter) (int, []LicenseModel, error) {
+func QueryLicenseList(query *ginparam.ListOption, filter *QueryFilter) (int, []LicenseModel, error) {
 	db := sqldb.GetDB()
 
 	var lics []LicenseModel = []LicenseModel{}
@@ -109,7 +109,7 @@ func QueryLicenseList(query *goparam.Param, filter *QueryFilter) (int, []License
 	}
 
 	queryClause := `select * from license`
-	finalClause := goparam.BuildFinalClause(query, []string{"created_time", "expire_time"})
+	finalClause := sqldb.BuildFinalClause(query, []string{"created_time", "expire_time"})
 	queryClause += (whereClause + finalClause)
 	rows, err := db.Queryx(queryClause, whereArgs...)
 	if err != nil {

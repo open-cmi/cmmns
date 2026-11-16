@@ -7,18 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/auditlog"
 	"github.com/open-cmi/cmmns/module/rbac"
-	"github.com/open-cmi/cmmns/module/user"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 func List(c *gin.Context) {
-	param := goparam.ParseParams(c)
-
-	usr := user.Get(param.UserID)
-	if usr == nil {
-		c.JSON(http.StatusForbidden, "")
-		return
-	}
+	param := ginparam.ParseListOption(c)
 
 	var filter auditlog.QueryFilter
 	addr := c.Query("ip")
@@ -40,7 +33,7 @@ func List(c *gin.Context) {
 		filter.TimeEnd = int64(timeEnd)
 	}
 
-	count, list, err := auditlog.QueryList(param, &filter)
+	count, list, err := auditlog.QueryList(&param, &filter)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return

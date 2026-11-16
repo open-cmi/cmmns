@@ -10,7 +10,7 @@ import (
 	"github.com/open-cmi/cmmns/module/wac/blacklist"
 	"github.com/open-cmi/cmmns/module/wac/whitelist"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 func GetWAC(c *gin.Context) {
@@ -115,9 +115,9 @@ func DelWhitelist(c *gin.Context) {
 }
 
 func ListWhitelist(c *gin.Context) {
-	param := goparam.ParseParams(c)
+	param := ginparam.ParseListOption(c)
 
-	count, lists, err := whitelist.QueryList(param)
+	count, lists, err := whitelist.QueryList(&param)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -180,9 +180,9 @@ func DelBlacklist(c *gin.Context) {
 }
 
 func ListBlacklist(c *gin.Context) {
-	param := goparam.ParseParams(c)
+	param := ginparam.ParseListOption(c)
 
-	count, lists, err := blacklist.QueryList(param)
+	count, lists, err := blacklist.QueryList(&param)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return

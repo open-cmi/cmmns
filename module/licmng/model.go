@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/essential/sqldb"
-	"github.com/open-cmi/gobase/pkg/goparam"
 )
 
 type LicenseModel struct {
@@ -33,11 +32,11 @@ func (m *LicenseModel) Save() error {
 
 	if m.isNew {
 		// 存储到数据库
-		columns := goparam.GetColumn(*m, []string{})
-		values := goparam.GetColumnInsertNamed(columns)
+		columns := sqldb.ExtractDBColumns(*m, []string{})
+		values := sqldb.GetNamedInsertValuesClauses(columns)
 
 		insertClause := fmt.Sprintf("insert into license(%s) values(%s)",
-			strings.Join(columns, ","), strings.Join(values, ","))
+			strings.Join(columns, ","), values)
 
 		logger.Debugf("start to exec sql clause: %s\n", insertClause)
 
@@ -48,7 +47,7 @@ func (m *LicenseModel) Save() error {
 		}
 		m.isNew = false
 	} else {
-		columns := goparam.GetColumn(*m, []string{"id", "created_time"})
+		columns := sqldb.ExtractDBColumns(*m, []string{"id", "created_time"})
 
 		m.UpdatedTime = time.Now().Unix()
 		var updates []string = []string{}

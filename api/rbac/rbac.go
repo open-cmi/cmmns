@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/rbac"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 func GetAllRoleNames(c *gin.Context) {
@@ -23,9 +23,9 @@ func GetAllRoleNames(c *gin.Context) {
 }
 
 func RoleList(c *gin.Context) {
-	param := goparam.ParseParams(c)
+	param := ginparam.ParseListOption(c)
 
-	count, results, err := rbac.RoleList(param)
+	count, results, err := rbac.RoleList(&param)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
@@ -47,7 +47,7 @@ func DeleteRole(c *gin.Context) {
 		return
 	}
 
-	user := goparam.GetUser(c)
+	user := ginparam.GetUser(c)
 	curRole, _ := user["role"].(string)
 	if curRole == apimsg.ID {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": i18n.Sprintf("no permission")})
@@ -93,7 +93,7 @@ func CreateRole(c *gin.Context) {
 		return
 	}
 
-	user := goparam.GetUser(c)
+	user := ginparam.GetUser(c)
 	curRole, _ := user["role"].(string)
 	if curRole != "admin" {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": i18n.Sprintf("no permission")})
@@ -124,7 +124,7 @@ func EditRole(c *gin.Context) {
 		return
 	}
 
-	user := goparam.GetUser(c)
+	user := ginparam.GetUser(c)
 	curRole, _ := user["role"].(string)
 	if curRole != "admin" {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": i18n.Sprintf("no permission")})

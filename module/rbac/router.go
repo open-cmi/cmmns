@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-cmi/cmmns/module/rbac/middleware"
 	"github.com/open-cmi/gobase/essential/i18n"
-	"github.com/open-cmi/gobase/pkg/goparam"
+	"github.com/open-cmi/gobase/pkg/ginparam"
 )
 
 // RouterGroup is a function to api group router
@@ -178,7 +178,7 @@ func MustAuthAPI(prod, method, path string, handler gin.HandlerFunc, perms ...st
 	regMu.Unlock()
 
 	wrapped := func(c *gin.Context) {
-		user := goparam.GetUser(c)
+		user := ginparam.GetUser(c)
 		if user == nil {
 			c.String(http.StatusUnauthorized, "authenticate is required")
 			return
@@ -224,7 +224,7 @@ func OptionAuthAPI(prod, method, path string, handler gin.HandlerFunc, perms ...
 	regMu.Unlock()
 
 	wrapped := func(c *gin.Context) {
-		user := goparam.GetUser(c)
+		user := ginparam.GetUser(c)
 		if user == nil {
 			c.String(http.StatusUnauthorized, "authenticate is required")
 			return
