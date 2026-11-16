@@ -13,7 +13,7 @@ require (
 	github.com/jameskeane/bcrypt v0.0.0-20120420032655-c3cd44c1e20f
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
-	github.com/open-cmi/gobase v1.1.1-0.20261116024357-a07d1d4779d2
+	github.com/open-cmi/gobase v1.1.1-0.20261116125746-1057ebac1107
 	github.com/shirou/gopsutil/v4 v4.26.2
 	golang.org/x/text v0.43.0
 	gopkg.in/yaml.v3 v3.0.1

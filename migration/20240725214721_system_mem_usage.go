@@ -11,17 +11,17 @@ type MemUsageInstance struct {
 
 // Up up migrate
 func (mi MemUsageInstance) Up(db *sqlx.DB) error {
-	sqlClause := `
-		CREATE TABLE IF NOT EXISTS system_mem_usage (
-			dev_id varchar(128) NOT NULL,
-			step int NOT NULL DEFAULT 0,
-			updated_time bigint not null default 0,
-			mem_usage real default 0,
-			primary key(dev_id,step)
-		)
-	`
-	_, err := db.Exec(sqlClause)
-	return err
+	// sqlClause := `
+	// 	CREATE TABLE IF NOT EXISTS system_mem_usage (
+	// 		dev_id varchar(128) NOT NULL,
+	// 		step int NOT NULL DEFAULT 0,
+	// 		updated_time bigint not null default 0,
+	// 		mem_usage real default 0,
+	// 		primary key(dev_id,step)
+	// 	)
+	// `
+	// _, err := db.Exec(sqlClause)
+	return nil
 }
 
 // Down down migrate
