@@ -18,10 +18,6 @@
     "engine": "netplan",
     "devices": []
   },
-  "nginx": {
-    "conf": "",
-    "reload": ""
-  },
   "rdb": {
     "host": "127.0.0.1",
     "port": 25431,
