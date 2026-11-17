@@ -9,8 +9,7 @@ import (
 var gConf Config
 
 type Config struct {
-	Conf   string `json:"conf"`
-	Reload string `json:"reload"`
+	Conf string `json:"conf"`
 }
 
 func Parse(mess json.RawMessage) error {
@@ -24,5 +23,6 @@ func Save() json.RawMessage {
 }
 
 func init() {
+	gConf.Conf = "/etc/nginx"
 	config.RegisterConfig("nginx", Parse, Save)
 }

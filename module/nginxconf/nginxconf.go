@@ -29,10 +29,9 @@ func ApplyNginxBlackConf(blacklists []string) error {
 		content := fmt.Sprintf("deny %s;\n", line)
 		_, err = wf.WriteString(content)
 	}
-	if gConf.Reload != "" {
-		cmd := exec.Command("bash", "-c", gConf.Reload)
-		err = cmd.Run()
-	}
+
+	cmd := exec.Command("bash", "-c", "systemctl reload nginx")
+	err = cmd.Run()
 	return err
 }
 
@@ -52,10 +51,8 @@ func ApplyNginxWhiteConf(whitelists []string) error {
 		content := fmt.Sprintf("allow %s;\n", line)
 		_, err = wf.WriteString(content)
 	}
-	if gConf.Reload != "" {
-		cmd := exec.Command("bash", "-c", gConf.Reload)
-		err = cmd.Run()
-	}
+	cmd := exec.Command("bash", "-c", "systemctl reload nginx")
+	err = cmd.Run()
 	return err
 }
 
@@ -63,7 +60,7 @@ func applyAccessControl(mode string) error {
 	var err error
 
 	if gConf.Conf == "" {
-		return errors.New("nginx path is not set, please set it in config file first")
+		gConf.Conf = "/etc/nginx"
 	}
 
 	nginxConf := filepath.Join(gConf.Conf, "nginx.conf")
@@ -150,10 +147,9 @@ func ApplyNginxAccessControl(mode string) error {
 		return err
 	}
 	//
-	if gConf.Reload != "" {
-		cmd := exec.Command("bash", "-c", gConf.Reload)
-		err = cmd.Run()
-	}
+
+	cmd := exec.Command("bash", "-c", "systemctl reload nginx")
+	err = cmd.Run()
 	return err
 }
 
@@ -195,10 +191,8 @@ func CancelNginxAccessControl() error {
 	wf.Close()
 
 	//
-	if gConf.Reload != "" {
-		cmd := exec.Command("bash", "-c", gConf.Reload)
-		err = cmd.Run()
-	}
+	cmd := exec.Command("bash", "-c", "systemctl reload nginx")
+	err = cmd.Run()
 	return err
 }
 
@@ -257,10 +251,7 @@ func ApplyServicePort(httpPort int, httpsPort int) error {
 		logger.Errorf("write %s failed\n", nginxConf)
 		return err
 	}
-	//
-	if gConf.Reload != "" {
-		cmd := exec.Command("bash", "-c", gConf.Reload)
-		err = cmd.Run()
-	}
+	cmd := exec.Command("bash", "-c", "systemctl reload nginx")
+	err = cmd.Run()
 	return err
 }
