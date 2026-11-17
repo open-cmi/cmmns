@@ -101,33 +101,6 @@ func findInstallScript(destDir, prod string) (string, error) {
 		}
 	}
 
-	// 优先检查一级子目录下的 scripts/install.sh
-	if matches, err := filepath.Glob(filepath.Join(destDir, "*", "scripts", "install.sh")); err == nil {
-		for _, m := range matches {
-			if fi, err := os.Stat(m); err == nil && !fi.IsDir() {
-				return m, nil
-			}
-		}
-	}
-
-	var found string
-	_ = filepath.Walk(destDir, func(p string, fi os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		// 跳过 3rdparty 目录，防止误触发第三方组件自带的 install.sh
-		if fi.IsDir() && fi.Name() == "3rdparty" {
-			return filepath.SkipDir
-		}
-		if !fi.IsDir() && strings.HasSuffix(p, filepath.Join("scripts", "install.sh")) {
-			found = p
-			return filepath.SkipAll
-		}
-		return nil
-	})
-	if found != "" {
-		return found, nil
-	}
 	return "", fmt.Errorf("install.sh not found under %s", destDir)
 }
 
