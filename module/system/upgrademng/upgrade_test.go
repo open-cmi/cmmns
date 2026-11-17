@@ -83,3 +83,39 @@ func TestExtractAndFindScript(t *testing.T) {
 		t.Fatalf("expected script %s, got %s", expectedScript, scriptPath)
 	}
 }
+
+func TestExtractProdAndSkip3rdparty(t *testing.T) {
+	if got := extractProdFromPackage("/tmp/motagent-1.2.3-linux-amd64.tar.gz"); got != "motagent" {
+		t.Fatalf("expected motagent, got %s", got)
+	}
+	if got := extractProdFromPackage("licmng-v2.0.tar.gz"); got != "licmng" {
+		t.Fatalf("expected licmng, got %s", got)
+	}
+	if got := extractProdFromPackage("noprefix.tar.gz"); got != "" {
+		t.Fatalf("expected empty, got %s", got)
+	}
+
+	tmpDir := t.TempDir()
+	pkgPath := filepath.Join(tmpDir, "licmng-v1.0.tar.gz")
+	files := map[string]string{
+		"licmng/3rdparty/sub/scripts/install.sh": "#!/bin/bash\necho 3rdparty",
+		"licmng/scripts/install.sh":              "#!/bin/bash\necho main",
+	}
+	createMockTarGz(t, pkgPath, files)
+
+	extractDir := filepath.Join(tmpDir, "extracted")
+	if err := extractPackage(pkgPath, extractDir); err != nil {
+		t.Fatalf("extractPackage failed: %v", err)
+	}
+
+	prod := extractProdFromPackage(pkgPath)
+	scriptPath, err := findInstallScript(extractDir, prod)
+	if err != nil {
+		t.Fatalf("findInstallScript failed: %v", err)
+	}
+	expected := filepath.Join(extractDir, "licmng", "scripts", "install.sh")
+	if scriptPath != expected {
+		t.Fatalf("expected %s, got %s", expected, scriptPath)
+	}
+}
+

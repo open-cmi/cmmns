@@ -79,20 +79,47 @@ func extractPackage(pkgPath, destDir string) error {
 	return nil
 }
 
-func findInstallScript(destDir, prod string) (string, error) {
-	candidates := []string{
-		filepath.Join(destDir, prod, "scripts", "install.sh"),
-		filepath.Join(destDir, "scripts", "install.sh"),
+// extractProdFromPackage extracts the product prefix before '-' from package filename (e.g. motagent-1.0.tar.gz -> motagent).
+func extractProdFromPackage(pkgPath string) string {
+	base := filepath.Base(pkgPath)
+	if idx := strings.Index(base, "-"); idx > 0 {
+		return base[:idx]
 	}
+	return ""
+}
+
+func findInstallScript(destDir, prod string) (string, error) {
+	var candidates []string
+	if prod != "" {
+		candidates = append(candidates, filepath.Join(destDir, prod, "scripts", "install.sh"))
+	}
+	candidates = append(candidates, filepath.Join(destDir, "scripts", "install.sh"))
+
 	for _, c := range candidates {
 		if fi, err := os.Stat(c); err == nil && !fi.IsDir() {
 			return c, nil
 		}
 	}
 
+	// 优先检查一级子目录下的 scripts/install.sh
+	if matches, err := filepath.Glob(filepath.Join(destDir, "*", "scripts", "install.sh")); err == nil {
+		for _, m := range matches {
+			if fi, err := os.Stat(m); err == nil && !fi.IsDir() {
+				return m, nil
+			}
+		}
+	}
+
 	var found string
 	_ = filepath.Walk(destDir, func(p string, fi os.FileInfo, err error) error {
-		if err == nil && !fi.IsDir() && strings.HasSuffix(p, "scripts/install.sh") {
+		if err != nil {
+			return nil
+		}
+		// 跳过 3rdparty 目录，防止误触发第三方组件自带的 install.sh
+		if fi.IsDir() && fi.Name() == "3rdparty" {
+			return filepath.SkipDir
+		}
+		if !fi.IsDir() && strings.HasSuffix(p, filepath.Join("scripts", "install.sh")) {
 			found = p
 			return filepath.SkipAll
 		}
@@ -120,16 +147,22 @@ func executeSelfUpgrade(scriptPath string) {
 
 	logger.Infof("starting self-upgrade script: %s -u (log: %s)", scriptPath, logFile)
 
+	var cmd *exec.Cmd
+	if systemdRun, err := exec.LookPath("systemd-run"); err == nil {
+		// 使用 systemd-run --scope 脱离当前服务的 cgroup，防止服务重启时把升级脚本一起杀掉
+		unitName := fmt.Sprintf("eyas-upgrade-%d", time.Now().Unix())
+		cmd = exec.Command(systemdRun, "--scope", "--unit="+unitName, "bash", scriptPath, "-u")
+	} else {
+		cmd = exec.Command("bash", scriptPath, "-u")
+		setProcessGroup(cmd)
+	}
+
 	f, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-	cmd := exec.Command("bash", scriptPath, "-u")
 	if err == nil {
 		defer f.Close()
 		cmd.Stdout = f
 		cmd.Stderr = f
 	}
-
-	// 开启独立的进程组，防止父进程重启时杀死子进程
-	setProcessGroup(cmd)
 
 	if err := cmd.Start(); err != nil {
 		logger.Errorf("failed to start upgrade script: %v", err)
@@ -152,10 +185,12 @@ func StartUpgrade(req *UpgradeRequest) error {
 		return err
 	}
 
-	// 识别当前产品名
-	prod := "xsnos"
-	if curVer, err := eyas.CurrentVersion(); err == nil && curVer != nil && curVer.Prod != "" {
-		prod = curVer.Prod
+	// 从升级包文件名前缀（'-' 之前）提取产品名，若无 '-' 则回退到当前版本信息
+	prod := extractProdFromPackage(pkgPath)
+	if prod == "" {
+		if curVer, err := eyas.CurrentVersion(); err == nil && curVer != nil && curVer.Prod != "" {
+			prod = curVer.Prod
+		}
 	}
 
 	// 解压到临时目录
@@ -173,7 +208,7 @@ func StartUpgrade(req *UpgradeRequest) error {
 	}
 	_ = os.Chmod(scriptPath, 0755)
 
-	logger.Infof("upgrade package %s extracted to %s, launching script %s", pkgPath, extractDir, scriptPath)
+	logger.Infof("upgrade package %s (prod: %s) extracted to %s, launching script %s", pkgPath, prod, extractDir, scriptPath)
 
 	// 启动后台自我升级流程
 	go executeSelfUpgrade(scriptPath)

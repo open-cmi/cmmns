@@ -13,7 +13,11 @@ import (
 )
 
 func UploadPackage(c *gin.Context) {
-	file, _ := c.FormFile("file")
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
 	src, err := file.Open()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
@@ -26,8 +30,8 @@ func UploadPackage(c *gin.Context) {
 	upgradeDir := filepath.Join(eyas.GetDataDir(), "upgrades")
 	os.MkdirAll(upgradeDir, 0755)
 
-	dst := filepath.Join(upgradeDir, file.Filename)
-	out, err := os.OpenFile(dst, os.O_CREATE|os.O_RDWR, 0600)
+	dst := filepath.Join(upgradeDir, filepath.Base(file.Filename))
+	out, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
