@@ -36,11 +36,16 @@ func UploadPackage(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
 		return
 	}
-	defer out.Close()
-
-	_, err = io.Copy(out, src)
+	written, err := io.Copy(out, src)
+	_ = out.Close()
 	if err != nil {
+		_ = os.Remove(dst)
 		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": err.Error()})
+		return
+	}
+	if file.Size > 0 && written != file.Size {
+		_ = os.Remove(dst)
+		c.JSON(http.StatusOK, gin.H{"ret": -1, "msg": "upload incomplete"})
 		return
 	}
 
