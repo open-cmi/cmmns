@@ -32,7 +32,6 @@
     "private_file": ""
   },
   "webserver": {
-    "option_auth": true,
     "debug": true,
     "server": [
       {
