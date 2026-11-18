@@ -75,7 +75,7 @@ func Get() *Setting {
 	var value string
 	err := row.Scan(&value)
 	if err != nil {
-		logger.Infof("ntp setting scan setting failed: %s\n", err.Error())
+		logger.Debugf("ntp setting scan setting failed: %s\n", err.Error())
 		return nil
 	}
 
