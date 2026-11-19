@@ -43,7 +43,7 @@ func Get(key string) (string, bool) {
 	}
 	err := row.Scan(&value)
 	if err != nil {
-		logger.Debugf("dbkv Get row scan failed: %s\n", err.Error())
+		logger.Debugf("dbkv Get key %s failed: %s\n", key, err.Error())
 		return "", false
 	}
 	return value, true
