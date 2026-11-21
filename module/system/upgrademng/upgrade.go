@@ -85,7 +85,7 @@ func extractProdFromPackage(pkgPath string) string {
 	if idx := strings.Index(base, "-"); idx > 0 {
 		return base[:idx]
 	}
-	return ""
+	return base
 }
 
 func findInstallScript(destDir, prod string) (string, error) {
@@ -160,11 +160,6 @@ func StartUpgrade(req *UpgradeRequest) error {
 
 	// 从升级包文件名前缀（'-' 之前）提取产品名，若无 '-' 则回退到当前版本信息
 	prod := extractProdFromPackage(pkgPath)
-	if prod == "" {
-		if curVer, err := eyas.CurrentVersion(); err == nil && curVer != nil && curVer.Prod != "" {
-			prod = curVer.Prod
-		}
-	}
 
 	// 解压到临时目录
 	extractDir := filepath.Join(os.TempDir(), "eyas-self-upgrade")
