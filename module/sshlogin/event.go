@@ -79,14 +79,6 @@ func HandleSSHLoginEvent(event *SSHLoginEvent) {
 		logger.Errorf("failed to save ssh login event locally: %s\n", err.Error())
 	}
 
-	if event.Status == "success" {
-		logger.Infof("ssh login success: user=%s rhost=%s port=%d auth=%s",
-			event.Username, event.RHost, event.Port, event.AuthType)
-	} else {
-		logger.Infof("ssh login failed: user=%s rhost=%s port=%d auth=%s reason=%s invalid=%d",
-			event.Username, event.RHost, event.Port, event.AuthType, event.FailReason, event.IsInvalid)
-	}
-
 	handlersMu.RLock()
 	list := make([]LoginHandler, len(handlers))
 	copy(list, handlers)
