@@ -1,7 +1,7 @@
 ROOT := $(shell pwd)
 
 VERSION=$(shell git describe --tags --long)
-TARGET=$(ROOT)/main/cmmns
+TARGET=$(ROOT)/build/cmmns
 all:build
 
 .PHONY:dep
@@ -10,6 +10,7 @@ dep:
 
 .PHONY:build
 build:dep
+	mkdir -p $(ROOT)/build
 	#cd internal/translation && gotext -srclang=en-US update -out=catalog-gen.go -lang=en-US,zh-CN github.com/open-cmi/cmmns/main
 	#cd main && CGO_ENABLED=1 CGO_CFLAGS="-DSQLITE_ENABLE_RTREE -DSQLITE_THREADSAFE=1" go build -ldflags "-s -w" -o $(TARGET) main.go
 	cd internal/translation && gotext -srclang=en-US update -lang=en-US,zh-CN github.com/open-cmi/cmmns/main
@@ -23,4 +24,4 @@ install:
 
 .PHONY:clean
 clean:
-	rm -r build/*
+	rm -rf $(ROOT)/build/*

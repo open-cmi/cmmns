@@ -5,3 +5,4 @@ data/*
 uncommit.sh
 catalog-gen.go
 main/cmmns
+build/*
