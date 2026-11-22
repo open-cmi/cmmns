@@ -21,7 +21,14 @@ type Config struct {
 
 // Parse parses syslog configuration from json
 func Parse(mess json.RawMessage) error {
-	return json.Unmarshal(mess, &gConf)
+	err := json.Unmarshal(mess, &gConf)
+	if err != nil {
+		return err
+	}
+	if gConf.KeepDays == 0 {
+		gConf.KeepDays = 30
+	}
+	return nil
 }
 
 // Save marshals syslog configuration to json
