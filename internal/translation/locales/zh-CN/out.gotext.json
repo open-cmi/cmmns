@@ -12,6 +12,26 @@
             "translation": "设置管理口"
         },
         {
+            "id": "no permission",
+            "message": "no permission",
+            "translation": "权限不足"
+        },
+        {
+            "id": "role is not exist",
+            "message": "role is not exist",
+            "translation": ""
+        },
+        {
+            "id": "the role can not be deleted",
+            "message": "the role can not be deleted",
+            "translation": ""
+        },
+        {
+            "id": "preset role can not be deleted",
+            "message": "preset role can not be deleted",
+            "translation": ""
+        },
+        {
             "id": "set host name",
             "message": "set host name",
             "translation": "设置主机名"
@@ -52,9 +72,64 @@
             "translation": "下载授权文件"
         },
         {
+            "id": "reboot system",
+            "message": "reboot system",
+            "translation": "重启系统"
+        },
+        {
+            "id": "shutdown system",
+            "message": "shutdown system",
+            "translation": "关闭系统"
+        },
+        {
+            "id": "create scheduled power task",
+            "message": "create scheduled power task",
+            "translation": ""
+        },
+        {
+            "id": "delete scheduled power task",
+            "message": "delete scheduled power task",
+            "translation": ""
+        },
+        {
+            "id": "upload background",
+            "message": "upload background",
+            "translation": ""
+        },
+        {
+            "id": "reset background",
+            "message": "reset background",
+            "translation": ""
+        },
+        {
+            "id": "upload favicon",
+            "message": "upload favicon",
+            "translation": ""
+        },
+        {
+            "id": "reset favicon",
+            "message": "reset favicon",
+            "translation": ""
+        },
+        {
+            "id": "upload logo",
+            "message": "upload logo",
+            "translation": ""
+        },
+        {
+            "id": "reset logo",
+            "message": "reset logo",
+            "translation": ""
+        },
+        {
             "id": "set prod basis info",
             "message": "set prod basis info",
             "translation": "设置产品基本信息"
+        },
+        {
+            "id": "reset prod basis info",
+            "message": "reset prod basis info",
+            "translation": ""
         },
         {
             "id": "set email setting",
@@ -72,16 +147,6 @@
             "translation": "设置web服务端口"
         },
         {
-            "id": "reboot system",
-            "message": "reboot system",
-            "translation": "重启系统"
-        },
-        {
-            "id": "shutdown system",
-            "message": "shutdown system",
-            "translation": "关闭系统"
-        },
-        {
             "id": "set ssh service",
             "message": "set ssh service",
             "translation": "设置SSH服务"
@@ -90,11 +155,6 @@
             "id": "set ntp setting",
             "message": "set ntp setting",
             "translation": "设置NTP服务"
-        },
-        {
-            "id": "set upgrade setting",
-            "message": "set upgrade setting",
-            "translation": "设置升级配置"
         },
         {
             "id": "user is not existing",
@@ -125,11 +185,6 @@
             "id": "list users failed",
             "message": "list users failed",
             "translation": "获取用户列表失败"
-        },
-        {
-            "id": "rdb is not available now",
-            "message": "rdb is not available now",
-            "translation": "缓存当前不可用"
         },
         {
             "id": "your account has been locked, please try again 10 miniutes later",
@@ -185,9 +240,9 @@
             "translation": "删除用户"
         },
         {
-            "id": "no permission",
-            "message": "no permission",
-            "translation": "权限不足"
+            "id": "can't delete youself",
+            "message": "can't delete youself",
+            "translation": ""
         },
         {
             "id": "create token",
@@ -269,9 +324,65 @@
             "translation": "失败"
         },
         {
+            "id": "role is not existing",
+            "message": "role is not existing",
+            "translation": ""
+        },
+        {
+            "id": "admin can not be delete",
+            "message": "admin can not be delete",
+            "translation": ""
+        },
+        {
+            "id": "role name cannot be empty",
+            "message": "role name cannot be empty",
+            "translation": ""
+        },
+        {
+            "id": "role already exists",
+            "message": "role already exists",
+            "translation": ""
+        },
+        {
+            "id": "admin role cannot be edited",
+            "message": "admin role cannot be edited",
+            "translation": ""
+        },
+        {
+            "id": "role '{Arg_1}' is in use by {Integer} user(s) and cannot be deleted",
+            "message": "role '{Arg_1}' is in use by {Integer} user(s) and cannot be deleted",
+            "translation": "",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                },
+                {
+                    "id": "Integer",
+                    "string": "%[2]d",
+                    "type": "",
+                    "underlyingType": "int",
+                    "argNum": 2
+                }
+            ]
+        },
+        {
             "id": "ntp server should not be empty",
             "message": "ntp server should not be empty",
             "translation": "NTP服务器不能为空"
+        },
+        {
+            "id": "confirm password is not same with password",
+            "message": "confirm password is not same with password",
+            "translation": ""
+        },
+        {
+            "id": "username is existing",
+            "message": "username is existing",
+            "translation": ""
         },
         {
             "id": "address {Arg_1} is existing",
@@ -286,6 +397,11 @@
                     "argNum": 1
                 }
             ]
+        },
+        {
+            "id": "open version file failed",
+            "message": "open version file failed",
+            "translation": ""
         }
     ]
 }

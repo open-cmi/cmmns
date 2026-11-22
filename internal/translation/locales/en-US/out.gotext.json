@@ -16,6 +16,34 @@
             "fuzzy": true
         },
         {
+            "id": "no permission",
+            "message": "no permission",
+            "translation": "no permission",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "role is not exist",
+            "message": "role is not exist",
+            "translation": "role is not exist",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "the role can not be deleted",
+            "message": "the role can not be deleted",
+            "translation": "the role can not be deleted",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "preset role can not be deleted",
+            "message": "preset role can not be deleted",
+            "translation": "preset role can not be deleted",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "set host name",
             "message": "set host name",
             "translation": "set host name",
@@ -72,9 +100,86 @@
             "fuzzy": true
         },
         {
+            "id": "reboot system",
+            "message": "reboot system",
+            "translation": "reboot system",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "shutdown system",
+            "message": "shutdown system",
+            "translation": "shutdown system",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "create scheduled power task",
+            "message": "create scheduled power task",
+            "translation": "create scheduled power task",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "delete scheduled power task",
+            "message": "delete scheduled power task",
+            "translation": "delete scheduled power task",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "upload background",
+            "message": "upload background",
+            "translation": "upload background",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "reset background",
+            "message": "reset background",
+            "translation": "reset background",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "upload favicon",
+            "message": "upload favicon",
+            "translation": "upload favicon",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "reset favicon",
+            "message": "reset favicon",
+            "translation": "reset favicon",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "upload logo",
+            "message": "upload logo",
+            "translation": "upload logo",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "reset logo",
+            "message": "reset logo",
+            "translation": "reset logo",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "set prod basis info",
             "message": "set prod basis info",
             "translation": "set prod basis info",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "reset prod basis info",
+            "message": "reset prod basis info",
+            "translation": "reset prod basis info",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -100,20 +205,6 @@
             "fuzzy": true
         },
         {
-            "id": "reboot system",
-            "message": "reboot system",
-            "translation": "reboot system",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "shutdown system",
-            "message": "shutdown system",
-            "translation": "shutdown system",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
             "id": "set ssh service",
             "message": "set ssh service",
             "translation": "set ssh service",
@@ -124,13 +215,6 @@
             "id": "set ntp setting",
             "message": "set ntp setting",
             "translation": "set ntp setting",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "set upgrade setting",
-            "message": "set upgrade setting",
-            "translation": "set upgrade setting",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -173,13 +257,6 @@
             "id": "list users failed",
             "message": "list users failed",
             "translation": "list users failed",
-            "translatorComment": "Copied from source.",
-            "fuzzy": true
-        },
-        {
-            "id": "rdb is not available now",
-            "message": "rdb is not available now",
-            "translation": "rdb is not available now",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -251,9 +328,9 @@
             "fuzzy": true
         },
         {
-            "id": "no permission",
-            "message": "no permission",
-            "translation": "no permission",
+            "id": "can't delete youself",
+            "message": "can't delete youself",
+            "translation": "can't delete youself",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -365,9 +442,81 @@
             "fuzzy": true
         },
         {
+            "id": "role is not existing",
+            "message": "role is not existing",
+            "translation": "role is not existing",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "admin can not be delete",
+            "message": "admin can not be delete",
+            "translation": "admin can not be delete",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "role name cannot be empty",
+            "message": "role name cannot be empty",
+            "translation": "role name cannot be empty",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "role already exists",
+            "message": "role already exists",
+            "translation": "role already exists",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "admin role cannot be edited",
+            "message": "admin role cannot be edited",
+            "translation": "admin role cannot be edited",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "role '{Arg_1}' is in use by {Integer} user(s) and cannot be deleted",
+            "message": "role '{Arg_1}' is in use by {Integer} user(s) and cannot be deleted",
+            "translation": "role '{Arg_1}' is in use by {Integer} user(s) and cannot be deleted",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Arg_1",
+                    "string": "%[1]s",
+                    "type": "",
+                    "underlyingType": "string",
+                    "argNum": 1
+                },
+                {
+                    "id": "Integer",
+                    "string": "%[2]d",
+                    "type": "",
+                    "underlyingType": "int",
+                    "argNum": 2
+                }
+            ],
+            "fuzzy": true
+        },
+        {
             "id": "ntp server should not be empty",
             "message": "ntp server should not be empty",
             "translation": "ntp server should not be empty",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "confirm password is not same with password",
+            "message": "confirm password is not same with password",
+            "translation": "confirm password is not same with password",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "username is existing",
+            "message": "username is existing",
+            "translation": "username is existing",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -385,6 +534,13 @@
                     "argNum": 1
                 }
             ],
+            "fuzzy": true
+        },
+        {
+            "id": "open version file failed",
+            "message": "open version file failed",
+            "translation": "open version file failed",
+            "translatorComment": "Copied from source.",
             "fuzzy": true
         }
     ]
