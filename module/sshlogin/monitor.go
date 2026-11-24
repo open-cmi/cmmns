@@ -1,7 +1,6 @@
 package sshlogin
 
 import (
-	"bufio"
 	"io"
 	"os"
 	"strconv"
@@ -9,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/nxadm/tail"
 	"github.com/open-cmi/gobase/essential/logger"
 	"github.com/open-cmi/gobase/initial"
 )
@@ -20,28 +20,6 @@ var (
 	gDedupMutex sync.Mutex
 	gDedupCache = make(map[string]int64)
 )
-
-func checkFileRotate(file *os.File, filepath string) bool {
-	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		return true
-	}
-
-	currentInfo, err := file.Stat()
-	if err != nil {
-		return true
-	}
-
-	newInfo, err := os.Stat(filepath)
-	if err != nil {
-		return true
-	}
-
-	if !os.SameFile(currentInfo, newInfo) {
-		return true
-	}
-
-	return false
-}
 
 func extractUserHostPort(rest string) (string, string, int) {
 	fromIdx := strings.Index(rest, " from ")
@@ -220,47 +198,37 @@ func ParseSSHLogLine(origin string) *SSHLoginEvent {
 }
 
 func tailFile(filePath string) {
-	var file *os.File
-	var reader *bufio.Reader
-
 	for {
-		if file == nil {
-			f, err := os.Open(filePath)
-			if err != nil {
-				logger.Errorf("Error opening file %s: %s\n", filePath, err.Error())
-				time.Sleep(1 * time.Second)
-				continue
-			}
-			file = f
-			reader = bufio.NewReader(file)
-			_, err = file.Seek(0, io.SeekEnd)
-			if err != nil {
-				logger.Errorf("Error seeking to end of file: %s", err.Error())
-				time.Sleep(1 * time.Second)
-				continue
-			}
+		t, err := tail.TailFile(filePath, tail.Config{
+			Follow:    true,
+			ReOpen:    true,
+			MustExist: false,
+			Location:  &tail.SeekInfo{Offset: 0, Whence: io.SeekEnd},
+			Logger:    tail.DiscardingLogger,
+		})
+		if err != nil {
+			logger.Errorf("Error tailing file %s: %s\n", filePath, err.Error())
+			time.Sleep(1 * time.Second)
+			continue
 		}
 
-		origin, err := reader.ReadString('\n')
-		if err != nil {
-			if err != io.EOF {
-				logger.Errorf("Error reading file: %s. Re-opening...\n", err.Error())
-				file.Close()
-				file = nil
-				time.Sleep(1 * time.Second)
-			} else {
-				if checkFileRotate(file, filePath) {
-					file.Close()
-					file = nil
-				}
-				time.Sleep(500 * time.Millisecond)
+		for line := range t.Lines {
+			if line == nil {
+				continue
 			}
-		} else {
-			event := ParseSSHLogLine(origin)
+			if line.Err != nil {
+				logger.Warnf("Error reading line from %s: %v", filePath, line.Err)
+				continue
+			}
+			event := ParseSSHLogLine(line.Text)
 			if event != nil {
 				HandleSSHLoginEvent(event)
 			}
 		}
+
+		_ = t.Stop()
+		t.Cleanup()
+		time.Sleep(1 * time.Second)
 	}
 }
 
