@@ -15,7 +15,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/nxadm/tail v1.4.11
-	github.com/open-cmi/gobase v1.1.1-0.20261121004627-29bd8b2e4f11
+	github.com/open-cmi/gobase v1.1.1-0.20261124141958-4d996a8912ad
 	github.com/shirou/gopsutil/v4 v4.26.2
 	golang.org/x/text v0.43.0
 	gopkg.in/yaml.v3 v3.0.1

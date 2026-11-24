@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/open-cmi/cmmns/module/license"
+	"github.com/open-cmi/gobase/essential/cli"
 	"github.com/open-cmi/gobase/essential/config"
-	"github.com/open-cmi/gobase/essential/subcommands"
 )
 
 type activateCommand struct {
@@ -59,5 +59,5 @@ func (c *activateCommand) Run() error {
 }
 
 func init() {
-	subcommands.RegisterCommand("activate", &activateCommand{})
+	cli.Register("activate", &activateCommand{})
 }

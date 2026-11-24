@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/open-cmi/gobase/essential/subcommands"
+	"github.com/open-cmi/gobase/essential/cli"
 )
 
 var Version string
@@ -21,5 +21,5 @@ func (c *VersionCommand) Run() error {
 }
 
 func init() {
-	subcommands.RegisterCommand("version", &VersionCommand{})
+	cli.Register("version", &VersionCommand{})
 }
