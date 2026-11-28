@@ -4,6 +4,7 @@ import (
 	_ "github.com/open-cmi/cmmns/api/auditlog"
 	_ "github.com/open-cmi/cmmns/api/captcha"
 	_ "github.com/open-cmi/cmmns/api/network"
+	_ "github.com/open-cmi/cmmns/api/portal"
 	_ "github.com/open-cmi/cmmns/api/rbac"
 	_ "github.com/open-cmi/cmmns/api/syslog"
 	_ "github.com/open-cmi/cmmns/api/system"
